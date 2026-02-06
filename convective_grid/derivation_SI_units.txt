@@ -1,0 +1,213 @@
+CONVECTIVE FLUX DERIVATION - SI UNITS
+======================================
+
+This document provides a complete derivation of all equations used in the
+convective flux solver, with explicit unit checks in SI units.
+
+PHYSICAL CONSTANTS (SI UNITS)
+------------------------------
+
+Universal gas constant:
+    R = 8.314 J/(mol·K) = 8.314 kg·m²/(s²·mol·K)
+
+Boltzmann constant:
+    k_B = 1.380649e-23 J/K = 1.380649e-23 kg·m²/(s²·K)
+
+UNIT CONVERSIONS:
+    1 J = 1 kg·m²/s²
+    1 W = 1 J/s = 1 kg·m²/s³
+    1 erg = 1 g·cm²/s² = 10⁻⁷ J
+    1 m = 100 cm
+    1 kg = 1000 g
+
+CORE EQUATIONS WITH UNIT DERIVATION
+-----------------------------------
+
+1. PRESSURE SCALE HEIGHT
+-------------------------
+    H_p = RT/(μ·g)
+
+WHERE:
+    R: Universal gas constant = 8.314 J/(mol·K) = 8.314 kg·m²/(s²·mol·K)
+    T: Temperature (K)
+    μ: Mean molecular weight (kg/mol)
+    g: Gravity (m/s²)
+
+UNIT DERIVATION:
+    H_p = (kg·m²/(s²·mol·K)) × K / ((kg/mol) × (m/s²))
+        = (kg·m²/(s²·mol)) / (kg·m/(mol·s²))
+        = m ✓
+
+RESULT: H_p has units of meters (m) ✓
+
+2. MIXING LENGTH
+----------------
+    l = α × H_p
+
+WHERE:
+    α: Mixing length parameter (dimensionless)
+    H_p: Pressure scale height (m)
+
+UNIT DERIVATION:
+    l = (dimensionless) × (m) = m ✓
+
+RESULT: l has units of meters (m) ✓
+
+3. SPECIFIC HEAT CAPACITY
+--------------------------
+    c_p = (2 + n_dof) × R / μ
+
+WHERE:
+    n_dof: Number of degrees of freedom (dimensionless)
+    R: Universal gas constant = 8.314 J/(mol·K) = 8.314 kg·m²/(s²·mol·K)
+    μ: Mean molecular weight (kg/mol)
+
+UNIT DERIVATION:
+    c_p = (dimensionless) × (kg·m²/(s²·mol·K)) / (kg/mol)
+        = kg·m²/(s²·mol·K) × mol/kg
+        = m²/(s²·K)
+        = J/(kg·K) ✓
+
+RESULT: c_p has units of J/(kg·K) ✓
+
+4. ADIABATIC TEMPERATURE GRADIENT
+----------------------------------
+    N_ad = g / c_p
+
+WHERE:
+    g: Gravity (m/s²)
+    c_p: Specific heat capacity (J/(kg·K)) = m²/(s²·K)
+
+UNIT DERIVATION:
+    N_ad = (m/s²) / (m²/(s²·K))
+         = (m/s²) × (s²·K/m²)
+         = K/m ✓
+
+RESULT: N_ad has units of K/m ✓
+
+5. TEMPERATURE GRADIENT
+-----------------------
+    N = -dT/dz
+
+WHERE:
+    T: Temperature (K)
+    z: Altitude (m)
+
+UNIT DERIVATION:
+    N = -K/m = K/m (magnitude) ✓
+
+RESULT: N has units of K/m ✓
+
+6. CONVECTIVE FLUX FORMULA
+---------------------------
+    F_conv = ρ × c_p × l² × sqrt(g/T) × (N - N_ad)^(3/2)
+
+WHERE:
+    ρ: Density (kg/m³)
+    c_p: Specific heat capacity (J/(kg·K)) = m²/(s²·K)
+    l: Mixing length (m)
+    g: Gravity (m/s²)
+    T: Temperature (K)
+    N: Temperature gradient (K/m)
+    N_ad: Adiabatic gradient (K/m)
+
+UNIT DERIVATION:
+
+    Term 1: ρ = kg/m³
+    
+    Term 2: c_p = J/(kg·K) = m²/(s²·K)
+    
+    Term 3: l² = m²
+    
+    Term 4: sqrt(g/T) = sqrt((m/s²)/K) = sqrt(m/(s²·K)) = m^(1/2)/(s·K^(1/2))
+    
+    Term 5: (N - N_ad)^(3/2) = (K/m)^(3/2) = K^(3/2)/m^(3/2)
+
+MULTIPLYING ALL TERMS:
+    F_conv = (kg/m³) × (m²/(s²·K)) × (m²) × (m^(1/2)/(s·K^(1/2))) × (K^(3/2)/m^(3/2))
+           = kg × m² × m² × m^(1/2) × K^(3/2) / (m³ × s² × K × s × K^(1/2) × m^(3/2))
+           = kg × m^(4.5) × K^(3/2) / (m^(4.5) × s³ × K^(3/2))
+           = kg/s³
+
+CONVERT TO ENERGY FLUX:
+    kg/s³ = (kg·m²/s²)/(m²·s) = J/(m²·s) = W/m² ✓
+
+RESULT: F_conv has units of W/m² (energy flux per unit area) ✓
+
+CONVERSION TO CGS (FOR COMPATIBILITY):
+    W/m² = 10³ erg cm⁻² s⁻¹
+
+7. FLUX DIVERGENCE
+------------------
+    dF_conv/dz = d/dz [F_conv]
+
+WHERE:
+    F_conv: Convective flux (W/m² = J/(m²·s))
+    z: Altitude (m)
+
+UNIT DERIVATION:
+    dF_conv/dz = (W/m²)/m = (J/(m²·s))/m = J/(m³·s) = W/m³ ✓
+
+RESULT: dF_conv/dz has units of W/m³ ✓
+
+8. TEMPERATURE UPDATE EQUATION
+-------------------------------
+
+ENERGY CONSERVATION FORM:
+    dT/dt = -(1/(ρ·c_p)) × dF_conv/dz
+
+WHERE:
+    ρ: Density (kg/m³)
+    c_p: Specific heat capacity (J/(kg·K)) = m²/(s²·K)
+    dF_conv/dz: Flux divergence (W/m³ = J/(m³·s))
+
+UNIT DERIVATION:
+    1/(ρ·c_p) = 1/((kg/m³) × (m²/(s²·K)))
+              = 1/(kg·m²/(m³·s²·K))
+              = m³·s²·K/(kg·m²)
+              = m·s²·K/kg
+    
+    dF_conv/dz = W/m³ = J/(m³·s) = kg/(m·s³)
+    
+    dT/dt = (m·s²·K/kg) × (kg/(m·s³))
+          = K/s ✓
+
+RESULT: dT/dt has units of K/s ✓
+
+SIMPLIFIED CONSTANT FORM (OPTIONAL):
+    dT/dt = -C × dF_conv/dz
+
+WHERE:
+    C: User-specified constant (units: m·s²·K/kg)
+    
+    This allows using a constant value instead of calculating 1/(ρ·c_p) 
+    at each point. Useful for testing or when ρ and c_p are approximately 
+    constant.
+
+COMPLETE UNIT SUMMARY TABLE
+----------------------------
+Variable    SI Units        Expanded Units              Physical Meaning
+------------------------------------------------------------------------
+R           J/(mol·K)       kg·m²/(s²·mol·K)           Gas constant
+T           K               K                          Temperature
+μ           kg/mol          kg/mol                     Mean molecular weight
+g           m/s²            m/s²                       Gravity
+H_p         m               m                          Pressure scale height
+α           dimensionless  1                          Mixing length parameter
+l           m               m                          Mixing length
+c_p         J/(kg·K)       m²/(s²·K)                  Specific heat capacity
+N_ad        K/m             K/m                        Adiabatic gradient
+N           K/m             K/m                        Temperature gradient
+ρ           kg/m³          kg/m³                       Density
+F_conv      W/m²           J/(m²·s) = kg/s³           Convective flux
+dF_conv/dz  W/m³           J/(m³·s) = kg/(m·s³)       Flux divergence
+dT/dt       K/s            K/s                        Temperature rate
+
+VERIFICATION CHECKLIST
+----------------------
+✓ All equations have consistent units
+✓ Energy flux F_conv = W/m² = J/(m²·s)
+✓ Flux divergence dF/dz = W/m³ = J/(m³·s)
+✓ Temperature rate dT/dt = K/s
+✓ All intermediate calculations verified
+✓ Unit conversions documented

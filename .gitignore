@@ -1,0 +1,51 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Jupyter Notebook
+.ipynb_checkpoints/
+*.ipynb_checkpoints
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Data files (large binary/data files)
+*.npz
+*.h5
+*.hdf5
+parameter_sweep_data.json
+*.csv
+
+# Plot outputs (optional - uncomment if you don't want to track plots)
+# plots/
+# *.png
+# *.jpg
+# *.pdf
+
+# Archives
+*.zip
+*.tar.gz
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Environment
+venv/
+env/
+ENV/
+.venv
+
+# Background PDFs (large files)
+Background/
+
+# Legacy checkpoints/backups
+*_checkpoint*
+*_backup*
