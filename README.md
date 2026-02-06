@@ -2,8 +2,6 @@
 
 A 1D atmospheric column model implementing mixing length theory (MLT) for convective flux calculations in planetary atmospheres.
 
-Toy model for future convective flux implementation into radiative transfer code/exoplanet atmosphere modelling.
-
 ## Overview
 
 This repository contains code for:
