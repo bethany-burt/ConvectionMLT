@@ -87,6 +87,7 @@ python convective_grid/convective_flux_v3.py --profile-type guillot --no-prompt 
 ```bash
 python convective_grid/convective_flux_v3.py --profile-type guillot --no-prompt --dt 1.0
 ```
+(v3 still in progress)
 
 **Other options:** `--n-layers 50`, `--max-steps 10000`, `--tol 1e-4`, `--debug`, `--output results.csv`, `--plot-prefix my_run`
 
