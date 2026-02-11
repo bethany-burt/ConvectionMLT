@@ -16,7 +16,7 @@ This repository contains code for:
 
 - **`tp.py`** - Temperature-pressure profile computation (by Kevin Heng, 2014)
 - **`convective_grid/convective_flux_v2.py`** - Convective flux solver with fixed timestepping
-- **`convective_grid/convective_flux_v3.py`** - Convective flux solver with dynamic (per-layer) timestepping
+- **`convective_grid/convective_flux_v3.py`** - Convective flux solver with dynamic timestepping, pressure-based grid, and adiabatic damping
 - **`extra_scripts/collect_parameter_sweep_data.py`** - Parameter sweep data collection
 - **`plot_convergence_vs_mixing_length.py`** - Convergence analysis plotting
 - **`analyze_stability.py`** - Stability analysis tools
@@ -78,18 +78,36 @@ python convective_grid/convective_flux_v2.py --profile-type guillot --no-prompt
 python convective_grid/convective_flux_v2.py --profile-type guillot --no-prompt --plot
 ```
 
-**v3 with dynamic timestepping (Guillot, gradient method):**
+**v3 Key Features:**
+
+1. **Pressure-based grid**: Grid constructed from log-spaced pressure interfaces, with altitude and density derived from hydrostatic equilibrium
+2. **Super-adiabatic initialization**: Option to start with dry adiabat perturbed to be super-adiabatic (drives convection)
+3. **Dynamic timestepping**: Per-layer timesteps based on convective/radiative timescales (optional, enabled with `--dynamic-dt`)
+4. **Adiabatic damping**: Reduces timestep near adiabat to prevent overshooting (optional, `--damping-method`)
+5. **Adiabatic convergence**: Primary convergence criterion based on proximity to adiabatic gradient
+
+**v3 Examples:**
+
+**Dynamic timestepping with formal method (default):**
 ```bash
-python convective_grid/convective_flux_v3.py --profile-type guillot --no-prompt --dt-method gradient
+python convective_grid/convective_flux_v3.py --profile-type semi-isothermal --dynamic-dt --no-prompt
 ```
 
-**v3 with fixed timestepping (same as v2 behaviour):**
+**Dynamic timestepping with radiative method and damping:**
+```bash
+python convective_grid/convective_flux_v3.py --profile-type semi-isothermal --dynamic-dt --dt-method radiative --damping-method restoring_force --no-prompt
+```
+
+**Fixed timestepping (same as v2 behaviour):**
 ```bash
 python convective_grid/convective_flux_v3.py --profile-type guillot --no-prompt --dt 1.0
 ```
 (v3 still in progress)
 
-**Other options:** `--n-layers 50`, `--max-steps 10000`, `--tol 1e-4`, `--debug`, `--output results.csv`, `--plot-prefix my_run`
+**Other options:** 
+- `--dt-method`: `formal` (default), `convective`, `radiative`, `gradient`, `fixed`, `absolute`, `hybrid`, `minimum`
+- `--damping-method`: `current` (default), `restoring_force`, `none`
+- `--n-layers 50`, `--max-steps 10000`, `--tol 1e-4`, `--debug`, `--output results.csv`, `--plot-prefix my_run`
 
 See individual script docstrings and notebooks for full usage.
 
