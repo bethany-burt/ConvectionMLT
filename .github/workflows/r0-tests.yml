@@ -1,0 +1,68 @@
+name: R0 reference kernel
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 4 * * 1"
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.10", "3.12", "3.14"]
+    defaults:
+      run:
+        working-directory: convection_mlt
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+          cache-dependency-path: |
+            convection_mlt/requirements.lock
+            convection_mlt/requirements-plot.lock
+      - run: python -m pip install -e ".[test,plot]"
+      - run: python -m pytest
+      - run: mlt-baseline --output stage0/baseline-result.json
+      - name: Stage 1 plot smoke bundle
+        run: python stage1/plots/make_all.py --smoke
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: stage1-plot-smoke-${{ matrix.python-version }}
+          path: |
+            convection_mlt/stage1/plots/generated/
+            convection_mlt/stage1/plots/data/generation_summary.json
+
+  full-campaigns:
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: convection_mlt
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: |
+            convection_mlt/requirements.lock
+            convection_mlt/requirements-plot.lock
+      - run: python -m pip install -e ".[test,plot]"
+      - run: python stage1/experiments/equilibrium_invariance.py
+      - run: python stage1/experiments/temporal_convergence.py
+      - run: python stage1/experiments/robustness_locality.py
+      - name: Full Stage 1 validation plot evidence
+        run: python stage1/plots/make_all.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: r0-full-campaign-results
+          path: |
+            convection_mlt/stage1/results/*.json
+            convection_mlt/stage1/plots/data/
+            convection_mlt/stage1/plots/generated/

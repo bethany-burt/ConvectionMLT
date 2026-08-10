@@ -1,0 +1,115 @@
+{
+  "case": {
+    "n_layers": 8,
+    "name": "stage0_exact_adiabat",
+    "p_bottom_pa": 10000000.0,
+    "p_top_pa": 1000.0
+  },
+  "metadata": {
+    "closure": {
+      "mixing_length": "alpha_times_pressure_scale_height",
+      "name": "AGNI_Lee_inspired_R0",
+      "prefactor": 0.5,
+      "sources": [
+        {
+          "accessed": "2026-08-09",
+          "formulae": [
+            "convective_flux",
+            "convective_velocity"
+          ],
+          "name": "AGNI atmospheric convection documentation",
+          "url": "https://www.h-nicholls.space/AGNI/dev/explanation/model_convection/"
+        },
+        {
+          "doi": "10.1093/mnras/stae537",
+          "formulae": [
+            "pressure_coordinate_MLT",
+            "Kzz=w*ell"
+          ],
+          "name": "Lee, Tan & Tsai (2024)"
+        }
+      ]
+    },
+    "configuration": {
+      "physics": {
+        "alpha": 1.0,
+        "closure_prefactor": 0.5,
+        "gravity": 15.0
+      },
+      "solver": {
+        "c_active": 10.0,
+        "c_cross": 1.0,
+        "c_diff": 0.2,
+        "dt_min": 1e-12,
+        "enthalpy_drift_tolerance": 1e-10,
+        "epsilon_gradient": 1e-08,
+        "epsilon_temperature": 0.001,
+        "f_back": 0.5,
+        "flux_tolerance": 0.005,
+        "max_rejections": 50,
+        "max_steps": 1000000,
+        "temperature_max_tolerance": 1e-07,
+        "temperature_rms_tolerance": 1e-08,
+        "tendency_tolerance": 1e-12,
+        "theta_rms_tolerance": 1e-08,
+        "transfer_merge_tolerance": 1e-09
+      }
+    },
+    "flux_sign": "upward_positive",
+    "git_commit": "14f517fbea2af19d2648b4dfc082edf2031ceb8c",
+    "git_dirty": true,
+    "numpy": "2.5.1",
+    "precision": "float64",
+    "pressure_order": "bottom_to_top_decreasing",
+    "python": "3.14.0",
+    "units": {
+      "density": "kg m^-3",
+      "diffusivity": "m^2 s^-1",
+      "flux": "W m^-2",
+      "heat_capacity": "J kg^-1 K^-1",
+      "length": "m",
+      "pressure": "Pa",
+      "temperature": "K",
+      "time": "s",
+      "velocity": "m s^-1"
+    }
+  },
+  "outcome": {
+    "cumulative_unmerged_transfer_j_m2": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "max_unmerged_transfer_fraction": 0.0,
+    "metrics": {
+      "convective_flux_max": 2.407569698291032e-13,
+      "enthalpy_drift": 0.0,
+      "max_superadiabaticity": 5.551115123125783e-16,
+      "normalized_tendency_max": 8.126735391357398e-26,
+      "potential_temperature_rms": 6.68725099863816e-18,
+      "temperature_max": 1.9289084280991851e-16,
+      "temperature_rms": 4.7384064296924687e-17
+    },
+    "reason": "all acceptance metrics are within tolerance",
+    "region_labels": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "rejections": 0,
+    "simulated_time_s": 0.0,
+    "status": "converged",
+    "steps": 0
+  }
+}

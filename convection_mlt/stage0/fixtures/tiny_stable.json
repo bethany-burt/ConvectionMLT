@@ -1,0 +1,12 @@
+{
+  "name": "tiny_stable",
+  "n_layers": 4,
+  "p_bottom_pa": 1000000.0,
+  "p_top_pa": 1000.0,
+  "gravity_m_s2": 15.0,
+  "alpha": 1.0,
+  "temperature_reference_k": 1000.0,
+  "pressure_reference_pa": 100000.0,
+  "power_law_exponent": 0.15,
+  "expected_status": "no_active_convection"
+}

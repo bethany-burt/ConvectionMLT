@@ -1,0 +1,73 @@
+PHYSICAL REASON FOR TEMPERATURE EXPLOSIONS
+==========================================
+
+Problem:
+--------
+Some combinations of alpha (mixing length parameter) and timestep (dt) cause 
+temperature explosions (NaN/Inf values) in the convective flux solver.
+
+Root Cause:
+-----------
+The temperature update equation is:
+    dT = -dt * (1/(ρ*c_p)) * dF_dz
+
+For numerical stability, we need:
+    |dT| << T
+
+This requires:
+    dt << T * (ρ*c_p) / |dF_dz|
+
+Physical Dependence:
+-------------------
+1. The convective flux is: F_conv = ρ * c_p * l² * sqrt(g/T) * (N - N_ad)^(3/2)
+   where l = α * H_p is the mixing length.
+
+2. Since l² = (α * H_p)², the flux scales as: F_conv ∝ α²
+
+3. The flux divergence dF_dz is proportional to the flux gradient, so:
+   |dF_dz| ∝ |dF_conv/dz| ∝ α²
+
+4. Therefore, the maximum stable timestep scales as:
+   dt_max ∝ 1/α²
+
+5. This means: if alpha doubles, dt must be reduced by a factor of 4 for stability.
+
+Stability Criterion:
+--------------------
+For stability with a safety factor f (e.g., f = 0.1 for 10% max change per step):
+    dt < f * T * (ρ*c_p) / |dF_dz|
+
+Since |dF_dz| ∝ α², we can write:
+    dt < C / α²
+
+where C is a constant that depends on T, ρ, c_p, and the atmospheric structure.
+
+Practical Guidelines:
+---------------------
+1. For alpha = 0.1: dt can be relatively large (e.g., 100-1000 s)
+2. For alpha = 1.0: dt must be much smaller (e.g., 1-10 s)
+3. For alpha = 2.0: dt must be very small (e.g., < 1 s)
+
+The exact value depends on the atmospheric conditions (T, ρ, gradients), but the 
+α² scaling is the key physical relationship.
+
+Why Exponential Growth:
+------------------------
+When dt is too large:
+1. Large dT causes T to change significantly
+2. This changes the temperature gradient N = -dT/dz
+3. This changes the flux F_conv (which depends on N - N_ad)
+4. This changes dF_dz, which causes an even larger dT in the next step
+5. This positive feedback leads to exponential growth → explosion
+
+The instability is a numerical instability caused by violating the CFL-like 
+condition that the timestep must be small enough that the solution doesn't 
+change too much in one step.
+
+Solution:
+---------
+1. Use adaptive timestep: reduce dt when |dT|/T becomes large
+2. Use explicit stability check: detect when dT/T > threshold and abort
+3. Use implicit or semi-implicit time integration (more complex but stable)
+4. For fixed dt: choose dt < C / α² where C is determined empirically or 
+   from stability analysis

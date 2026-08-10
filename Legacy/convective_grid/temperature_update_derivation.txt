@@ -1,0 +1,157 @@
+TEMPERATURE UPDATE EQUATION - EXPLICIT DERIVATION
+==================================================
+
+PHYSICAL PRINCIPLE: ENERGY CONSERVATION
+----------------------------------------
+Energy conservation in a volume element states that the rate of change of 
+internal energy equals the net energy flux into/out of the volume.
+
+STEP-BY-STEP DERIVATION
+------------------------
+
+1. ENERGY DENSITY (ENERGY PER UNIT VOLUME)
+
+The energy change per unit volume when temperature changes is:
+    dE = ρ × c_p × dT
+
+Taking the time derivative:
+    dE/dt = ρ × c_p × dT/dt
+
+UNITS:
+    ρ: kg/m³
+    c_p: J/(kg·K) = (kg·m²/s²)/(kg·K) = m²/(s²·K)
+    dT/dt: K/s
+
+EXPLICIT UNIT CHECK:
+    dE/dt = (kg/m³) × (m²/(s²·K)) × (K/s)
+          = (kg/m³) × (m²/s²) × (1/s)
+          = kg·m²/(m³·s³)
+          = kg/(m·s³)
+
+PHYSICAL MEANING: Energy density rate of change has units of energy per 
+unit volume per unit time.
+    Energy: J = kg·m²/s²
+    Volume: m³
+    Time: s
+    Energy density rate: (kg·m²/s²)/(m³·s) = kg/(m·s³) ✓
+
+2. ENERGY FLUX DIVERGENCE
+
+In 1D (vertical direction z), the energy flux divergence is:
+    ∇·F = dF/dz
+
+UNITS:
+    F: Energy flux = W/m² = J/(m²·s) = (kg·m²/s²)/(m²·s) = kg/s³
+    z: m
+    dF/dz: (J/(m²·s))/m = J/(m³·s) = W/m³ = kg/(m·s³)
+
+3. ENERGY CONSERVATION EQUATION
+
+Energy conservation states:
+    dE/dt = -∇·F
+
+SIGN CONVENTION EXPLANATION:
+    - Positive flux divergence (dF/dz > 0) means more energy flows out 
+      than in → energy decreases
+    - Negative flux divergence (dF/dz < 0) means more energy flows in 
+      than out → energy increases
+    - The negative sign ensures: when dF/dz > 0, dE/dt < 0 (energy decreases)
+
+Substituting our expressions:
+    ρ × c_p × dT/dt = -dF/dz
+
+UNIT CHECK:
+    Left side: kg/(m·s³) (from step 1)
+    Right side: kg/(m·s³) (from step 2, with negative sign)
+    ✓ Units match!
+
+4. SOLVE FOR dT/dt
+
+    dT/dt = -(1/(ρ × c_p)) × dF/dz
+
+EXPLICIT UNIT CHECK:
+    1/(ρ × c_p): 1/((kg/m³) × (m²/(s²·K))) 
+                = 1/(kg·m²/(m³·s²·K)) 
+                = m³·s²·K/(kg·m²) 
+                = m·s²·K/kg
+    
+    dF/dz: kg/(m·s³)
+
+RESULT:
+    dT/dt = (m·s²·K/kg) × (kg/(m·s³))
+          = K/s ✓
+
+FINAL EQUATION
+--------------
+    dT/dt = -(1/(ρ × c_p)) × dF/dz
+
+In discrete form (for numerical integration):
+    ΔT = -Δt × (1/(ρ × c_p)) × (dF/dz)
+
+WHERE:
+    ΔT: Temperature change (K)
+    Δt: Time step (s)
+    ρ: Density (kg/m³)
+    c_p: Specific heat capacity (J/(kg·K))
+    dF/dz: Flux divergence (W/m³ = J/(m³·s))
+
+SIMPLIFIED CONSTANT FORM (OPTIONAL)
+-------------------------------------
+    dT/dt = -C × dF/dz
+
+WHERE:
+    C: User-specified constant (units: m·s²·K/kg to give K/s when 
+       multiplied by W/m³)
+    
+    This allows using a constant value instead of calculating 1/(ρ·c_p) 
+    at each point. Useful for testing or when ρ and c_p are approximately 
+    constant.
+
+UNIT VERIFICATION SUMMARY
+--------------------------
+Term              Units              Expanded              Notes
+------------------------------------------------------------------------
+ρ                 kg/m³              kg/m³                Mass density
+c_p               J/(kg·K)           m²/(s²·K)            Specific heat capacity
+dT/dt             K/s                K/s                  Temperature rate of change
+F                 W/m²               J/(m²·s) = kg/s³    Energy flux
+dF/dz             W/m³               J/(m³·s) = kg/(m·s³) Flux divergence
+ρ·c_p             J/(m³·K)            kg/(m·s²·K)          Energy density per K
+1/(ρ·c_p)         m·s²·K/kg          m·s²·K/kg            Inverse energy density per K
+(1/(ρ·c_p))×dF/dz K/s                K/s ✓               Final result
+
+EXPLICIT FINAL VERIFICATION
+---------------------------
+
+Starting from:
+    dT/dt = -(1/(ρ × c_p)) × dF/dz
+
+STEP 1: Calculate 1/(ρ × c_p)
+    ρ × c_p = (kg/m³) × (m²/(s²·K))
+            = kg·m²/(m³·s²·K)
+            = kg/(m·s²·K)
+    
+    1/(ρ × c_p) = 1/(kg/(m·s²·K))
+                = m·s²·K/kg
+
+STEP 2: Calculate dF/dz
+    F = W/m² = J/(m²·s) = (kg·m²/s²)/(m²·s) = kg/s³
+    
+    dF/dz = (kg/s³)/m = kg/(m·s³)
+
+STEP 3: Multiply
+    dT/dt = -(m·s²·K/kg) × (kg/(m·s³))
+          = -K/s ✓
+
+RESULT: Temperature changes at a rate of K/s, which is correct!
+
+CONVERSION TO CGS UNITS (FOR REFERENCE)
+----------------------------------------
+If working in CGS:
+    ρ: g/cm³
+    c_p: erg/(g·K)
+    dF/dz: erg/(cm³·s)
+    1/(ρ·c_p): cm³·K/erg
+    Result: (cm³·K/erg) × (erg/(cm³·s)) = K/s ✓
+
+Same result, different unit system.

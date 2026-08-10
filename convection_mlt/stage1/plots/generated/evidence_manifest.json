@@ -1,0 +1,334 @@
+{
+  "campaign_metrics": {
+    "closure_scaling_slopes": {
+      "flux_vs_alpha2": 0.9999999999999994,
+      "kzz_vs_alpha2": 0.9999999999999994,
+      "velocity_vs_alpha": 0.9999999999999994
+    },
+    "equilibrium_scores": [
+      {
+        "alpha": 0.25,
+        "n_layers": 25,
+        "pass": true,
+        "score": 0.9993799787721969,
+        "status": "converged"
+      },
+      {
+        "alpha": 0.5,
+        "n_layers": 25,
+        "pass": true,
+        "score": 0.9993799787721969,
+        "status": "converged"
+      },
+      {
+        "alpha": 1.0,
+        "n_layers": 25,
+        "pass": true,
+        "score": 0.9993799787721969,
+        "status": "converged"
+      },
+      {
+        "alpha": 2.0,
+        "n_layers": 25,
+        "pass": true,
+        "score": 0.9999186710678537,
+        "status": "converged"
+      },
+      {
+        "alpha": 4.0,
+        "n_layers": 25,
+        "pass": true,
+        "score": 0.996610511815242,
+        "status": "converged"
+      },
+      {
+        "alpha": 0.25,
+        "n_layers": 50,
+        "pass": true,
+        "score": 0.9992779992362699,
+        "status": "converged"
+      },
+      {
+        "alpha": 0.5,
+        "n_layers": 50,
+        "pass": true,
+        "score": 0.9992779992362699,
+        "status": "converged"
+      },
+      {
+        "alpha": 1.0,
+        "n_layers": 50,
+        "pass": true,
+        "score": 0.9992779992362699,
+        "status": "converged"
+      },
+      {
+        "alpha": 2.0,
+        "n_layers": 50,
+        "pass": true,
+        "score": 0.9984414156429158,
+        "status": "converged"
+      },
+      {
+        "alpha": 4.0,
+        "n_layers": 50,
+        "pass": true,
+        "score": 0.9983380350490388,
+        "status": "converged"
+      },
+      {
+        "alpha": 0.25,
+        "n_layers": 100,
+        "pass": true,
+        "score": 0.9996251604249551,
+        "status": "converged"
+      },
+      {
+        "alpha": 0.5,
+        "n_layers": 100,
+        "pass": true,
+        "score": 0.9996251604249551,
+        "status": "converged"
+      },
+      {
+        "alpha": 1.0,
+        "n_layers": 100,
+        "pass": true,
+        "score": 0.9996251604249551,
+        "status": "converged"
+      },
+      {
+        "alpha": 2.0,
+        "n_layers": 100,
+        "pass": true,
+        "score": 0.9995519999932556,
+        "status": "converged"
+      },
+      {
+        "alpha": 4.0,
+        "n_layers": 100,
+        "pass": true,
+        "score": 0.9999680261944629,
+        "status": "converged"
+      },
+      {
+        "alpha": 0.25,
+        "n_layers": 200,
+        "pass": true,
+        "score": 0.9999530314885874,
+        "status": "converged"
+      },
+      {
+        "alpha": 0.5,
+        "n_layers": 200,
+        "pass": true,
+        "score": 0.9999530314885874,
+        "status": "converged"
+      },
+      {
+        "alpha": 1.0,
+        "n_layers": 200,
+        "pass": true,
+        "score": 0.9999530314885874,
+        "status": "converged"
+      },
+      {
+        "alpha": 2.0,
+        "n_layers": 200,
+        "pass": true,
+        "score": 0.9998889820691289,
+        "status": "converged"
+      },
+      {
+        "alpha": 4.0,
+        "n_layers": 200,
+        "pass": true,
+        "score": 0.9998849333450639,
+        "status": "converged"
+      },
+      {
+        "alpha": 0.25,
+        "n_layers": 400,
+        "pass": true,
+        "score": 0.9999800321125463,
+        "status": "converged"
+      },
+      {
+        "alpha": 0.5,
+        "n_layers": 400,
+        "pass": true,
+        "score": 0.9999800321125463,
+        "status": "converged"
+      },
+      {
+        "alpha": 1.0,
+        "n_layers": 400,
+        "pass": true,
+        "score": 0.9999800321125463,
+        "status": "converged"
+      },
+      {
+        "alpha": 2.0,
+        "n_layers": 400,
+        "pass": true,
+        "score": 0.9999786757499289,
+        "status": "converged"
+      },
+      {
+        "alpha": 4.0,
+        "n_layers": 400,
+        "pass": true,
+        "score": 0.9999746374468356,
+        "status": "converged"
+      }
+    ],
+    "resolution_timing_exponent": 2.0449192774048957,
+    "resolution_timing_note": "provisional fitted wall-time vs N exponent",
+    "robustness_pass_fail": [
+      {
+        "name": "uniform_superadiabatic",
+        "pass": true,
+        "status": "converged"
+      },
+      {
+        "name": "irregular_superadiabatic",
+        "pass": true,
+        "status": "converged"
+      },
+      {
+        "name": "exact_adiabat",
+        "pass": true,
+        "status": "converged"
+      },
+      {
+        "name": "fully_stable",
+        "pass": true,
+        "status": "no_active_convection"
+      },
+      {
+        "name": "steep_superadiabatic",
+        "pass": true,
+        "status": "converged"
+      },
+      {
+        "name": "shallow_superadiabatic",
+        "pass": true,
+        "status": "converged"
+      },
+      {
+        "name": "wide_pressure_range",
+        "pass": true,
+        "status": "converged"
+      },
+      {
+        "name": "narrow_pressure_range",
+        "pass": true,
+        "status": "converged"
+      },
+      {
+        "name": "localized_unstable",
+        "pass": true,
+        "status": "converged"
+      }
+    ],
+    "temporal_fitted_slopes": [
+      {
+        "alpha": 1.0,
+        "fitted_slope": 1.0362278444368211,
+        "n_layers": 25
+      },
+      {
+        "alpha": 1.0,
+        "fitted_slope": 1.038145884119279,
+        "n_layers": 100
+      }
+    ]
+  },
+  "files": [
+    {
+      "bytes": 219393,
+      "exists": true,
+      "name": "01_global_column.png"
+    },
+    {
+      "bytes": 199123,
+      "exists": true,
+      "name": "02_localized_barrier.png"
+    },
+    {
+      "bytes": 171478,
+      "exists": true,
+      "name": "02b_robustness_summary.png"
+    },
+    {
+      "bytes": 107064,
+      "exists": true,
+      "name": "03_enthalpy_conservation.png"
+    },
+    {
+      "bytes": 334777,
+      "exists": true,
+      "name": "04_equilibrium_invariance.png"
+    },
+    {
+      "bytes": 207272,
+      "exists": true,
+      "name": "05_alpha_relaxation.png"
+    },
+    {
+      "bytes": 106953,
+      "exists": true,
+      "name": "05b_closure_scaling.png"
+    },
+    {
+      "bytes": 271655,
+      "exists": true,
+      "name": "06_resolution_scaling.png"
+    },
+    {
+      "bytes": 199708,
+      "exists": true,
+      "name": "07a_stability_controller.png"
+    },
+    {
+      "bytes": 93517,
+      "exists": true,
+      "name": "07b_temporal_convergence.png"
+    },
+    {
+      "bytes": 255210,
+      "exists": true,
+      "name": "08_invariant_table.png"
+    },
+    {
+      "bytes": 347,
+      "exists": true,
+      "name": "enthalpy_telescoping.csv"
+    },
+    {
+      "bytes": 2974,
+      "exists": true,
+      "name": "robustness_summary.csv"
+    },
+    {
+      "bytes": 2034,
+      "exists": true,
+      "name": "validation_table.csv"
+    }
+  ],
+  "invariant_audit_pass": true,
+  "machine": {
+    "git_commit": "14f517fbea2af19d2648b4dfc082edf2031ceb8c",
+    "git_dirty": true,
+    "machine": "arm64",
+    "numpy": "2.5.2",
+    "platform": "macOS-26.5.2-arm64-arm-64bit-Mach-O",
+    "processor": "arm",
+    "python": "3.14.0",
+    "system": "Darwin"
+  },
+  "missing_outputs": [],
+  "pass": true,
+  "smoke": false,
+  "validation_failures": []
+}

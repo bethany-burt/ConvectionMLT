@@ -1,0 +1,233 @@
+R0 DEBUG AND BUG-FIX RECORD
+===========================
+
+Fix ID: R0-S1-001
+Date: 2026-08-09
+Stage: Stage 1 - Closed dry-H2 convective column
+Status: Fixed and regression-tested
+Title: Localized mixed region incorrectly tested against a global adiabat
+
+SUMMARY
+-------
+The localized-convection robustness case evolved to negligible
+superadiabaticity and temperature tendency while conserving column enthalpy,
+but the solver continued until max_steps and returned "failed".
+
+This was a convergence-diagnostics/reference-state bug. It was not a defect in
+the MLT flux or conservative energy update.
+
+OBSERVED FAILURE
+----------------
+Before the fix, the localized case reached:
+
+  max superadiabaticity       = 1.72e-15
+  max normalized tendency     = 6.54e-25 s^-1
+  relative enthalpy drift     = 0
+  max global-reference T error = approximately 3.1e-2
+  terminal status             = failed
+  accepted steps              = 1,000,000
+
+The tiny gradient and tendency showed that the active region had stopped
+evolving. The nonzero temperature error came from comparing the whole column
+with one global enthalpy-normalized adiabat.
+
+ROOT CAUSE
+----------
+A global reference adiabat is valid only when the mixed region is connected.
+Stable interfaces prevent dry MLT from exchanging enthalpy between separated
+regions. Each connected region therefore conserves its own enthalpy and can
+reach an adiabat with a different normalization.
+
+An initial static piecewise partition was also insufficient. An interface that
+starts stable can later become actively convective. Once enthalpy has crossed
+that interface, the adjacent regions must be treated as one combined region.
+Keeping the original labels produced a stale reference normalization.
+
+FIX
+---
+1. Label layers connected through actively unstable interfaces.
+2. Construct a separate enthalpy-normalized reference adiabat for each region.
+3. Evaluate potential-temperature spread within each region rather than across
+   stable barriers.
+4. During evolution, merge two regions whenever their separating interface
+   becomes actively unstable:
+
+       delta_j > c_active * epsilon_gradient
+
+5. After a merge, recompute the combined region's reference from the original
+   initial temperatures and combined initial enthalpy.
+6. Never split a region after merging, because prior enthalpy exchange means
+   the two original regional budgets are no longer independent.
+7. Do not project temperatures onto the reference. The reference remains a
+   convergence diagnostic only.
+
+FILES AND CURRENT CODE LINES
+----------------------------
+convection_mlt/src/convection_mlt/diagnostics.py
+  Lines 62-83:
+    piecewise_enthalpy_reference(); computes an independently normalized
+    analytic adiabat for each connected region.
+
+  Lines 86-106:
+    reference_enthalpy_residuals(); verifies each reference region conserves
+    its initial enthalpy to roundoff.
+
+  Lines 109-126:
+    mixing_region_labels(); creates the initial connectivity labels from
+    interfaces whose superadiabaticity exceeds the active threshold.
+
+  Lines 141-194:
+    convergence_metrics(); computes mass-weighted potential-temperature spread
+    region by region, compares T with the piecewise reference, and independently
+    checks superadiabaticity, tendency, convective flux, and enthalpy drift.
+
+convection_mlt/src/convection_mlt/solvers.py
+  Lines 214-239:
+    _merge_active_regions(); monotonically merges labels when a previously
+    separating interface becomes actively convective.
+
+  Lines 242-260:
+    _piecewise_reference_checked(); rebuilds a piecewise reference and raises
+    if any regional enthalpy identity exceeds the roundoff allowance.
+
+  Lines 263-292:
+    _unmerged_transfer_fractions(); normalizes cumulative accepted interface
+    transfer by the smaller adjacent region enthalpy.
+
+  Lines 295-326:
+    _merge_transferred_regions(); merges regions when sub-threshold cumulative
+    transfer exceeds transfer_merge_tolerance.
+
+  Lines 329 onward:
+    solve_adaptive(); accepts region labels, stores cumulative transfer, and
+    chooses a global or piecewise reference.
+
+  Lines 372-384:
+    computes candidate active merges from the accepted pre-step closure, but
+    does not commit labels or rebuild the reference yet.
+
+  Lines 397-404:
+    prevents all-singleton reference agreement from being treated as evidence
+    of convective equilibrium and applies the full convergence criteria.
+
+  Lines 466-496:
+    commits candidate active merges only after a trial is accepted, before
+    accumulating transfer and applying transfer-driven merges. Rejected trials
+    never mutate labels, transfer, or reference.
+
+convection_mlt/stage1/experiments/robustness_locality.py
+  Lines 29-44:
+    passes region labels into solve_adaptive().
+
+  Lines 97-116:
+    constructs the localized perturbation, derives initial region labels, and
+    executes the locality case.
+
+convection_mlt/stage1/tests/test_equilibrium.py
+  Lines 58-77:
+    regression test proving that the localized case converges against its
+    piecewise enthalpy references with temperature error below 1e-7 and
+    enthalpy drift below 1e-10.
+
+  Lines 80-95:
+    verifies a permanently stable barrier remains unmerged.
+
+  Lines 98-109:
+    verifies each merged reference conserves its initial regional enthalpy to
+    roundoff.
+
+convection_mlt/stage1/tests/test_step_rejection.py
+  Lines 52-75:
+    verifies a rejected trial leaves temperature, labels, and cumulative
+    transfer unchanged.
+
+  Lines 78-105:
+    verifies an actively unstable separated interface retains its original
+    labels when forced backtracking failure prevents any accepted step.
+
+  Lines 108-124:
+    verifies alpha=0 on a superadiabatic separated profile returns
+    no_active_convection without merging labels.
+
+  Lines 148-170:
+    verifies near-threshold nonzero flux triggers transfer-based merging when
+    cumulative exchange becomes appreciable.
+
+  Lines 173-205:
+    verifies an interface active in the accepted pre-step state is merged even
+    when the accepted post-step state lies in the neutral band.
+
+convection_mlt/stage1/tests/test_solver_statuses.py
+  Lines 99-112:
+    verifies perfect reference agreement cannot override excessive convective
+    flux.
+
+VALIDATION AFTER FIX
+--------------------
+The Stage 1 localized pilot now gives:
+
+  terminal status              = converged
+  accepted steps               = 1,279
+  max superadiabaticity        = 9.963954883396298e-09
+  max normalized tendency      = 9.99423150173468e-15 s^-1
+  potential-temperature RMS    = 9.381129413559298e-10
+  relative temperature RMS     = 9.56776359810799e-10
+  max relative temperature error = 3.520543929524847e-08
+  relative enthalpy drift      = 0
+
+Recorded result:
+  convection_mlt/stage1/results/robustness_locality_pilot.json
+
+DOCUMENTATION RULE
+------------------
+A single enthalpy-normalized reference adiabat must only be used for a globally
+connected mixed region. A column containing stable barriers must use one
+enthalpy-normalized reference per connected mixing region. Region connectivity
+may grow during evolution when an interface becomes actively convective.
+
+FINAL AUDIT ADDENDUM
+--------------------
+Audit date: 2026-08-09; commit-order correction 2026-08-10
+Tests after audit: 46 passed
+
+Merge timing:
+  Candidate active-interface merges are computed from the accepted pre-step
+  state before trial construction. Labels and reference are committed only
+  inside the trial.accepted branch, and before cumulative-transfer accounting,
+  so active-before/neutral-after interfaces remain correctly merged when a step
+  is accepted. Rejected trials, max_steps=0 terminals, and no_active_convection
+  exits leave labels and transfer unchanged.
+
+Sub-threshold transport:
+  For each still-unmerged internal interface, accepted updates accumulate
+
+      Q_j = sum_n F_conv,j^n * dt_n.
+
+  Q_j is divided by the smaller initial enthalpy of the two adjacent current
+  regions. The provisional transfer_merge_tolerance is 1e-9, one tenth of the
+  1e-8 relative temperature RMS tolerance. Exceeding it merges the regions.
+  The cumulative transfer, final labels, and maximum surviving unmerged
+  transfer fraction are stored in every integration result and campaign JSON.
+
+  In the refreshed localized pilot, the largest surviving unmerged transfer
+  fraction is 7.035817076352645e-18, comfortably below 1e-9.
+
+Reference conservation:
+  Every initial or rebuilt piecewise reference is checked region by region.
+  Relative initial-versus-reference enthalpy residual must remain below
+  64*machine_epsilon; otherwise the solver raises ArithmeticError.
+
+Reference remains secondary:
+  Converged status requires superadiabaticity, normalized tendency, absolute
+  convective flux, relative potential-temperature spread, relative temperature
+  error, and enthalpy drift to pass independently. The provisional absolute
+  convective-flux tolerance is 5e-3 W m^-2, set just above the measured
+  float64 pilot floor of approximately 4.2e-3 W m^-2. An all-singleton
+  partition cannot establish convergence through trivial reference agreement;
+  an exactly stationary stable case instead returns no_active_convection.
+
+Refined wording:
+  Each region conserves its own enthalpy while the flux through its separating
+  interfaces is zero or negligible within the diagnostic tolerance. Once
+  appreciable transport occurs, the connected regions are merged and their
+  combined initial enthalpy determines the new reference normalization.

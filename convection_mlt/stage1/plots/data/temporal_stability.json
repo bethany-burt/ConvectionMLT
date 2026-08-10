@@ -1,0 +1,417 @@
+{
+  "campaign": "temporal_stability",
+  "machine": {
+    "git_commit": "14f517fbea2af19d2648b4dfc082edf2031ceb8c",
+    "git_dirty": true,
+    "machine": "arm64",
+    "numpy": "2.5.2",
+    "platform": "macOS-26.5.2-arm64-arm-64bit-Mach-O",
+    "processor": "arm",
+    "python": "3.14.0",
+    "system": "Darwin"
+  },
+  "order_records": [
+    {
+      "alpha": 1.0,
+      "final_time_s": 16.0,
+      "fitted_slope": 1.0362278444368211,
+      "identity": {
+        "closure": {
+          "mixing_length": "alpha_times_pressure_scale_height",
+          "name": "AGNI_Lee_inspired_R0",
+          "prefactor": 0.5,
+          "sources": [
+            {
+              "accessed": "2026-08-09",
+              "formulae": [
+                "convective_flux",
+                "convective_velocity"
+              ],
+              "name": "AGNI atmospheric convection documentation",
+              "url": "https://www.h-nicholls.space/AGNI/dev/explanation/model_convection/"
+            },
+            {
+              "doi": "10.1093/mnras/stae537",
+              "formulae": [
+                "pressure_coordinate_MLT",
+                "Kzz=w*ell"
+              ],
+              "name": "Lee, Tan & Tsai (2024)"
+            }
+          ]
+        },
+        "configuration": {
+          "physics": {
+            "alpha": 1.0,
+            "closure_prefactor": 0.5,
+            "gravity": 15.0
+          },
+          "solver": {
+            "c_active": 10.0,
+            "c_cross": 1.0,
+            "c_diff": 0.2,
+            "dt_min": 1e-12,
+            "enthalpy_drift_tolerance": 1e-10,
+            "epsilon_gradient": 1e-08,
+            "epsilon_temperature": 0.5,
+            "f_back": 0.5,
+            "flux_tolerance": 0.005,
+            "max_rejections": 50,
+            "max_steps": 1000000,
+            "temperature_max_tolerance": 1e-07,
+            "temperature_rms_tolerance": 1e-08,
+            "tendency_tolerance": 1e-12,
+            "theta_rms_tolerance": 1e-08,
+            "transfer_merge_tolerance": 1e-09
+          }
+        },
+        "flux_sign": "upward_positive",
+        "git_commit": "14f517fbea2af19d2648b4dfc082edf2031ceb8c",
+        "git_dirty": true,
+        "machine": {
+          "git_commit": "14f517fbea2af19d2648b4dfc082edf2031ceb8c",
+          "git_dirty": true,
+          "machine": "arm64",
+          "numpy": "2.5.2",
+          "platform": "macOS-26.5.2-arm64-arm-64bit-Mach-O",
+          "processor": "arm",
+          "python": "3.14.0",
+          "system": "Darwin"
+        },
+        "numpy": "2.5.2",
+        "precision": "float64",
+        "pressure_order": "bottom_to_top_decreasing",
+        "python": "3.14.0",
+        "units": {
+          "density": "kg m^-3",
+          "diffusivity": "m^2 s^-1",
+          "flux": "W m^-2",
+          "heat_capacity": "J kg^-1 K^-1",
+          "length": "m",
+          "pressure": "Pa",
+          "temperature": "K",
+          "time": "s",
+          "velocity": "m s^-1"
+        }
+      },
+      "n_layers": 25,
+      "points": [
+        {
+          "dt_s": 1.0,
+          "relative_temperature_rms": 2.2234863738865707e-06,
+          "status": "completed",
+          "used_in_fit": false
+        },
+        {
+          "dt_s": 0.5,
+          "relative_temperature_rms": 1.1031258617504688e-06,
+          "status": "completed",
+          "used_in_fit": false
+        },
+        {
+          "dt_s": 0.25,
+          "relative_temperature_rms": 5.461726121517825e-07,
+          "status": "completed",
+          "used_in_fit": true
+        },
+        {
+          "dt_s": 0.125,
+          "relative_temperature_rms": 2.684949910355648e-07,
+          "status": "completed",
+          "used_in_fit": true
+        },
+        {
+          "dt_s": 0.0625,
+          "relative_temperature_rms": 1.2985497459276192e-07,
+          "status": "completed",
+          "used_in_fit": true
+        }
+      ],
+      "reference": {
+        "status": "completed",
+        "steps": 4096
+      },
+      "reference_dt_s": 0.00390625,
+      "reference_refinement_delta": 8.653391216420761e-09
+    },
+    {
+      "alpha": 1.0,
+      "final_time_s": 16.0,
+      "fitted_slope": 1.038145884119279,
+      "identity": {
+        "closure": {
+          "mixing_length": "alpha_times_pressure_scale_height",
+          "name": "AGNI_Lee_inspired_R0",
+          "prefactor": 0.5,
+          "sources": [
+            {
+              "accessed": "2026-08-09",
+              "formulae": [
+                "convective_flux",
+                "convective_velocity"
+              ],
+              "name": "AGNI atmospheric convection documentation",
+              "url": "https://www.h-nicholls.space/AGNI/dev/explanation/model_convection/"
+            },
+            {
+              "doi": "10.1093/mnras/stae537",
+              "formulae": [
+                "pressure_coordinate_MLT",
+                "Kzz=w*ell"
+              ],
+              "name": "Lee, Tan & Tsai (2024)"
+            }
+          ]
+        },
+        "configuration": {
+          "physics": {
+            "alpha": 1.0,
+            "closure_prefactor": 0.5,
+            "gravity": 15.0
+          },
+          "solver": {
+            "c_active": 10.0,
+            "c_cross": 1.0,
+            "c_diff": 0.2,
+            "dt_min": 1e-12,
+            "enthalpy_drift_tolerance": 1e-10,
+            "epsilon_gradient": 1e-08,
+            "epsilon_temperature": 0.5,
+            "f_back": 0.5,
+            "flux_tolerance": 0.005,
+            "max_rejections": 50,
+            "max_steps": 1000000,
+            "temperature_max_tolerance": 1e-07,
+            "temperature_rms_tolerance": 1e-08,
+            "tendency_tolerance": 1e-12,
+            "theta_rms_tolerance": 1e-08,
+            "transfer_merge_tolerance": 1e-09
+          }
+        },
+        "flux_sign": "upward_positive",
+        "git_commit": "14f517fbea2af19d2648b4dfc082edf2031ceb8c",
+        "git_dirty": true,
+        "machine": {
+          "git_commit": "14f517fbea2af19d2648b4dfc082edf2031ceb8c",
+          "git_dirty": true,
+          "machine": "arm64",
+          "numpy": "2.5.2",
+          "platform": "macOS-26.5.2-arm64-arm-64bit-Mach-O",
+          "processor": "arm",
+          "python": "3.14.0",
+          "system": "Darwin"
+        },
+        "numpy": "2.5.2",
+        "precision": "float64",
+        "pressure_order": "bottom_to_top_decreasing",
+        "python": "3.14.0",
+        "units": {
+          "density": "kg m^-3",
+          "diffusivity": "m^2 s^-1",
+          "flux": "W m^-2",
+          "heat_capacity": "J kg^-1 K^-1",
+          "length": "m",
+          "pressure": "Pa",
+          "temperature": "K",
+          "time": "s",
+          "velocity": "m s^-1"
+        }
+      },
+      "n_layers": 100,
+      "points": [
+        {
+          "dt_s": 1.0,
+          "relative_temperature_rms": 1.1578433957380703e-05,
+          "status": "completed",
+          "used_in_fit": false
+        },
+        {
+          "dt_s": 0.5,
+          "relative_temperature_rms": 5.702911576596211e-06,
+          "status": "completed",
+          "used_in_fit": false
+        },
+        {
+          "dt_s": 0.25,
+          "relative_temperature_rms": 2.813520712681049e-06,
+          "status": "completed",
+          "used_in_fit": true
+        },
+        {
+          "dt_s": 0.125,
+          "relative_temperature_rms": 1.380656712671594e-06,
+          "status": "completed",
+          "used_in_fit": true
+        },
+        {
+          "dt_s": 0.0625,
+          "relative_temperature_rms": 6.671508055005068e-07,
+          "status": "completed",
+          "used_in_fit": true
+        }
+      ],
+      "reference": {
+        "status": "completed",
+        "steps": 4096
+      },
+      "reference_dt_s": 0.00390625,
+      "reference_refinement_delta": 4.442385580338977e-08
+    }
+  ],
+  "safety_cases": [
+    {
+      "alpha": 1.0,
+      "c_cross": 1.0,
+      "c_diff": 0.2,
+      "expected_unstable": false,
+      "margin_includes_rejected_trials": true,
+      "min_accepted_trial_delta_over_epsilon": 9.944112083770662,
+      "min_rejected_trial_delta_over_epsilon": null,
+      "min_trial_delta_over_epsilon": 9.944112083770662,
+      "min_trial_delta_over_epsilon_all_attempts": 9.944112083770662,
+      "mode": "adaptive",
+      "n_layers": 25,
+      "outcome_class": "direct_acceptance",
+      "reason": "all acceptance metrics are within tolerance",
+      "rejections": 0,
+      "status": "converged",
+      "steps": 2901
+    },
+    {
+      "alpha": 1.0,
+      "c_cross": 1.0,
+      "c_diff": 1.0,
+      "expected_unstable": false,
+      "margin_includes_rejected_trials": true,
+      "min_accepted_trial_delta_over_epsilon": 0.802728883364523,
+      "min_rejected_trial_delta_over_epsilon": -156272.54856780957,
+      "min_trial_delta_over_epsilon": -156272.54856780957,
+      "min_trial_delta_over_epsilon_all_attempts": -156272.54856780957,
+      "mode": "adaptive",
+      "n_layers": 25,
+      "outcome_class": "adaptive_acceptance_after_backtracking",
+      "reason": "all acceptance metrics are within tolerance",
+      "rejections": 894,
+      "status": "converged",
+      "steps": 1520
+    },
+    {
+      "alpha": 1.0,
+      "c_cross": 1.0,
+      "c_diff": 10.0,
+      "expected_unstable": false,
+      "margin_includes_rejected_trials": true,
+      "min_accepted_trial_delta_over_epsilon": -0.9803261036278599,
+      "min_rejected_trial_delta_over_epsilon": -409745.8298494894,
+      "min_trial_delta_over_epsilon": -409745.8298494894,
+      "min_trial_delta_over_epsilon_all_attempts": -409745.8298494894,
+      "mode": "adaptive",
+      "n_layers": 25,
+      "outcome_class": "adaptive_acceptance_after_backtracking",
+      "reason": "all diffusivities and tendencies are exactly zero",
+      "rejections": 2424,
+      "status": "no_active_convection",
+      "steps": 1241
+    },
+    {
+      "alpha": 1.0,
+      "c_cross": 1.0,
+      "c_diff": 100.0,
+      "expected_unstable": false,
+      "margin_includes_rejected_trials": true,
+      "min_accepted_trial_delta_over_epsilon": -0.8838608123173941,
+      "min_rejected_trial_delta_over_epsilon": -428341.05602135294,
+      "min_trial_delta_over_epsilon": -428341.05602135294,
+      "min_trial_delta_over_epsilon_all_attempts": -428341.05602135294,
+      "mode": "adaptive",
+      "n_layers": 25,
+      "outcome_class": "adaptive_acceptance_after_backtracking",
+      "reason": "all diffusivities and tendencies are exactly zero",
+      "rejections": 6195,
+      "status": "no_active_convection",
+      "steps": 1573
+    },
+    {
+      "alpha": 1.0,
+      "c_cross": 1.0,
+      "c_diff": 1e+30,
+      "expected_unstable": true,
+      "margin_includes_rejected_trials": true,
+      "min_accepted_trial_delta_over_epsilon": null,
+      "min_rejected_trial_delta_over_epsilon": null,
+      "min_trial_delta_over_epsilon": null,
+      "min_trial_delta_over_epsilon_all_attempts": null,
+      "mode": "adaptive",
+      "n_layers": 25,
+      "outcome_class": "adaptive_failure",
+      "reason": "backtracking failed: trial state contains nonpositive temperature; final attempted dt=6.070683580102315e+31",
+      "rejections": 1,
+      "status": "failed",
+      "steps": 0
+    },
+    {
+      "alpha": 1.0,
+      "c_cross": 1.0,
+      "c_diff": null,
+      "dt_s": 0.01,
+      "expected_unstable": false,
+      "margin_includes_rejected_trials": false,
+      "min_accepted_trial_delta_over_epsilon": 6427775.5105190845,
+      "min_rejected_trial_delta_over_epsilon": null,
+      "min_trial_delta_over_epsilon": 6427775.5105190845,
+      "min_trial_delta_over_epsilon_all_attempts": 6427775.5105190845,
+      "mode": "fixed_like",
+      "n_layers": 25,
+      "outcome_class": "direct_acceptance",
+      "reason": null
+    },
+    {
+      "alpha": 1.0,
+      "c_cross": 1.0,
+      "c_diff": null,
+      "dt_s": 1.0,
+      "expected_unstable": false,
+      "margin_includes_rejected_trials": false,
+      "min_accepted_trial_delta_over_epsilon": 6349002.519369845,
+      "min_rejected_trial_delta_over_epsilon": null,
+      "min_trial_delta_over_epsilon": 6349002.519369845,
+      "min_trial_delta_over_epsilon_all_attempts": 6349002.519369845,
+      "mode": "fixed_like",
+      "n_layers": 25,
+      "outcome_class": "direct_acceptance",
+      "reason": null
+    },
+    {
+      "alpha": 1.0,
+      "c_cross": 1.0,
+      "c_diff": null,
+      "dt_s": 100.0,
+      "expected_unstable": true,
+      "margin_includes_rejected_trials": false,
+      "min_accepted_trial_delta_over_epsilon": null,
+      "min_rejected_trial_delta_over_epsilon": -1306343.4127585927,
+      "min_trial_delta_over_epsilon": -1306343.4127585927,
+      "min_trial_delta_over_epsilon_all_attempts": -1306343.4127585927,
+      "mode": "fixed_like",
+      "n_layers": 25,
+      "outcome_class": "fixed_step_failure",
+      "reason": "active interface 24 crossed the neutral hysteresis band"
+    },
+    {
+      "alpha": 1.0,
+      "c_cross": 1.0,
+      "c_diff": null,
+      "dt_s": 400.0,
+      "expected_unstable": true,
+      "margin_includes_rejected_trials": false,
+      "min_accepted_trial_delta_over_epsilon": null,
+      "min_rejected_trial_delta_over_epsilon": -22118519.75179958,
+      "min_trial_delta_over_epsilon": -22118519.75179958,
+      "min_trial_delta_over_epsilon_all_attempts": -22118519.75179958,
+      "mode": "fixed_like",
+      "n_layers": 25,
+      "outcome_class": "fixed_step_failure",
+      "reason": "active interface 1 crossed the neutral hysteresis band"
+    }
+  ]
+}

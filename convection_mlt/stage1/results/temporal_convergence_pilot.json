@@ -1,0 +1,63 @@
+{
+  "campaign": "temporal_convergence",
+  "configuration": {
+    "alpha": 1.0,
+    "final_time_s": 16.0,
+    "initial_exponent": 0.35,
+    "n_layers": 25,
+    "reference_dt_s": 0.03125,
+    "solver": {
+      "c_active": 10.0,
+      "c_cross": 1.0,
+      "c_diff": 0.2,
+      "dt_min": 1e-12,
+      "enthalpy_drift_tolerance": 1e-10,
+      "epsilon_gradient": 1e-08,
+      "epsilon_temperature": 0.5,
+      "f_back": 0.5,
+      "flux_tolerance": 0.005,
+      "max_rejections": 50,
+      "max_steps": 1000000,
+      "temperature_max_tolerance": 1e-07,
+      "temperature_rms_tolerance": 1e-08,
+      "tendency_tolerance": 1e-12,
+      "theta_rms_tolerance": 1e-08,
+      "transfer_merge_tolerance": 1e-09
+    }
+  },
+  "observed_orders": [
+    1.0528637291846306,
+    1.1022997390226112,
+    1.2237707555510953
+  ],
+  "records": [
+    {
+      "dt_s": 1.0,
+      "relative_temperature_rms": 2.1629020369548393e-06,
+      "status": "completed",
+      "steps": 16
+    },
+    {
+      "dt_s": 0.5,
+      "relative_temperature_rms": 1.0425413416763028e-06,
+      "status": "completed",
+      "steps": 32
+    },
+    {
+      "dt_s": 0.25,
+      "relative_temperature_rms": 4.85588060791894e-07,
+      "status": "completed",
+      "steps": 64
+    },
+    {
+      "dt_s": 0.125,
+      "relative_temperature_rms": 2.0791043875670968e-07,
+      "status": "completed",
+      "steps": 128
+    }
+  ],
+  "reference": {
+    "status": "completed",
+    "steps": 512
+  }
+}

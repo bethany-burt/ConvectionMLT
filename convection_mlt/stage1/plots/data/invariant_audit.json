@@ -1,0 +1,205 @@
+{
+  "campaign": "invariant_audit",
+  "machine": {
+    "git_commit": "14f517fbea2af19d2648b4dfc082edf2031ceb8c",
+    "git_dirty": true,
+    "machine": "arm64",
+    "numpy": "2.5.2",
+    "platform": "macOS-26.5.2-arm64-arm-64bit-Mach-O",
+    "processor": "arm",
+    "python": "3.14.0",
+    "system": "Darwin"
+  },
+  "pass": true,
+  "rows": [
+    {
+      "error": 0.0,
+      "expected": 0.0,
+      "name": "stable_profile_zero_flux",
+      "notes": "fully stable => exact-zero convective flux",
+      "observed": 0.0,
+      "pass": true,
+      "tolerance": 0.0
+    },
+    {
+      "error": 1.4996192443269118e-12,
+      "expected": 0.0,
+      "name": "exact_adiabat_zero_flux",
+      "notes": "",
+      "observed": 1.4996192443269118e-12,
+      "pass": true,
+      "tolerance": 1e-09
+    },
+    {
+      "error": 1.1102230246251565e-15,
+      "expected": 0.0,
+      "name": "exact_adiabat_max_superadiabaticity",
+      "notes": "",
+      "observed": 1.1102230246251565e-15,
+      "pass": true,
+      "tolerance": 1e-14
+    },
+    {
+      "error": 0.0,
+      "expected": 274965.5276489089,
+      "name": "manufactured_mixing_length",
+      "notes": "hand-calculated \u2113=\u03b1 H_P at internal interface",
+      "observed": 274965.5276489089,
+      "pass": true,
+      "tolerance": 2.749655276489089e-07
+    },
+    {
+      "error": 0.0,
+      "expected": 686.563526536006,
+      "name": "manufactured_velocity",
+      "notes": "hand-calculated w=\u2113\u221a(g/H_P \u03b4)",
+      "observed": 686.563526536006,
+      "pass": true,
+      "tolerance": 6.865635265360059e-10
+    },
+    {
+      "error": 0.0,
+      "expected": 13731270.530720083,
+      "name": "manufactured_flux",
+      "notes": "hand-calculated F_conv with prefactor 1/2",
+      "observed": 13731270.530720083,
+      "pass": true,
+      "tolerance": 1.3731270530720082e-05
+    },
+    {
+      "error": 0.0,
+      "expected": 188781302.33846855,
+      "name": "manufactured_kzz",
+      "notes": "hand-calculated Kzz=w\u2113",
+      "observed": 188781302.33846855,
+      "pass": true,
+      "tolerance": 0.00018878130233846856
+    },
+    {
+      "error": 0.0,
+      "expected": 1.0,
+      "name": "manufactured_positive_flux",
+      "notes": "boolean (1=true): F_conv>0",
+      "observed": 1.0,
+      "pass": true,
+      "tolerance": 0.0
+    },
+    {
+      "error": 0.0,
+      "expected": 1.0,
+      "name": "manufactured_positive_velocity",
+      "notes": "boolean (1=true): w>0",
+      "observed": 1.0,
+      "pass": true,
+      "tolerance": 0.0
+    },
+    {
+      "error": 0.0,
+      "expected": 1.0,
+      "name": "manufactured_positive_mixing_length",
+      "notes": "boolean (1=true): \u2113>0",
+      "observed": 1.0,
+      "pass": true,
+      "tolerance": 0.0
+    },
+    {
+      "error": 0.0,
+      "expected": 1.0,
+      "name": "manufactured_positive_kzz",
+      "notes": "boolean (1=true): Kzz>0",
+      "observed": 1.0,
+      "pass": true,
+      "tolerance": 0.0
+    },
+    {
+      "error": 0.0,
+      "expected": 1.0,
+      "name": "update_sign_lower_cools",
+      "notes": "boolean (1=true): lower layer cools",
+      "observed": 1.0,
+      "pass": true,
+      "tolerance": 0.0
+    },
+    {
+      "error": 0.0,
+      "expected": 1.0,
+      "name": "update_sign_upper_heats",
+      "notes": "boolean (1=true): upper layer heats",
+      "observed": 1.0,
+      "pass": true,
+      "tolerance": 0.0
+    },
+    {
+      "error": 0.0,
+      "expected": 0.0,
+      "name": "boundary_flux_bottom_zero",
+      "notes": "",
+      "observed": 0.0,
+      "pass": true,
+      "tolerance": 0.0
+    },
+    {
+      "error": 0.0,
+      "expected": 0.0,
+      "name": "boundary_flux_top_zero",
+      "notes": "",
+      "observed": 0.0,
+      "pass": true,
+      "tolerance": 0.0
+    },
+    {
+      "error": 1.862645149230957e-09,
+      "expected": 0.0,
+      "name": "one_step_telescoping_residual",
+      "notes": "",
+      "observed": 1.862645149230957e-09,
+      "pass": true,
+      "tolerance": 3.0489545401124656e-08
+    },
+    {
+      "error": 0.0,
+      "expected": 1.0,
+      "name": "alpha_zero_status_no_active",
+      "notes": "boolean (1=true): \u03b1=0 => no_active_convection",
+      "observed": 1.0,
+      "pass": true,
+      "tolerance": 0.0
+    },
+    {
+      "error": 0.0,
+      "expected": 1.0,
+      "name": "rejected_state_purity",
+      "notes": "boolean (1=true): rejected trials leave state/labels/transfers unchanged",
+      "observed": 1.0,
+      "pass": true,
+      "tolerance": 0.0
+    },
+    {
+      "error": 1.3842130801491256e-16,
+      "expected": 0.0,
+      "name": "regional_reference_enthalpy_identity",
+      "notes": "",
+      "observed": 1.3842130801491256e-16,
+      "pass": true,
+      "tolerance": 1e-14
+    },
+    {
+      "error": 0.0,
+      "expected": 1.0,
+      "name": "status_stable_no_active",
+      "notes": "boolean (1=true): fully stable => no_active_convection",
+      "observed": 1.0,
+      "pass": true,
+      "tolerance": 0.0
+    },
+    {
+      "error": 0.0,
+      "expected": 1.0,
+      "name": "status_superadiabatic_converged",
+      "notes": "boolean (1=true): globally superadiabatic => converged",
+      "observed": 1.0,
+      "pass": true,
+      "tolerance": 0.0
+    }
+  ]
+}

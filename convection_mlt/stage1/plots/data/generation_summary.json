@@ -1,0 +1,51 @@
+{
+  "campaigns": {
+    "alpha_trajectories": {
+      "path": "stage1/plots/data/alpha_trajectories.json",
+      "wall_time_s": 45.768685000017285
+    },
+    "enthalpy": {
+      "path": "stage1/plots/data/enthalpy.json",
+      "wall_time_s": 200.56965266703628
+    },
+    "equilibrium_matrix": {
+      "path": "stage1/plots/data/equilibrium_matrix.json",
+      "wall_time_s": 308.0586264580488
+    },
+    "global_profile": {
+      "path": "stage1/plots/data/global_profile.json",
+      "wall_time_s": 8.39004912506789
+    },
+    "invariant_audit": {
+      "path": "stage1/plots/data/invariant_audit.json",
+      "wall_time_s": 0.3079014589311555
+    },
+    "locality": {
+      "path": "stage1/plots/data/locality.json",
+      "wall_time_s": 2.453666666056961
+    },
+    "resolution_scaling": {
+      "path": "stage1/plots/data/resolution_scaling.json",
+      "wall_time_s": 385.29751716705505
+    },
+    "robustness": {
+      "path": "stage1/plots/data/robustness.json",
+      "wall_time_s": 7.638387875049375
+    },
+    "temporal_stability": {
+      "path": "stage1/plots/data/temporal_stability.json",
+      "wall_time_s": 3.0817767499247566
+    }
+  },
+  "machine": {
+    "git_commit": "14f517fbea2af19d2648b4dfc082edf2031ceb8c",
+    "git_dirty": true,
+    "machine": "arm64",
+    "numpy": "2.5.2",
+    "platform": "macOS-26.5.2-arm64-arm-64bit-Mach-O",
+    "processor": "arm",
+    "python": "3.14.0",
+    "system": "Darwin"
+  },
+  "smoke": false
+}

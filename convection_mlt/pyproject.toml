@@ -1,0 +1,25 @@
+[build-system]
+requires = ["setuptools>=69", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "convection-mlt"
+version = "0.1.0"
+description = "Reference mixing-length convection kernel for a closed dry-H2 column"
+requires-python = ">=3.10"
+dependencies = ["numpy>=1.26"]
+
+[project.optional-dependencies]
+test = ["pytest>=8.0"]
+plot = ["matplotlib>=3.8"]
+
+[project.scripts]
+mlt-baseline = "convection_mlt.cli:baseline"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["stage0/tests", "stage1/tests"]
+pythonpath = ["src"]
+addopts = "-ra"

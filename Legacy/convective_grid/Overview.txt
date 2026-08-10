@@ -1,0 +1,104 @@
+## Convective Flux grid ##
+
+Convective flux included in equilibrium equation as:
+
+p*g/4*pi * dF_conv/dz
+
+And convective flux is calculate as:
+
+F_conv = p * c_p * l^2 * sqrt(g/T) * (N-N_ad)^3/2
+
+p = density, g/cm3
+c_p = specific heat capacity, composition dependent, erg g^-1 K^-1
+        c_p = (k_B(2+n_dof))/m  
+        where k_B is boltzmann constant (ergs K^-1) and m is mean molecular mass (grams)
+l = mixing length, as a factor of pressure scale height
+        l = alpha * H_p
+g = gravity, m/s^2
+T = temperature, K
+N = temperature gradient, -dT/dz
+N_ad = adiabatic temperature gradient, g/c_p
+
+
+I set up a grid of n layers, where T, P, and F_conv are calculated at each interface.
+T and P will then have to be calculated at the centre of layers, to match Helios.
+
+_________________
+|               |           We can use relation dT/dt = dF/dz * constant
+|_______________|           Use an initial TP profile
+|               |           Calculate dT across a layer/interface
+|_______________|               - will include both options, maybe one converges better than other
+|               |           Use dT to calculate F_conv across same layer/interface span
+|_______________|               - F_conv sits at the centre of the dT span?
+|               |           Calculate dF_conv across span, then recalculate dT via:
+|_______________|               dT = t*dF_conv/dz
+|               |           Repeat dT, dF_conv calculations until dT <<<< 1
+|_______________|
+|               |
+|_______________|
+|               |
+|_______________|
+
+______________________________________________________________________
+
+## Initial Setup ##
+
+Kept as simple as possible, not necessarily realistic
+
+1. TP profile
+        TOA at 800K, BOA at 2000K, linear gradient
+        Pressure at each point calculated following ideal gas law
+        Also have the option to load in a Guillot profile made from tp.py
+        
+2. Composition
+        Assume H2 dominated atmosphere
+        Density gradually decreasing radially outwards? Can interpolate
+            TOA at 0.1 g/cm^3, BOA at 1000 g/cm^3
+
+3. Gravity set to 15 m/s2
+        Wasp-39b diffuse, has g = 4.3 m/s^2
+        Jupiter has g = 25 m/s^2
+
+4. Timestep 100s for now
+
+5. Max altitude 500km (?)
+
+
+-------- Constants --------
+
+k_B = 1.380649*10^-16 erg K^-1            Boltzmann
+R = 8.314 * 10^7 erg mol-1 K-1            Ideal gas (divide by mmw for specific)
+
+-------- Inputs --------
+
+T_toa = 800 K
+T_boa = 2000 K
+t = 100 s
+max_z = 500_000 m
+g = 15 m/s^-2
+p_toa = 0.1 g/cm^3    (convert to g/m^3 to match gravity units?)
+p_boa = 1000 g/cm^3     "    "
+l = 1
+
+-------- Equations --------
+
+Convectve flux 
+    F_conv = p * c_p * l^2 * sqrt(g/T) * (N-N_ad)^3/2
+
+Temperature gradient
+    N = -dT/dz
+
+Adiabatic temeprature gradient
+    N_ad = g/c_p
+
+Temperature change
+    dT = t * dF_conv/dz * constant
+
+
+______________________________________________________________________
+
+Check if convergence rate can be improved via tuning:
+
+- initial TP profile guess (constant * adiabatic)
+- mixing length 
+- timestep

@@ -1,0 +1,89 @@
+### Initial checks ###
+
+
+Inputs:
+# Temperature boundaries (K)
+T_TOA = 800.0   # Top of atmosphere
+T_BOA = 2000.0  # Bottom of atmosphere
+
+# Density boundaries (g/cm^3) - will convert to g/m^3 for consistency
+RHO_TOA = 0.1    # g/cm^3
+RHO_BOA = 1000.0 # g/cm^3
+
+# Physical parameters
+G = 15.0         # Gravity (m/s^2)
+L = 1.0          # Mixing length (dimensionless)
+DT = 100.0       # Timestep (s)
+MAX_Z = 500_000  # Maximum altitude (m)
+
+# Grid parameters
+N_LAYERS = 5    # Number of layers (will have n_layers+1 interfaces)
+
+# Composition parameters (H2 dominated)
+N_DOF = 5        # Degrees of freedom for H2 (3 translational + 2 rotational)
+MMW = 2.016      # Mean molecular weight (g/mol) for H2
+
+# Solver parameters
+MAX_STEPS = 1000      # Maximum iteration steps
+CONVERGENCE_TOL = 1e-4  # Convergence tolerance for max|dT| (K)
+DEBUG_INTERVAL = 10     # Print debug info every N steps
+
+
+----- No. layers ---------
+
+! I have one value for N_adiabat - if this is dependent on pressure, it should change at each layer (?)
+Layers dont change much from initial T gradient, and dont exactly match adiabat. Closest match is
+for the bottom layer:
+
+======================================================================
+Final Results
+======================================================================
+Final T range: [1265.5, 1532.4] K
+Final rho range: [0.100, 1000.0] g/cm^3
+Final F_conv range: [9.55e+01, 8.28e+02] erg cm^-2 s^-1
+Convective layers: 12 / 12
+Initial T gradient: [0.0005219  0.00052458 0.00052685 0.00052897 0.00053101 0.00053302
+ 0.000535   0.00053697 0.00053894 0.00054093 0.000543   0.00054563]
+Final T gradient: [0.0005219  0.00052457 0.00052684 0.00052895 0.00053099 0.00053299
+ 0.00053497 0.00053694 0.0005389  0.00054089 0.00054296 0.00054559]
+Adiabat = 0.000519605484724561
+
+(for a run with 12 layers)
+
+Change in temperature/flux is violent at the start. For runs up to 13 layers, the system can 
+still converge. For runs with more layers, the temperature spikes orders of magnitudes in the 
+upper layers.
+ - repeating this with 20 layers and mixing length set to 0.1, the system survives, 
+ with a max dT 0.078196 K and non-adiabatic layers
+ - increasing l worsens the temperature erraticism
+ - decreasing the timestep to 10s gives a similar result to decreasing l, although this time 
+ with max dT = 0.134375 K
+ - increasing timestep to 1000s worsens the temperature
+
+ So, smaller timestep and mixing length gives the system more ability to settle?
+
+ Now the main issue is that the layers in the system dont fluctuate in T, but are still 
+ superadiabatic. 
+    - check pressure dependence of adiabat
+    - convergence within ±0.00005 when no. steps increased to 10000 - maybe we just need a 
+      condition on superadiabaticity as well as dT
+
+So far, it seems like convergence can be reached via:
+    - changing l and/or timestep for stability
+    - increasing no.steps to system give time to settle
+
+
+Standard Helios runs use ~100 layers
+    - needs timestep of 1 s and 70000 steps to converge, but reaches similar adiabaticity
+    as for runs with 10 layers
+    - This many steps only took a couple of seconds to complete
+
+
+After adiabaticity check (pressure dependence + acceptable uncertainty), should find relationship
+between no. layers and min l/min t required for convergence at 70k steps 
+
+------- TP profile ----------
+
+! Included the option to use a Guillot profile via tp.py, which calculates TP then maps pressure 
+array altitude grid. I dont know if this is a valid approach, however I can come back to
+it later. 

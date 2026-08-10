@@ -42,6 +42,10 @@ venv/
 env/
 ENV/
 .venv
+.pytest_cache/
+*.egg-info/
+build/
+dist/
 
 # Background PDFs (large files)
 Background/
