@@ -1,0 +1,59 @@
+name: Stage 4 HELIOS Live
+
+on:
+  workflow_dispatch:
+    inputs:
+      helios_output_dir:
+        description: "Path to HELIOS output directory on runner"
+        required: true
+      helios_case:
+        description: "HELIOS case name prefix"
+        required: true
+
+jobs:
+  stage4-fixtures:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: convection_mlt
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: convection_mlt/requirements.lock
+      - run: python -m pip install -e ".[test]"
+      - run: python -m pytest stage4/tests/test_helios_adapter_live.py -v
+
+  stage4-live-helios:
+    # Requires a CUDA-capable self-hosted runner with HELIOS outputs.
+    runs-on: [self-hosted, linux, x64, gpu]
+    defaults:
+      run:
+        working-directory: convection_mlt
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install -e ".[test,plot,helios]"
+      - name: Verify HELIOS pin and compare Stage4
+        env:
+          PYTHONPATH: src
+        run: |
+          python stage4/experiments/live_helios_compare.py \
+            --helios-output-dir "${{ inputs.helios_output_dir }}" \
+            --helios-case "${{ inputs.helios_case }}" \
+            --output stage4/results/live_helios_comparison.json
+      - name: Rebuild Stage 4 dossier with live HELIOS
+        env:
+          PYTHONPATH: src
+        run: python stage4/experiments/build_exit_dossier.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: stage4-live-helios-results
+          path: |
+            convection_mlt/stage4/results/live_helios_comparison.json
+            convection_mlt/stage4/results/exit_gate_audit.json
+            convection_mlt/stage4/plots/generated/

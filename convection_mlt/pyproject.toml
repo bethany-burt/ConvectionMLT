@@ -13,6 +13,7 @@ dependencies = ["numpy>=1.26"]
 test = ["pytest>=8.0"]
 plot = ["matplotlib>=3.8"]
 jax = ["jax[cpu]>=0.4", "jaxlib>=0.4"]
+helios = ["pycuda>=2025.1", "scipy", "astropy", "h5py", "numba", "wget"]
 
 [project.scripts]
 mlt-baseline = "convection_mlt.cli:baseline"
@@ -24,6 +25,6 @@ where = ["src"]
 "convection_mlt.thermo_data" = ["*.json"]
 
 [tool.pytest.ini_options]
-testpaths = ["stage0/tests", "stage1/tests", "stage2/tests", "stage3/tests"]
+testpaths = ["stage0/tests", "stage1/tests", "stage2/tests", "stage3/tests", "stage4/tests"]
 pythonpath = ["src"]
 addopts = "-ra"

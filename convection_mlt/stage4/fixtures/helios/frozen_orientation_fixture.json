@@ -1,0 +1,16 @@
+{
+  "helios_commit": "b0800f9ea4366263241c13bb926e8ca68f266cc5",
+  "helios_config": {
+    "case": "stage4_orientation_fixture",
+    "convection": 0,
+    "lower_bc": "flux",
+    "top_irradiation": "enabled"
+  },
+  "units": {
+    "temperature": "K",
+    "pressure": "microbar",
+    "flux": "erg s^-1 cm^-2"
+  },
+  "orientation": "helios_top_to_bottom",
+  "checksum_sha256": "pending_generated_by_test"
+}

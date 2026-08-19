@@ -1,0 +1,270 @@
+{
+  "stage": "4",
+  "full_stage4_claim": false,
+  "claim_text": "Live HELIOS execution completed; Stage 4 core and HELIOS parity remain pending.",
+  "gates": {
+    "manufactured_hot": 1e-08,
+    "manufactured_cold": 1e-08,
+    "unsplit_split_t": 1e-08,
+    "flux_flatness": 1e-08,
+    "boundary_mismatch": 1e-08,
+    "energy_residual": 1e-12,
+    "hot_cold": 1e-08,
+    "identity_flux": 1e-15,
+    "identity_tendency": 1e-15,
+    "helios_t": 1e-08,
+    "helios_flux": 1e-08,
+    "orientation": 0.0
+  },
+  "rows": [
+    {
+      "name": "35_manufactured_identity_flux",
+      "observed": 0.0,
+      "tolerance": 1e-15,
+      "criterion": "<=",
+      "status": "PASS",
+      "scale": "max |F_rad*+F_conv-F0|",
+      "category": "35",
+      "source": "manufactured_operator_identity"
+    },
+    {
+      "name": "35_manufactured_identity_tendency",
+      "observed": 0.0,
+      "tolerance": 1e-15,
+      "criterion": "<=",
+      "status": "PASS",
+      "scale": "max |dh/dt| at T*",
+      "category": "35",
+      "source": "manufactured_operator_identity"
+    },
+    {
+      "name": "35_manufactured_attraction_hot",
+      "observed": 1.872736254980008e-08,
+      "tolerance": 1e-08,
+      "criterion": "<=",
+      "status": "FAIL",
+      "scale": "max relative T",
+      "category": "35",
+      "source": "solve_adaptive_rce unsplit manufactured",
+      "terminal_status": "max_steps",
+      "steps_accepted": 250,
+      "simulated_time": 13.521745181866052,
+      "auditable": false,
+      "note": "terminal status is not converged; result is not auditable"
+    },
+    {
+      "name": "35_manufactured_attraction_cold",
+      "observed": 1.872685515996195e-08,
+      "tolerance": 1e-08,
+      "criterion": "<=",
+      "status": "FAIL",
+      "scale": "max relative T",
+      "category": "35",
+      "source": "solve_adaptive_rce unsplit manufactured",
+      "terminal_status": "max_steps",
+      "steps_accepted": 250,
+      "simulated_time": 13.521747449529371,
+      "auditable": false,
+      "note": "terminal status is not converged; result is not auditable"
+    },
+    {
+      "name": "36_one_step_energy_residual_rel",
+      "observed": 0.0,
+      "tolerance": 1e-12,
+      "criterion": "<=",
+      "status": "PASS",
+      "scale": "max(|RHS|, F_scale dt, E_floor)",
+      "category": "36",
+      "source": "one accepted unsplit manufactured step"
+    },
+    {
+      "name": "36_unsplit_split_rc_one_step",
+      "observed": 7.751034492604291e-13,
+      "tolerance": 1e-08,
+      "criterion": "<=",
+      "status": "PASS",
+      "scale": "max relative T, common dt",
+      "category": "36",
+      "source": "prescribed_dt one-step"
+    },
+    {
+      "name": "36_unsplit_split_cr_one_step",
+      "observed": 1.1768723200675272e-14,
+      "tolerance": 1e-08,
+      "criterion": "<=",
+      "status": "PASS",
+      "scale": "max relative T, common dt",
+      "category": "36",
+      "source": "prescribed_dt one-step"
+    },
+    {
+      "name": "36_flux_flatness_unsplit",
+      "observed": 0.88491714265749,
+      "tolerance": 1e-08,
+      "criterion": "<=",
+      "status": "FAIL",
+      "scale": "max |F-F_ref| / F_scale",
+      "category": "36",
+      "source": "real unsplit RCE",
+      "terminal_status": "max_steps",
+      "auditable": false,
+      "note": "terminal status is not converged; result is not auditable"
+    },
+    {
+      "name": "36_boundary_mismatch_unsplit",
+      "observed": 3.3798185628087666e-05,
+      "tolerance": 1e-08,
+      "criterion": "<=",
+      "status": "FAIL",
+      "scale": "|F(0)-F(N)| / F_scale",
+      "category": "36",
+      "source": "real unsplit RCE",
+      "terminal_status": "max_steps",
+      "auditable": false,
+      "note": "terminal status is not converged; result is not auditable"
+    },
+    {
+      "name": "36_time_integrated_energy_residual_max",
+      "observed": 2.8081153435687394e-16,
+      "tolerance": 1e-12,
+      "criterion": "<=",
+      "status": "PASS",
+      "scale": "max(|RHS|, F_scale dt, E_floor)",
+      "category": "36",
+      "source": "accepted unsplit steps"
+    },
+    {
+      "name": "37_helios_temperature_max_rel",
+      "observed": 0.9725130145072304,
+      "tolerance": 1e-08,
+      "criterion": "<=",
+      "status": "FAIL",
+      "scale": "max relative T, matched setup required",
+      "category": "37",
+      "source": "live_helios_comparison.json"
+    },
+    {
+      "name": "37_helios_flux_max_rel",
+      "observed": 1.0140950252982088,
+      "tolerance": 1e-08,
+      "criterion": "<=",
+      "status": "FAIL",
+      "scale": "max relative F_total, matched setup required",
+      "category": "37",
+      "source": "live_helios_comparison.json"
+    },
+    {
+      "name": "38_orientation_roundtrip_exact",
+      "observed": 1.0,
+      "tolerance": true,
+      "criterion": "true",
+      "status": "PASS",
+      "scale": "exact array equality",
+      "category": "38",
+      "source": "HeliosAdapter.roundtrip_layers"
+    },
+    {
+      "name": "38_convection_off_flux_max_rel",
+      "observed": null,
+      "tolerance": 1e-08,
+      "criterion": "<=",
+      "status": "FAIL",
+      "scale": "max relative F, convection-off",
+      "category": "38",
+      "source": "live_helios_comparison.json",
+      "portable_name": "stage4_live_conv_off_integrated_flux.dat",
+      "checksum_sha256": null,
+      "fixture_portable_name": "sample_integrated_flux.dat",
+      "fixture_checksum_sha256": "61a481312c284cb2ee48618fa1bb579c77599a45ca7fedf4ef1c27336a6aedf7"
+    },
+    {
+      "name": "40_hot_cold_path_independence",
+      "observed": 3.7454217008343326e-08,
+      "tolerance": 1e-08,
+      "criterion": "<=",
+      "status": "FAIL",
+      "scale": "max relative T",
+      "category": "40",
+      "source": "manufactured hot vs cold"
+    },
+    {
+      "name": "39_bottleneck_fields_complete",
+      "observed": 1.0,
+      "tolerance": true,
+      "criterion": "true",
+      "status": "PASS",
+      "scale": "dt_rad, dt_MLT, bracketed stable dt present",
+      "category": "39",
+      "source": "frozen-operator bottleneck",
+      "metrics": {
+        "dt_mlt": 0.7860934288343355,
+        "dt_rad": 1566.7569047628988,
+        "bracketed_stable_dt_low": 1609.9193422527192,
+        "bracketed_stable_dt_high": 3219.8386845054383,
+        "convection_only_call_time_s": 3.792290226556361e-05,
+        "radiation_plus_conv_call_time_s": 9.000205318443477e-05,
+        "call_count_each": 20,
+        "smallest_stable_operator": "convection",
+        "wall_time_unsplit_s": 0.013231083052232862,
+        "wall_time_split_rc_s": 0.018164874985814095,
+        "physical_relaxation_tau_s": 0.9741009078847066,
+        "physical_relaxation_residual": "max |T-T*| / T*"
+      }
+    }
+  ],
+  "points": {
+    "35": {
+      "identity_flux_err": 0.0,
+      "identity_tendency_err": 0.0,
+      "manufactured_attraction_hot_max_rel": 1.872736254980008e-08,
+      "manufactured_attraction_cold_max_rel": 1.872685515996195e-08,
+      "hot_status": "max_steps",
+      "cold_status": "max_steps"
+    },
+    "36": {
+      "unsplit_status": "max_steps",
+      "unsplit_split_rc_temp_max_rel": 7.751034492604291e-13,
+      "unsplit_split_cr_temp_max_rel": 1.1768723200675272e-14,
+      "flux_flatness_unsplit": 0.88491714265749,
+      "boundary_mismatch_unsplit": 3.3798185628087666e-05,
+      "time_integrated_energy_residual_max": 2.8081153435687394e-16,
+      "one_step_energy_residual_rel": 0.0
+    },
+    "37": {
+      "live_helios_status": "pilot",
+      "helios_commit": "b0800f9ea4366263241c13bb926e8ca68f266cc5",
+      "equilibrium_temperature_max_rel": 0.9725130145072304,
+      "equilibrium_flux_total_max_rel": 1.0140950252982088,
+      "note": "unmatched live HELIOS run is a pilot, not parity"
+    },
+    "38": {
+      "adapter_orientation_fixture_status": "implemented",
+      "orientation_roundtrip_exact": true,
+      "fixture_portable_name": "sample_integrated_flux.dat",
+      "fixture_checksum_sha256": "61a481312c284cb2ee48618fa1bb579c77599a45ca7fedf4ef1c27336a6aedf7",
+      "live_helios_boundary_status": "pilot",
+      "convection_off_flux_max_rel": null,
+      "convection_off_flux_file_portable": "stage4_live_conv_off_integrated_flux.dat",
+      "convection_off_checksum_sha256": null
+    },
+    "39": {
+      "dt_mlt": 0.7860934288343355,
+      "dt_rad": 1566.7569047628988,
+      "bracketed_stable_dt_low": 1609.9193422527192,
+      "bracketed_stable_dt_high": 3219.8386845054383,
+      "convection_only_call_time_s": 3.792290226556361e-05,
+      "radiation_plus_conv_call_time_s": 9.000205318443477e-05,
+      "call_count_each": 20,
+      "smallest_stable_operator": "convection",
+      "wall_time_unsplit_s": 0.013231083052232862,
+      "wall_time_split_rc_s": 0.018164874985814095,
+      "physical_relaxation_tau_s": 0.9741009078847066,
+      "physical_relaxation_residual": "max |T-T*| / T*"
+    },
+    "40": {
+      "hot_cold_path_independence_max_rel": 3.7454217008343326e-08,
+      "hot_status": "max_steps",
+      "cold_status": "max_steps"
+    }
+  }
+}

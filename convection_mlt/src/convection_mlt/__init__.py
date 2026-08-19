@@ -50,6 +50,25 @@ from .radiation import (
     radiation_core,
     solve_radiation,
 )
+from .rce import (
+    ManufacturedRadiativeTarget,
+    RCEConfig,
+    RCEResult,
+    RCERoute,
+    RCEStepDiagnostics,
+    RCETerminalStatus,
+    manufactured_operator_identity,
+    solve_adaptive_rce,
+)
+from .adapters.helios import (
+    HeliosAdapter,
+    HeliosFixtureMetadata,
+    HeliosFluxProfile,
+    HeliosTPProfile,
+    load_integrated_flux,
+    load_tp_profile,
+    make_fixture_metadata,
+)
 from .trace import IntegrationTrace, TraceLevel, make_trace
 
 __all__ = [
@@ -62,6 +81,10 @@ __all__ = [
     "ConvergenceMetrics",
     "EnthalpyInversionError",
     "HydrostaticDomainError",
+    "HeliosAdapter",
+    "HeliosFluxProfile",
+    "HeliosFixtureMetadata",
+    "HeliosTPProfile",
     "IdealH2",
     "IntegrationResult",
     "IntegrationTrace",
@@ -88,6 +111,10 @@ __all__ = [
     "mixing_region_labels",
     "mixing_length_flux",
     "monatomic_helium",
+    "make_fixture_metadata",
+    "load_integrated_flux",
+    "load_tp_profile",
+    "ManufacturedRadiativeTarget",
     "numerical_isentrope",
     "PrescribedBandOpacity",
     "piecewise_enthalpy_reference",
@@ -95,7 +122,14 @@ __all__ = [
     "RadiationResult",
     "reconstruct_hydrostatic",
     "reference_enthalpy_residuals",
+    "RCEConfig",
+    "RCEResult",
+    "RCERoute",
+    "RCEStepDiagnostics",
+    "RCETerminalStatus",
+    "manufactured_operator_identity",
     "solve_adaptive",
+    "solve_adaptive_rce",
     "solve_radiation",
     "SolveRoute",
     "STEFAN_BOLTZMANN",

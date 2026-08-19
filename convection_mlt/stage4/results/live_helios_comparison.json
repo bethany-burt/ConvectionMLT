@@ -1,0 +1,19 @@
+{
+  "helios_commit": "b0800f9ea4366263241c13bb926e8ca68f266cc5",
+  "helios_case": "stage4_live_conv_on",
+  "status": "pilot",
+  "note": "Live HELIOS executable completed on an unmatched setup. Temperature/flux differences near unity are not parity. Not an exit-gate pass.",
+  "metrics": {
+    "equilibrium_temperature_max_rel": 0.9725130145072304,
+    "equilibrium_flux_total_max_rel": 1.0140950252982088,
+    "primary_rcb_log10p_mlt": 6.654217909056628
+  },
+  "point_38": {
+    "orientation_roundtrip_exact": true,
+    "convection_off_boundary_sign_check": true,
+    "convection_off_finite_flux": true,
+    "convection_off_flux_file_used": "/project/ls-heng/Bethany.Burt/helios_stage4_output/stage4_live_conv_off/stage4_live_conv_off_integrated_flux.dat",
+    "convection_off_flux_file_portable": "stage4_live_conv_off_integrated_flux.dat",
+    "note": "Boolean finite/sign checks are not quantitative convection-off recovery."
+  }
+}
