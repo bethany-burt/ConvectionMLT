@@ -23,6 +23,11 @@ import pytest
 jax = pytest.importorskip("jax")
 import jax.numpy as jnp
 
+# Verify x64 was enabled *before* array creation
+assert jax.config.x64_enabled, (
+    "JAX_ENABLE_X64 must be set before JAX import; x64 is not enabled"
+)
+
 from convection_mlt.radiation import (
     DEFAULT_DIFFUSIVITY,
     STEFAN_BOLTZMANN,
@@ -146,6 +151,33 @@ class TestBatchSizeOne:
 
         assert _norm_diff(r_np.flux_up, r_jax.flux_up) < GATE
         assert _norm_diff(r_np.flux_down, r_jax.flux_down) < GATE
+
+
+class TestVariedColumnParity:
+    """Nonisothermal, nonuniform column — measured parity should be finite."""
+
+    def test_varied(self):
+        n = 20
+        temp = np.linspace(1200.0, 3000.0, n)
+        mass_path = np.linspace(300.0, 1500.0, n)
+        kappa = np.linspace(0.005, 0.1, n)[np.newaxis, :]
+        w = np.array([1.0])
+        top = np.array([150.0])
+        B_bot = STEFAN_BOLTZMANN * temp[0] ** 4
+        bot = np.array([B_bot])
+        D = DEFAULT_DIFFUSIVITY
+
+        r_np = radiation_core(temp, mass_path, kappa, w, top, bot, D, SolveRoute.THOMAS)
+        j_temp, j_mp, j_kappa, j_w, j_top, j_bot = _to_jax(temp, mass_path, kappa, w, top, bot)
+        r_jax = radiation_core_jax(j_temp, j_mp, j_kappa, j_w, j_top, j_bot, D)
+
+        diff_fu = _norm_diff(r_np.flux_up, r_jax.flux_up)
+        diff_fd = _norm_diff(r_np.flux_down, r_jax.flux_down)
+        diff_h = _norm_diff(r_np.heating, r_jax.heating)
+
+        assert diff_fu < GATE
+        assert diff_fd < GATE
+        assert diff_h < GATE
 
 
 class TestColumnEnergyParity:

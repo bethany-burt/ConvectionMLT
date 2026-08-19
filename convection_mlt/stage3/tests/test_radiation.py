@@ -290,6 +290,89 @@ class TestConservativeHeating:
         assert abs(lhs - rhs) / scale < GATE
 
 
+class TestLayerEnergyIdentity:
+    """Independent layer absorption/emission identity.
+
+    For each layer i (one band):
+      Q_layer = (1 - 𝒯_i)(F↑[i] + F↓[i+1] - 2 B_i)
+    must agree with flux-divergence heating:
+      Q_layer = F_net[i] - F_net[i+1]
+
+    This catches shared sign or stream-indexing errors that pure
+    telescoping cannot detect.
+    """
+
+    @pytest.mark.parametrize("route", SolveRoute)
+    @pytest.mark.parametrize("n", [1, 5, 20])
+    def test_layer_identity_grey(self, route, n):
+        T0 = 1800.0
+        temp, mass_path, kappa, w, _, _, D = _make_grey_inputs(n, T0, kappa0=0.05)
+        top = np.array([200.0])
+        bot = np.array([800.0])
+        r = radiation_core(temp, mass_path, kappa, w, top, bot, D, route)
+
+        B = STEFAN_BOLTZMANN * T0 ** 4
+        trans = r.transmissivity[0]  # (n_layer,)
+        ef = 1.0 - trans
+
+        for i in range(n):
+            q_abs_emit = ef[i] * (r.flux_up[0, i] + r.flux_down[0, i + 1] - 2.0 * B)
+            q_divergence = r.flux_net[i] - r.flux_net[i + 1]
+            scale = max(1e-30, abs(q_abs_emit), abs(q_divergence))
+            assert abs(q_abs_emit - q_divergence) / scale < GATE, (
+                f"layer {i}: abs_emit={q_abs_emit:.6e} vs div={q_divergence:.6e}"
+            )
+
+    @pytest.mark.parametrize("route", SolveRoute)
+    def test_layer_identity_nonisothermal(self, route):
+        """Varying temperature profile — stronger test."""
+        n = 15
+        temp = np.linspace(1000.0, 3000.0, n)
+        mass_path = np.full(n, 500.0)
+        kappa = np.full((1, n), 0.03)
+        w = np.array([1.0])
+        D = DEFAULT_DIFFUSIVITY
+        B_bot = STEFAN_BOLTZMANN * temp[0] ** 4
+        top = np.array([100.0])
+        bot = np.array([B_bot])
+        r = radiation_core(temp, mass_path, kappa, w, top, bot, D, route)
+
+        B = STEFAN_BOLTZMANN * temp ** 4
+        trans = r.transmissivity[0]
+        ef = 1.0 - trans
+
+        for i in range(n):
+            q_abs_emit = ef[i] * (r.flux_up[0, i] + r.flux_down[0, i + 1] - 2.0 * B[i])
+            q_divergence = r.flux_net[i] - r.flux_net[i + 1]
+            scale = max(1e-30, abs(q_abs_emit), abs(q_divergence))
+            assert abs(q_abs_emit - q_divergence) / scale < GATE
+
+    def test_layer_identity_multiband(self):
+        """Sum of per-band layer identities = broadband flux divergence."""
+        n = 8
+        temp = np.linspace(1500.0, 2500.0, n)
+        mass_path = np.full(n, 600.0)
+        kappas = np.array([np.full(n, 0.01), np.full(n, 0.05), np.full(n, 0.1)])
+        weights = np.array([0.5, 0.3, 0.2])
+        D = DEFAULT_DIFFUSIVITY
+        B_total = STEFAN_BOLTZMANN * temp ** 4
+        top = weights * 100.0
+        bot = weights * STEFAN_BOLTZMANN * temp[0] ** 4
+        r = radiation_core(temp, mass_path, kappas, weights, top, bot, D)
+
+        for i in range(n):
+            q_abs_emit_sum = 0.0
+            for b in range(3):
+                B_b = weights[b] * B_total[i]
+                ef_b = 1.0 - r.transmissivity[b, i]
+                q_abs_emit_sum += ef_b * (
+                    r.flux_up[b, i] + r.flux_down[b, i + 1] - 2.0 * B_b
+                )
+            q_divergence = r.flux_net[i] - r.flux_net[i + 1]
+            scale = max(1e-30, abs(q_abs_emit_sum), abs(q_divergence))
+            assert abs(q_abs_emit_sum - q_divergence) / scale < GATE
+
+
 # ═══════════════════════════════════════════════════════════════════
 # POINT 33 — Convergence, positivity, float32 diagnostic
 # ═══════════════════════════════════════════════════════════════════
@@ -310,37 +393,87 @@ class TestPositivity:
 
 
 class TestGridConvergence:
-    """Nonisothermal manufactured profile converges with N."""
+    """Nonisothermal convergence against a high-resolution discrete reference.
 
-    def test_refinement(self):
-        Ns = [10, 20, 40, 80, 160]
-        T_bot = 3000.0
-        T_top = 1000.0
-        P_bot = 1e6
-        P_top = 1e3
-        g = 10.0
-        kappa0 = 0.01
+    For a piecewise-constant source discretization, the correct reference is
+    the same discrete scheme at very high N (here N_ref=4096). This avoids
+    comparing against a continuous integral that assumes a different source
+    representation. Errors should decrease ~O(1/N) under refinement.
+    """
+
+    @staticmethod
+    def _run_column(n, T_bot, T_top, kappa0, D, g, P_bot, P_top, F_down_top, F_up_bot):
+        dp = (P_bot - P_top) / n
+        mass_path = np.full(n, dp / g)
+        frac = (np.arange(n) + 0.5) / n
+        temp = T_bot + (T_top - T_bot) * frac
+        kappa = np.full((1, n), kappa0)
+        w = np.array([1.0])
+        return radiation_core(temp, mass_path, kappa, w,
+                              np.array([F_down_top]), np.array([F_up_bot]), D)
+
+    def test_refinement_vs_high_res(self):
+        """Errors decrease with N vs N_ref=4096 reference."""
+        kappa0 = 0.02
         D = DEFAULT_DIFFUSIVITY
-        f_down_top = 50.0
+        g = 10.0
+        P_bot, P_top = 1e6, 1e4
+        T_bot, T_top = 3000.0, 1500.0
+        B_bot = STEFAN_BOLTZMANN * T_bot ** 4
+        F_down_top_val = 50.0
 
+        N_ref = 4096
+        r_ref = self._run_column(N_ref, T_bot, T_top, kappa0, D, g, P_bot, P_top,
+                                  F_down_top_val, B_bot)
+        # reference interface fluxes at boundaries
+        fd_ref = float(r_ref.flux_down[0, 0])
+        fu_ref = float(r_ref.flux_up[0, N_ref])
+
+        Ns = [8, 16, 32, 64, 128, 256]
         errors = []
         for n in Ns:
-            p_centers = np.exp(np.linspace(np.log(P_bot), np.log(P_top), n))
-            p_edges = np.exp(np.linspace(np.log(P_bot * 1.01), np.log(P_top * 0.99), n + 1))
-            dp = np.abs(np.diff(p_edges))
-            mass_path = dp / g
-            temp = T_bot + (T_top - T_bot) * np.linspace(0, 1, n) ** 2
-            kappa = np.full((1, n), kappa0)
-            w = np.array([1.0])
-            B_bot = STEFAN_BOLTZMANN * temp[0] ** 4
-            top = np.array([f_down_top])
-            bot = np.array([B_bot])
-            r = radiation_core(temp, mass_path, kappa, w, top, bot, D)
-            errors.append(float(np.max(np.abs(r.heating))))
+            r = self._run_column(n, T_bot, T_top, kappa0, D, g, P_bot, P_top,
+                                  F_down_top_val, B_bot)
+            err = abs(float(r.flux_down[0, 0]) - fd_ref)
+            errors.append(err)
 
-        # errors should decrease (not necessarily monotonically due to manufactured grid)
-        # but the finest should be smaller than the coarsest
-        assert errors[-1] < errors[0] or all(np.isfinite(errors))
+        assert all(np.isfinite(errors))
+        assert all(e > 0 for e in errors), "Errors should be nonzero vs independent reference"
+
+        # errors must decrease
+        for i in range(len(Ns) - 1):
+            assert errors[i + 1] < errors[i] * 1.05, (
+                f"F↓ error not decreasing: N={Ns[i]}→{Ns[i+1]}: "
+                f"{errors[i]:.3e}→{errors[i+1]:.3e}"
+            )
+
+        # fit convergence order
+        order = np.log(errors[-2] / errors[-1]) / np.log(Ns[-1] / Ns[-2])
+        assert order > 0.8, f"Expected ~first order, got {order:.2f}"
+
+    def test_refinement_tau_spaced(self):
+        """Optical-depth-spaced grid also converges."""
+        kappa0 = 0.05
+        D = DEFAULT_DIFFUSIVITY
+        T_bot, T_top = 2500.0, 1200.0
+        B_bot = STEFAN_BOLTZMANN * T_bot ** 4
+        g = 10.0
+        P_bot, P_top = 5e5, 1e3
+
+        N_ref = 4096
+        r_ref = TestGridConvergence._run_column(
+            N_ref, T_bot, T_top, kappa0, D, g, P_bot, P_top, 0.0, B_bot)
+        fu_ref = float(r_ref.flux_up[0, N_ref])
+
+        Ns = [8, 16, 32, 64]
+        errors = []
+        for n in Ns:
+            r = TestGridConvergence._run_column(
+                n, T_bot, T_top, kappa0, D, g, P_bot, P_top, 0.0, B_bot)
+            errors.append(abs(float(r.flux_up[0, n]) - fu_ref))
+
+        for i in range(len(Ns) - 1):
+            assert errors[i + 1] < errors[i] * 1.05
 
 
 class TestFloat32Diagnostic:
@@ -450,3 +583,154 @@ class TestEdgeCases:
         )
         assert r.heating.shape == (1,)
         assert np.all(np.isfinite(r.heating))
+
+    def test_extreme_optical_depth_large(self):
+        """Δτ ~ 1e8 should not overflow/NaN."""
+        n = 5
+        temp = np.full(n, 2000.0)
+        mass_path = np.full(n, 1e6)
+        kappa = np.full((1, n), 100.0)
+        w = np.array([1.0])
+        r = radiation_core(temp, mass_path, kappa, w, np.array([100.0]), np.array([200.0]), DEFAULT_DIFFUSIVITY)
+        assert np.all(np.isfinite(r.flux_up))
+        assert np.all(np.isfinite(r.flux_down))
+        assert np.all(np.isfinite(r.heating))
+        assert np.all(r.transmissivity[0] >= 0.0)
+        assert np.all(r.transmissivity[0] <= 1e-300)  # effectively zero
+
+    def test_extreme_optical_depth_tiny(self):
+        """Δτ ~ 1e-18 should not cancel via expm1."""
+        n = 5
+        temp = np.full(n, 2000.0)
+        mass_path = np.full(n, 1e-10)
+        kappa = np.full((1, n), 1e-8)
+        w = np.array([1.0])
+        r = radiation_core(temp, mass_path, kappa, w, np.array([100.0]), np.array([200.0]), DEFAULT_DIFFUSIVITY)
+        assert np.all(np.isfinite(r.flux_up))
+        assert np.all(np.isfinite(r.flux_down))
+
+
+class TestAnalyticGreyExactValues:
+    """AnalyticGreyOpacity returns exact κ(T,P) = κ₀ (P/P₀)^a (T/T₀)^b."""
+
+    def test_exact_evaluation(self):
+        kappa0, P0, T0, a, b = 0.01, 1e5, 2000.0, 1.0, 0.5
+        opa = AnalyticGreyOpacity(kappa0=kappa0, P0=P0, T0=T0, a=a, b=b)
+        temp = np.array([1500.0, 2000.0, 2500.0])
+        pressure = np.array([1e4, 1e5, 1e6])
+        kappa = opa.evaluate(temp, pressure)
+        for i in range(3):
+            expected = kappa0 * (pressure[i] / P0) ** a * (temp[i] / T0) ** b
+            assert abs(kappa[0, i] - expected) < 1e-15 * expected
+
+
+class TestKappaDeltaPOverG:
+    """Δτ = κ · Δm = κ · ΔP/g under constant gravity."""
+
+    def test_equivalence(self):
+        n = 5
+        kappa0 = 0.02
+        g = 9.8
+        dp = np.array([1e4, 2e4, 1.5e4, 3e4, 1e4])
+        mass_path = dp / g
+        temp = np.full(n, 2000.0)
+        kappa = np.full((1, n), kappa0)
+        w = np.array([1.0])
+
+        r = radiation_core(temp, mass_path, kappa, w, np.array([0.0]),
+                           np.array([STEFAN_BOLTZMANN * 2000.0 ** 4]), DEFAULT_DIFFUSIVITY)
+
+        expected_dtau = kappa0 * dp / g
+        np.testing.assert_allclose(r.optical_depth[0], expected_dtau, rtol=1e-15)
+
+
+class TestVariableGMassPath:
+    """Nonuniform mass path from variable gravity."""
+
+    def test_variable_g(self):
+        n = 10
+        g_profile = np.linspace(8.0, 12.0, n)
+        dp = np.full(n, 1e4)
+        mass_path = dp / g_profile
+        temp = np.linspace(1500.0, 2500.0, n)
+        kappa = np.full((1, n), 0.01)
+        w = np.array([1.0])
+        r = radiation_core(temp, mass_path, kappa, w, np.array([50.0]),
+                           np.array([STEFAN_BOLTZMANN * temp[0] ** 4]), DEFAULT_DIFFUSIVITY)
+        assert np.all(np.isfinite(r.heating))
+        assert r.heating.shape == (n,)
+        # mass paths are different, so optical depths should vary
+        assert not np.allclose(r.optical_depth[0], r.optical_depth[0, 0])
+
+
+class TestRejectionCases:
+    """Input rejection for invalid data."""
+
+    def test_reject_negative_kappa(self):
+        with pytest.raises(ValueError):
+            from convection_mlt.opacity import PrescribedBandOpacity
+            PrescribedBandOpacity(np.array([[-0.01, 0.01]]), np.array([1.0]))
+
+    def test_reject_nan_kappa(self):
+        with pytest.raises(ValueError):
+            from convection_mlt.opacity import PrescribedBandOpacity
+            PrescribedBandOpacity(np.array([[np.nan, 0.01]]), np.array([1.0]))
+
+    def test_reject_negative_mass_path(self):
+        with pytest.raises(ValueError, match="positive"):
+            solve_radiation(
+                np.array([1500.0]), np.array([-100.0]),
+                ConstantGreyOpacity(0.01), np.array([1e5]),
+                TopIrradiation(0.0), LowerFlux(0.0),
+            )
+
+    def test_reject_inf_mass_path(self):
+        with pytest.raises(ValueError):
+            solve_radiation(
+                np.array([1500.0]), np.array([np.inf]),
+                ConstantGreyOpacity(0.01), np.array([1e5]),
+                TopIrradiation(0.0), LowerFlux(0.0),
+            )
+
+    def test_reject_bad_band_fractions(self):
+        from convection_mlt.radiation import TopIrradiation
+        opa = ConstantGreyOpacity(0.01)
+        with pytest.raises(ValueError):
+            solve_radiation(
+                np.array([1500.0]), np.array([1000.0]),
+                opa, np.array([1e5]),
+                TopIrradiation(100.0, band_fractions=np.array([0.5, 0.5])),
+                LowerFlux(0.0),
+            )
+
+
+class TestReverseStorageOrientation:
+    """Reversing layer storage order and converting back gives same physical fluxes."""
+
+    def test_reverse_recovery(self):
+        n = 10
+        temp = np.linspace(1500.0, 2500.0, n)
+        mass_path = np.linspace(500.0, 1500.0, n)
+        kappa0 = 0.03
+        kappa = np.full((1, n), kappa0)
+        w = np.array([1.0])
+        D = DEFAULT_DIFFUSIVITY
+        B_bot = STEFAN_BOLTZMANN * temp[0] ** 4
+        top = np.array([100.0])
+        bot = np.array([B_bot])
+
+        r_fwd = radiation_core(temp, mass_path, kappa, w, top, bot, D)
+
+        # reverse: flip layers, swap boundary roles
+        temp_rev = temp[::-1]
+        mass_path_rev = mass_path[::-1]
+        kappa_rev = kappa[:, ::-1]
+        r_rev = radiation_core(temp_rev, mass_path_rev, kappa_rev, w, bot, top, D)
+
+        # physical fluxes at each interface should match after reversal
+        np.testing.assert_allclose(
+            r_fwd.flux_up[0], r_rev.flux_down[0, ::-1], rtol=1e-12,
+        )
+        np.testing.assert_allclose(
+            r_fwd.flux_down[0], r_rev.flux_up[0, ::-1], rtol=1e-12,
+        )
