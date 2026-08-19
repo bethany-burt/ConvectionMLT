@@ -34,11 +34,29 @@ from .thermodynamics import (
     h2_he_mixture,
     monatomic_helium,
 )
+from .opacity import (
+    AnalyticGreyOpacity,
+    ConstantGreyOpacity,
+    PrescribedBandOpacity,
+)
+from .radiation import (
+    DEFAULT_DIFFUSIVITY,
+    STEFAN_BOLTZMANN,
+    LowerFlux,
+    LowerTemperature,
+    RadiationResult,
+    SolveRoute,
+    TopIrradiation,
+    radiation_core,
+    solve_radiation,
+)
 from .trace import IntegrationTrace, TraceLevel, make_trace
 
 __all__ = [
+    "AnalyticGreyOpacity",
     "AnalyticIdealGasThermo",
     "ClosureResult",
+    "ConstantGreyOpacity",
     "ConstantGravity",
     "ConstantH2Thermo",
     "ConvergenceMetrics",
@@ -63,15 +81,24 @@ __all__ = [
     "enthalpy_normalized_adiabat",
     "fixed_step",
     "h2_he_mixture",
+    "LowerFlux",
+    "LowerTemperature",
     "log_pressure_edges",
     "make_trace",
     "mixing_region_labels",
     "mixing_length_flux",
     "monatomic_helium",
     "numerical_isentrope",
+    "PrescribedBandOpacity",
     "piecewise_enthalpy_reference",
+    "radiation_core",
+    "RadiationResult",
     "reconstruct_hydrostatic",
     "reference_enthalpy_residuals",
     "solve_adaptive",
+    "solve_radiation",
+    "SolveRoute",
+    "STEFAN_BOLTZMANN",
     "solve_adaptive_enthalpy",
+    "TopIrradiation",
 ]

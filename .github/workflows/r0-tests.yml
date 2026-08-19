@@ -32,6 +32,26 @@ jobs:
         run: python stage1/plots/make_all.py --smoke
       - name: Stage 2 CI smoke campaign
         run: python stage2/experiments/ci_smoke.py
+      - name: Stage 3 radiation tests (NumPy only)
+        run: python -m pytest stage3/tests/test_radiation.py stage3/tests/test_multiband.py -v
+
+  stage3-jax:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: convection_mlt
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: convection_mlt/requirements.lock
+      - run: python -m pip install -e ".[test,jax]"
+      - name: Stage 3 JAX parity + exit gate
+        env:
+          JAX_ENABLE_X64: "True"
+        run: python -m pytest stage3/tests/ -v
       - uses: actions/upload-artifact@v4
         if: always()
         with:

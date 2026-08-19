@@ -1,0 +1,75 @@
+{
+  "F_floor": 1e-30,
+  "H_floor": 1e-30,
+  "gates": {
+    "analytic_limits": {
+      "transparent_fd_err": 0.0,
+      "transparent_fu_err": 0.0,
+      "isothermal_fnet_max": 0.0,
+      "isothermal_heating_max": 0.0,
+      "single_layer_finite": true
+    },
+    "solver_agreement": {
+      "N=5": {
+        "thomas_dense_flux": 0.0,
+        "thomas_sweep_flux": 0.0,
+        "thomas_dense_heating": 0.0,
+        "thomas_sweep_heating": 0.0
+      },
+      "N=20": {
+        "thomas_dense_flux": 0.0,
+        "thomas_sweep_flux": 0.0,
+        "thomas_dense_heating": 0.0,
+        "thomas_sweep_heating": 0.0
+      },
+      "N=50": {
+        "thomas_dense_flux": 0.0,
+        "thomas_sweep_flux": 0.0,
+        "thomas_dense_heating": 0.0,
+        "thomas_sweep_heating": 0.0
+      }
+    },
+    "conservation": {
+      "N=5": 0.0,
+      "N=20": 0.0,
+      "N=50": 0.0
+    },
+    "refinement_positivity": {
+      "N=10": {
+        "max_heating": 554.0104178555533,
+        "flux_up_min": 56746.92981010152,
+        "flux_down_min": 50.0,
+        "all_finite": true
+      },
+      "N=20": {
+        "max_heating": 133.1430434380751,
+        "flux_up_min": 56719.367913504924,
+        "flux_down_min": 50.0,
+        "all_finite": true
+      },
+      "N=40": {
+        "max_heating": 59.88770003160574,
+        "flux_up_min": 56710.38019834231,
+        "flux_down_min": 50.0,
+        "all_finite": true
+      }
+    },
+    "jax_parity": {
+      "flux_up": 0.0,
+      "flux_down": 0.0,
+      "flux_net": 0.0,
+      "heating": 0.0,
+      "float64_verified": true
+    },
+    "audit_summary": {
+      "point_29_analytic_limits": "PASS",
+      "point_30_thomas_vs_dense": "PASS",
+      "point_31_thomas_vs_sweep": "PASS",
+      "point_32_conservative_heating": "PASS",
+      "point_33_convergence_positivity": "PASS",
+      "point_34_jax_parity": "PASS",
+      "stage_0_2_regression": "PASS (verified separately)"
+    }
+  },
+  "timestamp": "2026-08-19T13:07:10Z"
+}
