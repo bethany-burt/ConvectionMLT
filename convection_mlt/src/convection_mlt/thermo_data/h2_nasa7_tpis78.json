@@ -1,0 +1,80 @@
+{
+  "species": "H2",
+  "source": "NASA CEA / Chemkin NASA7 polynomial form (TPIS78), coefficients as distributed via Cantera nasa_gas.yaml",
+  "citation": "McBride, B.J., Gordon, S., & Reno, M.A.; TPIS78 hydrogen data; NASA7 7-coefficient representation",
+  "cea_note": "TPIS78",
+  "format": "NASA7",
+  "units": {
+    "temperature": "K",
+    "cp_over_R": "dimensionless",
+    "H_over_RT": "dimensionless",
+    "S_over_R": "dimensionless",
+    "molar_mass": "kg mol^-1"
+  },
+  "molar_mass_kg_per_mol": 0.00201588,
+  "t_ref_k": 298.15,
+  "p_ref_pa": 100000.0,
+  "temperature_ranges_k": [
+    200.0,
+    1000.0,
+    6000.0
+  ],
+  "intervals": [
+    {
+      "t_min_k": 200.0,
+      "t_max_k": 1000.0,
+      "coefficients": [
+        2.34433112,
+        0.00798052075,
+        -1.9478151e-05,
+        2.01572094e-08,
+        -7.37611761e-12,
+        -917.935173,
+        0.683010238
+      ]
+    },
+    {
+      "t_min_k": 1000.0,
+      "t_max_k": 6000.0,
+      "coefficients": [
+        2.93286579,
+        0.000826607967,
+        -1.46402335e-07,
+        1.54100359e-11,
+        -6.88804432e-16,
+        -813.065597,
+        -1.02432887
+      ]
+    }
+  ],
+  "golden_values": {
+    "comment": "Computed from the checked-in NASA7 coefficients for regression tests",
+    "points": [
+      {
+        "T_k": 298.15,
+        "cp_J_per_kg_K": 14304.513431222262,
+        "h_J_per_kg": 0.0
+      },
+      {
+        "T_k": 500.0,
+        "cp_J_per_kg_K": 14533.430421575626,
+        "h_J_per_kg": 2924512.1080930633
+      },
+      {
+        "T_k": 1000.0,
+        "cp_J_per_kg_K": 14962.768817424967,
+        "h_J_per_kg": 10261788.329188528
+      },
+      {
+        "T_k": 2000.0,
+        "cp_J_per_kg_K": 16962.892043169562,
+        "h_J_per_kg": 26284123.138233997
+      },
+      {
+        "T_k": 3000.0,
+        "cp_J_per_kg_K": 18376.000461995878,
+        "h_J_per_kg": 43992658.403117925
+      }
+    ]
+  }
+}

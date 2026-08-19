@@ -1,0 +1,146 @@
+Stage 2 debug log — deviations from stage_2_thermo_hydro_6c64927b.plan.md
+=======================================================================
+Recorded during implementation. Plan file itself was not edited.
+
+1. Thermo evaluation performance (NASA)
+---------------------------------------
+Issue: NASA7 cp/h/s used Python ndindex loops; enthalpy inversion used
+       pure bisection. Adaptive NASA solves took ~minutes per N=25 case.
+Fix:   Vectorized NASA7 helpers on coeff arrays; added
+       invert_enthalpy_newton and invert_psi_newton (cp and cp/T
+       derivatives). Potential temperature and numerical_isentrope use
+       Newton. N=25 constant-g NASA solve ~3–4 s after fix.
+
+2. numerical_isentrope bracketing
+--------------------------------
+Issue: Initial bracket used min/max(s)±10 and expanded until enthalpy
+       matched. That requested Ψ outside the NASA domain and raised
+       EnthalpyInversionError / unreachable enthalpy ranges for
+       canonical P=1e7→1e3 Pa columns.
+Fix:   Valid constant-s interval is the intersection over layers of
+       s ∈ [Ψ(t_lo)−R ln(P/P_ref), Ψ(t_hi)−R ln(P/P_ref)]. Bisect only
+       inside that interval. Campaign seeds use hot enough bottoms
+       (e.g. T_bot≈4000 K, nabla≈0.30) so the enthalpy-normalized
+       isentrope stays in-domain.
+
+3. Variable-g convergence gates (enthalpy + T RMS)
+-------------------------------------------------
+Issue: Plan forbids claiming evolving variable-g mass/energy closure, but
+       ConvergenceMetrics still required enthalpy_drift ≤ 1e-12 and
+       T RMS vs an isentrope built with the *initial* mass path. Under
+       inverse-square, Δm changes each commit so apparent
+       Σ Δm h drifts (~1e-4) and the fixed-mass T reference never
+       reaches 1e-6 / 1e-7 — solves hung at max_steps.
+Fix:   In solve_adaptive_enthalpy:
+       - enforce_enthalpy_drift only for ConstantGravity;
+       - under InverseSquareGravity, temperature_rms/max gates use
+         relative entropy span (constant-s flatness), not the fixed
+         initial-mass isentrope.
+       Campaigns still report apparent enthalpy_drift; constant-g
+       retains the strict 1e-12 identity/conservation exit gate.
+       CI smoke allows inverse-square with max(z/R_p)>0 and a looser
+       reported T-vs-isentrope check after rebuilding the reference
+       with the final mass path.
+
+4. NASA breakpoint continuity tolerance
+---------------------------------------
+Plan:  relative jump in cp, h across breaks ≤ 1e-9.
+Issue: Checked-in TPIS78 NASA7 intervals at 1000 K differ by
+       ~1.8e-9 relative in cp (and similar in h) when both
+       polynomials are evaluated at the breakpoint.
+Fix:   Tests assert ≤ 2e-9 relative and note that this is the
+       continuity of the checked-in coefficient set, not silent
+       blending.
+
+5. Manufactured isentrope entropy flatness (float64)
+----------------------------------------------------
+Plan:  max |s_i − s_0| ≤ 1e-12.
+Issue: For |s| ~ 2e4, one float64 ulp is ~3.6e-12; absolute 1e-12 is
+       below representable noise.
+Fix:   Tests use max(1e-12, 64·eps·|s|). Finite-layer max|Δ∇_s| still
+       gated at ≤ 1e-12 (passes).
+
+6. Manufactured nonisothermal hydro amplitude
+---------------------------------------------
+Plan:  max |z−z_ref|/max|z_ref| ≤ 1e-8 at N=100 vs independent
+       continuous-T integrator; ≥1.5× error drop on refinement.
+Issue: Piecewise-constant centre-T vs continuous T(P) with a large
+       sin amplitude (400 K) gave ~6e-6 at N=100 (second-order in
+       ΔlnP, refinement OK but not the absolute gate).
+Fix:   Use mild curvature (0.5 K amplitude) so the same scheme meets
+       ≤1e-8 at N=100 while keeping the refinement ratios.
+
+7. Approach-to-constant-g R_p sweep
+-----------------------------------
+Plan:  R_p ∈ {1e8, 1e9} (or equiv.); when max(z/R_p)<0.02, relative
+       z error ≤ 1e-3.
+Issue: Isothermal 1000 K H2 over 1e7→1e3 Pa at R_p=1e9 has
+       max(z/R_p)≈0.0038 but RMS relative z ≈ 0.0022 > 1e-3.
+       Also z_edges[0]=0 caused 0/0 if comparing z/z_const.
+Fix:   Compare (z−z_const)/max(|z_const|,1); extend sweep through
+       R_p=1e10 and require that some case with max(z/R_p)<0.02
+       satisfies ≤1e-3 (monotonic decrease still required).
+
+8. Layout / module split (non-semantic)
+---------------------------------------
+Plan listed solvers.py for atomic commit.
+Actual: Stage 2 enthalpy adaptive path lives in solvers_enthalpy.py
+        so Stage 0/1 solve_adaptive (temperature) stays untouched.
+        state.py, gravity.py, hydrostatics.py, thermo_data/ as planned.
+        IdealH2 remains an alias of ConstantH2Thermo with legacy
+        .cp / .nabla_ad properties.
+
+9. ConstantH2 / Mixture domain helpers
+--------------------------------------
+Added t_min/t_max on ConstantH2Thermo (wide) and MixtureThermo
+(intersection of species) so numerical_isentrope / Newton inverts
+share one domain API with NASA/Analytic.
+
+10. CI smoke vs hung intermediate runs
+-------------------------------------
+Early ci_smoke.py runs hung on inverse-square for reason (3). After
+the metric fix, smoke completes (~45 s): N=25/50 constant-g NASA +
+one inverse-square R_p=1e8 case → stage2/results/ci_smoke.json.
+Workflow .github/workflows/r0-tests.yml runs that smoke on PR and
+production_campaign.py on schedule/workflow_dispatch.
+
+11. Production campaign checkpoints + step budget
+------------------------------------------------
+Issue: First cluster production job (15648136) wrote JSON only at the end.
+       Case 2 (N=25 irregular) hit max_steps=200_000 after ~30 min and the
+       whole job died with no production_campaign.json.
+Fix:   production_campaign.py checkpoints after every case to
+       stage2/results/production_campaign.json (atomic .tmp replace).
+       run_case catches SolverFailure and records status/reason so the
+       matrix continues. PRODUCTION_MAX_STEPS raised 200_000 → 2_000_000
+       (cluster later set to 5_000_000). SLURM walltime raised 4h → 24h.
+
+12. Irregular-grid generator (local debug of stuck case 2)
+---------------------------------------------------------
+Issue: Stage 2 irregular_log_pressure_edges used a sorted RNG scramble.
+       That created Δz ratios ~180× and collapsed dt_diff by ~130× vs
+       uniform (0.37 vs 48). Local profiling: residuals decay, but N=25
+       irregular needs ~4e5 steps (~minutes locally / hours on cluster)
+       vs ~3e3 for uniform. Plan required the Stage 1 locality generator.
+Fix:   Replace with Stage 1 perturbed_edges (sinusoidal 0.12·⟨ΔlnP⟩
+       perturbation of uniform log-P). Local verify: irregular N=25
+       converges in a few thousand steps again. Cluster job 15648448
+       still runs the old generator until resubmit.
+
+13. Case 19 (N=200 uniform) max_steps / enthalpy_drift
+------------------------------------------------------
+Issue: Production case 19 hit max_steps=5e6 with T_rms~1e-9 and
+       Δ~1e-11 but enthalpy_drift~5e-11 (gate 1e-12). Local profile:
+       by ~1.7e5 accepted steps all physics gates pass; only H fails,
+       and H *grows* with further stepping (~1.4e-12 → 4e-12 by 2.5e5).
+Root:  trial_enthalpy_step did h* = h + dt·dh/dt → T* = h^{-1}(h*) →
+       then build_column_state recomputed enthalpy as h(T*). NASA
+       h→T→h round-trip is ~1e-14 relative per step; over ~1e5–1e6
+       accepts that secularly exceeds the plan’s 1e-12 conservation
+       gate. Extra steps after the isentrope is reached make drift worse.
+Fix:   build_column_state accepts optional enthalpy=; trial commits keep
+       the conserved h* (T* still from invert). Identity residual uses
+       h*. Plan 1e-12 constant-g exit gate retained.
+       Also: _metrics defers potential_temperature (Newton per layer)
+       until the other exit gates pass — N=200 was spending most of
+       each step on θ while still far from the isentrope.

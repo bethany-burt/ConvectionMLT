@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "convection-mlt"
-version = "0.1.0"
-description = "Reference mixing-length convection kernel for a closed dry-H2 column"
+version = "0.2.0"
+description = "Reference mixing-length convection kernel with Stage 2 variable thermodynamics"
 requires-python = ">=3.10"
 dependencies = ["numpy>=1.26"]
 
@@ -19,7 +19,10 @@ mlt-baseline = "convection_mlt.cli:baseline"
 [tool.setuptools.packages.find]
 where = ["src"]
 
+[tool.setuptools.package-data]
+"convection_mlt.thermo_data" = ["*.json"]
+
 [tool.pytest.ini_options]
-testpaths = ["stage0/tests", "stage1/tests"]
+testpaths = ["stage0/tests", "stage1/tests", "stage2/tests"]
 pythonpath = ["src"]
 addopts = "-ra"

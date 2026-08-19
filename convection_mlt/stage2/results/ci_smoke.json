@@ -1,0 +1,43 @@
+{
+  "cases": [
+    {
+      "n_layers": 25,
+      "x_he": 0.0,
+      "gravity_mode": "constant",
+      "planet_radius": null,
+      "irregular_grid": false,
+      "status": "converged",
+      "steps": 2847,
+      "enthalpy_drift": 0.0,
+      "temperature_rms_vs_isentrope": 4.913604343390545e-09,
+      "max_z_over_rp": 0.0,
+      "max_superadiabaticity": 9.95894530973095e-09
+    },
+    {
+      "n_layers": 50,
+      "x_he": 0.0,
+      "gravity_mode": "constant",
+      "planet_radius": null,
+      "irregular_grid": false,
+      "status": "converged",
+      "steps": 10624,
+      "enthalpy_drift": 9.613408102393921e-14,
+      "temperature_rms_vs_isentrope": 4.912498057661322e-09,
+      "max_z_over_rp": 0.0,
+      "max_superadiabaticity": 9.987608775738663e-09
+    },
+    {
+      "n_layers": 25,
+      "x_he": 0.0,
+      "gravity_mode": "inverse_square",
+      "planet_radius": 100000000.0,
+      "irregular_grid": false,
+      "status": "converged",
+      "steps": 2791,
+      "enthalpy_drift": 0.00022940591025705185,
+      "temperature_rms_vs_isentrope": 4.862038241439512e-09,
+      "max_z_over_rp": 0.06523139615779727,
+      "max_superadiabaticity": 9.947585683592915e-09
+    }
+  ]
+}

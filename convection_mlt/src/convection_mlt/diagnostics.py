@@ -36,9 +36,19 @@ class ConvergenceMetrics:
 
 
 def column_enthalpy(grid: PressureGrid, temperature: ArrayLike, cp: float) -> float:
+    """Legacy Stage 0/1 column enthalpy using constant cp: Σ cp T Δm."""
     t = temperatures(temperature, grid.n_layers)
     positive("cp", cp)
     return float(np.sum(cp * t * grid.layer_mass))
+
+
+def column_enthalpy_per_area_from_state(
+    mass_path: ArrayLike, enthalpy: ArrayLike
+) -> float:
+    """Stage 2 column enthalpy per unit area H = Σ Δm_i h_i."""
+    from .energy import column_enthalpy_per_area
+
+    return column_enthalpy_per_area(mass_path, enthalpy)
 
 
 def enthalpy_normalized_adiabat(
@@ -214,3 +224,74 @@ def mixing_timescales(
     turn[active] = ell[active] / w[active]
     mix[active] = hp[active] ** 2 / diffusion[active]
     return turn, mix, active
+
+
+def numerical_isentrope(
+    grid: PressureGrid,
+    initial_temperature: ArrayLike,
+    thermo,
+    mass_path: ArrayLike | None = None,
+) -> NDArray[np.float64]:
+    """Build an enthalpy-normalized numerical isentrope on the pressure centres."""
+    from .energy import column_enthalpy_per_area
+
+    t0 = temperatures(initial_temperature, grid.n_layers)
+    mass = (
+        np.asarray(grid.layer_mass, dtype=float)
+        if mass_path is None
+        else finite_1d("mass_path", mass_path)
+    )
+    if mass.size != grid.n_layers:
+        raise ValueError("mass_path length mismatch")
+
+    t_min = float(getattr(thermo, "t_min", 200.0))
+    t_max = float(getattr(thermo, "t_max", 6000.0))
+    # Keep a small margin inside closed endpoints for robust inversion.
+    t_lo = t_min * (1.0 + 1.0e-9) if t_min > 0.0 else t_min + 1.0e-9
+    t_hi = t_max * (1.0 - 1.0e-9)
+    psi_lo = float(thermo.psi(np.asarray([t_lo]))[0])
+    psi_hi = float(thermo.psi(np.asarray([t_hi]))[0])
+    r_mix = float(thermo.gas_constant)
+    p_ref = float(thermo.p_ref)
+
+    # Valid constant-s values are the intersection over layers of
+    # s ∈ [Ψ_min - R ln(P/P_ref), Ψ_max - R ln(P/P_ref)].
+    s_lo = -np.inf
+    s_hi = np.inf
+    for pressure in grid.pressure_centres:
+        offset = r_mix * np.log(float(pressure) / p_ref)
+        s_lo = max(s_lo, psi_lo - offset)
+        s_hi = min(s_hi, psi_hi - offset)
+    if not np.isfinite(s_lo) or not np.isfinite(s_hi) or s_lo >= s_hi:
+        raise ValueError("no common entropy is reachable on this pressure grid")
+
+    def profile_for_entropy(s_target: float) -> NDArray[np.float64]:
+        from .thermodynamics import invert_psi_newton
+
+        target_psi = s_target + r_mix * np.log(grid.pressure_centres / p_ref)
+        return invert_psi_newton(thermo, target_psi, t_min=t_lo, t_max=t_hi)
+
+
+    def enthalpy_of_s(s_value: float) -> float:
+        return column_enthalpy_per_area(
+            mass, thermo.enthalpy(profile_for_entropy(s_value))
+        )
+
+    h_target = column_enthalpy_per_area(mass, thermo.enthalpy(t0))
+    h_lo = enthalpy_of_s(s_lo)
+    h_hi = enthalpy_of_s(s_hi)
+    if h_target < h_lo or h_target > h_hi:
+        raise ValueError(
+            "initial column enthalpy is outside the reachable isentrope range "
+            f"[{h_lo}, {h_hi}] for domain [{t_lo}, {t_hi}] K"
+        )
+
+    lo = float(s_lo)
+    hi = float(s_hi)
+    for _ in range(80):
+        mid = 0.5 * (lo + hi)
+        if enthalpy_of_s(mid) < h_target:
+            lo = mid
+        else:
+            hi = mid
+    return profile_for_entropy(0.5 * (lo + hi))

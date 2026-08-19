@@ -43,6 +43,7 @@ class AcceptedStepRecord:
     signed_enthalpy_drift: float
     region_labels: NDArray[np.int64]
     cumulative_transfer: NDArray[np.float64]
+    entropy_span: float | None = None
 
 
 @dataclass
@@ -92,13 +93,15 @@ class IntegrationTrace:
         self._initial_theta_rms = max(metrics.potential_temperature_rms, theta_tolerance)
         if self.level in (TraceLevel.PROFILES, TraceLevel.TRIALS):
             if not self.theta_rms_targets:
-                self.theta_rms_targets = list(
-                    np.geomspace(
-                        self._initial_theta_rms,
-                        max(theta_tolerance, np.finfo(float).tiny),
-                        8,
+                start = self._initial_theta_rms
+                if start is not None and np.isfinite(start) and start > 0.0:
+                    self.theta_rms_targets = list(
+                        np.geomspace(
+                            start,
+                            max(theta_tolerance, np.finfo(float).tiny),
+                            8,
+                        )
                     )
-                )
             self.profiles.append(
                 ProfileSnapshot(
                     0,
@@ -147,6 +150,10 @@ class IntegrationTrace:
         cumulative_transfer: NDArray[np.float64],
         temperature: NDArray[np.float64],
         flux: NDArray[np.float64],
+        *,
+        snapshot_profile: bool = True,
+        entropy_span: float | None = None,
+        force_summary: bool = False,
     ) -> None:
         if not self.enabled:
             return
@@ -157,8 +164,10 @@ class IntegrationTrace:
         self.totals["simulated_time"] = float(simulated_time)
         self._update_extrema(metrics, signed_enthalpy_drift)
         keep_summary = (
-            accepted_step % max(self.summary_stride, 1) == 0
+            force_summary
+            or accepted_step % max(self.summary_stride, 1) == 0
             or accepted_step == 1
+            or accepted_step == 0
         )
         if keep_summary:
             self.accepted_steps.append(
@@ -171,10 +180,11 @@ class IntegrationTrace:
                     float(signed_enthalpy_drift),
                     labels.copy(),
                     cumulative_transfer.copy(),
+                    None if entropy_span is None else float(entropy_span),
                 )
             )
             self._bound_summary_history()
-        if self.level in (TraceLevel.PROFILES, TraceLevel.TRIALS):
+        if snapshot_profile and self.level in (TraceLevel.PROFILES, TraceLevel.TRIALS):
             self._maybe_snapshot_profile(
                 accepted_step,
                 simulated_time,
@@ -244,7 +254,7 @@ class IntegrationTrace:
             self.accepted_steps = [
                 item
                 for item in self.accepted_steps
-                if item.accepted_step == 1
+                if item.accepted_step in (0, 1)
                 or item.accepted_step % self.summary_stride == 0
             ]
 
@@ -284,6 +294,7 @@ class IntegrationTrace:
                     "signed_enthalpy_drift": item.signed_enthalpy_drift,
                     "region_labels": item.region_labels.tolist(),
                     "cumulative_transfer": item.cumulative_transfer.tolist(),
+                    "entropy_span": item.entropy_span,
                 }
                 for item in self.accepted_steps
             ],

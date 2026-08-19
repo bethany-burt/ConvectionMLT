@@ -1,0 +1,269 @@
+{
+  "code_revision": {
+    "git_commit": "877bb18b7be4fb9af3d173ee15e3f14b5f2aec98",
+    "git_dirty": true
+  },
+  "rows": [
+    {
+      "comparison": "<=",
+      "metric": "dh/dT = cp identity (all plotted providers)",
+      "notes": "max over NASA H2 + H2-He mixtures, 250-5000 K, exact 1000 K join excluded",
+      "observed": 8.564000281905007e-09,
+      "source_case": "thermo_audit",
+      "status": "PASS",
+      "tolerance": 1e-08,
+      "units": "relative"
+    },
+    {
+      "comparison": "<=",
+      "metric": "equation-of-state identity",
+      "notes": "rho R T / P",
+      "observed": 1.1102230246251565e-16,
+      "source_case": "thermo_audit",
+      "status": "PASS",
+      "tolerance": 1e-12,
+      "units": "relative"
+    },
+    {
+      "comparison": "<=",
+      "metric": "pure-H2 mixture limit",
+      "notes": "",
+      "observed": 0.0,
+      "source_case": "thermo_audit",
+      "status": "PASS",
+      "tolerance": 1e-12,
+      "units": "relative"
+    },
+    {
+      "comparison": "<=",
+      "metric": "exact monatomic He cp",
+      "notes": "cp = 5/2 R",
+      "observed": 0.0,
+      "source_case": "thermo_audit",
+      "status": "PASS",
+      "tolerance": 1e-12,
+      "units": "relative"
+    },
+    {
+      "comparison": "<=",
+      "metric": "enthalpy inversion T->h->T (all plotted providers)",
+      "notes": "max over NASA H2 + H2-He mixtures, 250-5000 K, exact 1000 K join excluded",
+      "observed": 1.5698553568199713e-13,
+      "source_case": "thermo_audit",
+      "status": "PASS",
+      "tolerance": 1e-12,
+      "units": "relative"
+    },
+    {
+      "comparison": "<=",
+      "metric": "entropy-function inversion T->Psi->T (all plotted providers)",
+      "notes": "max over NASA H2 + H2-He mixtures, 250-5000 K, exact 1000 K join excluded",
+      "observed": 1.7763568394002505e-15,
+      "source_case": "thermo_audit",
+      "status": "PASS",
+      "tolerance": 1e-12,
+      "units": "relative"
+    },
+    {
+      "comparison": "<=",
+      "metric": "NASA breakpoint continuity (cp)",
+      "notes": "checked-in TPIS78 coefficients",
+      "observed": 1.6437945650092065e-09,
+      "source_case": "thermo_audit",
+      "status": "PASS",
+      "tolerance": 2e-09,
+      "units": "relative"
+    },
+    {
+      "comparison": "<=",
+      "metric": "NASA breakpoint continuity (h)",
+      "notes": "T=1000 K \u00b1 1e-6 K",
+      "observed": 1.4111042364208003e-09,
+      "source_case": "thermo_audit",
+      "status": "PASS",
+      "tolerance": 2e-09,
+      "units": "relative"
+    },
+    {
+      "comparison": "<=",
+      "metric": "NASA breakpoint continuity (Psi)",
+      "notes": "T=1000 K \u00b1 1e-6 K",
+      "observed": 5.465948235900133e-10,
+      "source_case": "thermo_audit",
+      "status": "PASS",
+      "tolerance": 2e-09,
+      "units": "relative"
+    },
+    {
+      "comparison": ">",
+      "metric": "cp > 0 (all providers, min cp)",
+      "notes": "min over NASA H2 + H2-He mixtures on 80 interior samples",
+      "observed": 10296.794879895595,
+      "source_case": "thermo_audit",
+      "status": "PASS",
+      "tolerance": 0.0,
+      "units": "J kg^-1 K^-1"
+    },
+    {
+      "comparison": ">",
+      "metric": "enthalpy monotonicity min(dh/dT) > 0",
+      "notes": "interval-aware stencil on NASA H2, 80 interior samples",
+      "observed": 13674.610893486602,
+      "source_case": "thermo_audit",
+      "status": "PASS",
+      "tolerance": 0.0,
+      "units": "J kg^-1 K^-1"
+    },
+    {
+      "comparison": "<=",
+      "metric": "manufactured-isentrope entropy flatness",
+      "notes": "",
+      "observed": 2.9103830456733704e-11,
+      "source_case": "N=50 NASA seed",
+      "status": "PASS",
+      "tolerance": 3.073801159849633e-10,
+      "units": "J kg^-1 K^-1"
+    },
+    {
+      "comparison": "<=",
+      "metric": "finite-layer entropy-instability identity",
+      "notes": "entropy \u0394\u2207 matches legacy nabla for ConstantH2Thermo",
+      "observed": 4.746203430272544e-15,
+      "source_case": "constant-cp closure",
+      "status": "PASS",
+      "tolerance": 1e-14,
+      "units": "relative"
+    },
+    {
+      "comparison": "<=",
+      "metric": "manufactured-isentrope entropy jump",
+      "notes": "",
+      "observed": 3.2741809263825417e-11,
+      "source_case": "N=50 NASA seed",
+      "status": "PASS",
+      "tolerance": 3.073801159849633e-10,
+      "units": "J kg^-1 K^-1"
+    },
+    {
+      "comparison": "==",
+      "metric": "rejected-state purity",
+      "notes": "T, h, density, z, g, and mass paths unchanged after rejection",
+      "observed": 1.0,
+      "source_case": "trial_enthalpy_step",
+      "status": "PASS",
+      "tolerance": 1.0,
+      "units": "boolean"
+    },
+    {
+      "comparison": "==",
+      "metric": "thermodynamic domain failure",
+      "notes": "ThermoDomainError below t_min and above t_max",
+      "observed": 1.0,
+      "source_case": "NASAThermo",
+      "status": "PASS",
+      "tolerance": 1.0,
+      "units": "boolean"
+    },
+    {
+      "comparison": "==",
+      "metric": "hydrostatic domain failure",
+      "notes": "HydrostaticDomainError for unreachable inverse-square column",
+      "observed": 1.0,
+      "source_case": "reconstruct_hydrostatic",
+      "status": "PASS",
+      "tolerance": 1.0,
+      "units": "boolean"
+    },
+    {
+      "comparison": "<=",
+      "metric": "constant-g isothermal hydrostatic error",
+      "notes": "max|z_model \u2212 z_analytic| / scale height",
+      "observed": 1.1290173748672502e-14,
+      "source_case": "hydro_references",
+      "status": "PASS",
+      "tolerance": 1e-12,
+      "units": "relative (z/H_p)"
+    },
+    {
+      "comparison": "<=",
+      "metric": "inverse-square isothermal hydrostatic error",
+      "notes": "max|z_model/z_analytic \u2212 1| at column top",
+      "observed": 1.509903313490213e-13,
+      "source_case": "hydro_references",
+      "status": "PASS",
+      "tolerance": 1e-10,
+      "units": "relative (z_top)"
+    },
+    {
+      "comparison": "<=",
+      "metric": "nonisothermal ODE-reference error at N=100 (mild)",
+      "notes": "max|z \u2212 z_ODE|/max|z_ODE|; mild T(P) profile",
+      "observed": 8.758223508708048e-09,
+      "source_case": "hydro_references",
+      "status": "PASS",
+      "tolerance": 2e-08,
+      "units": "relative"
+    },
+    {
+      "comparison": "<=",
+      "metric": "pressure round-trip error",
+      "notes": "max|P_recovered/P_edges \u2212 1|",
+      "observed": 8.881784197001252e-16,
+      "source_case": "hydro_references",
+      "status": "PASS",
+      "tolerance": 1e-10,
+      "units": "relative"
+    },
+    {
+      "comparison": "<=",
+      "metric": "ODE reference refinement change",
+      "notes": "max|z_tight \u2212 z_loose|/max|z_loose|",
+      "observed": 2.466721839661636e-08,
+      "source_case": "hydro_references",
+      "status": "PASS",
+      "tolerance": 1e-06,
+      "units": "relative"
+    },
+    {
+      "comparison": "<=",
+      "metric": "constant-g enthalpy conservation (campaign max)",
+      "notes": "",
+      "observed": 5.005605185309605e-15,
+      "source_case": "production_campaign_enriched",
+      "status": "PASS",
+      "tolerance": 1e-12,
+      "units": "relative"
+    },
+    {
+      "comparison": "<=",
+      "metric": "constant-gravity limit E_z (Rp=1e10 m)",
+      "notes": "coupled inverse-square column vs constant-g height",
+      "observed": 0.0005851988903638613,
+      "source_case": "gravity_limit",
+      "status": "PASS",
+      "tolerance": 0.001,
+      "units": "relative"
+    },
+    {
+      "comparison": ">=",
+      "metric": "production completion",
+      "notes": "27/27 converged, 0 gate failures",
+      "observed": 27.0,
+      "source_case": "production_campaign_enriched",
+      "status": "PASS",
+      "tolerance": 27.0,
+      "units": "count"
+    },
+    {
+      "comparison": "N/A",
+      "metric": "variable-g apparent enthalpy drift",
+      "notes": "Pressure-layer mass paths change under inverse-square gravity; strict conservation is not claimed.",
+      "observed": "2.222e-04 \u2013 3.547e-03",
+      "source_case": "gravity_stress",
+      "status": "N/A",
+      "tolerance": null,
+      "units": "relative"
+    }
+  ],
+  "title": "Stage 2 deterministic audit"
+}

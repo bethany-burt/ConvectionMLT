@@ -1,0 +1,31 @@
+{
+  "cases_included": [
+    25,
+    26
+  ],
+  "code_revision": {
+    "git_commit": "877bb18b7be4fb9af3d173ee15e3f14b5f2aec98",
+    "git_dirty": true
+  },
+  "extra": {
+    "height_norm": "E_z column-scale",
+    "radii_m": [
+      10000000.0,
+      100000000.0,
+      1000000000.0,
+      10000000000.0
+    ],
+    "rms_definition": "mass-weighted relative T vs rebuilt numerical isentrope"
+  },
+  "figure": "fig07_inverse_square",
+  "source_files": [
+    "/Users/burt/Desktop/USM/Exo/ConvectionMLT/convection_mlt/stage2/results/production_campaign_enriched.json",
+    "/Users/burt/Desktop/USM/Exo/ConvectionMLT/convection_mlt/stage2/plots/data/gravity_limit.json"
+  ],
+  "timestamp_utc": "2026-08-19T12:06:50.473245+00:00",
+  "tolerances": {
+    "enthalpy_drift_tolerance": 1e-12,
+    "epsilon_gradient": 1e-08,
+    "isentrope_rms_tolerance": 1e-06
+  }
+}
