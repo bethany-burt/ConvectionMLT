@@ -35,8 +35,9 @@ DEFAULT_DIFFUSIVITY = 1.66
 # ── Boundary conditions ──────────────────────────────────────────────
 
 class BCType(Enum):
-    LOWER_FLUX = auto()
+    LOWER_UPWARD_FLUX = auto()
     LOWER_TEMPERATURE = auto()
+    LOWER_NET_INTERNAL_FLUX = auto()
 
 
 @dataclass(frozen=True)
@@ -46,14 +47,35 @@ class TopIrradiation:
 
 
 @dataclass(frozen=True)
-class LowerFlux:
-    flux: float  # total F↑ at interface 0 [W m⁻²]
+class LowerUpwardFlux:
+    """Stage 3 two-stream BC: prescribe total F↑ at interface 0 [W m⁻²]."""
+
+    flux: float
     band_fractions: NDArray[np.float64] | None = None
+
+
+# Backward-compatible name for Stage 3 tests and call sites.
+LowerFlux = LowerUpwardFlux
 
 
 @dataclass(frozen=True)
 class LowerTemperature:
     temperature: float  # black lower boundary T_bound [K]
+
+
+@dataclass(frozen=True)
+class LowerNetInternalFlux:
+    """Stage 4 conservation BC: F_rad,net(0) + F_conv(0) = F_int [W m⁻²].
+
+    Absorption-only downward streams depend only on the top BC. After the
+    downward sweep, the required upward flux is
+        F_b↑(0) = F_b↓(0) + w_b [F_int − F_conv(0)].
+    """
+
+    flux: float  # F_int, net total internal flux [W m⁻²]
+
+
+LowerBoundary = LowerUpwardFlux | LowerTemperature | LowerNetInternalFlux
 
 
 # ── Result container ─────────────────────────────────────────────────
@@ -85,6 +107,8 @@ def radiation_core(
     bottom_up_flux_band: NDArray[np.float64],
     diffusivity_factor: float,
     route: SolveRoute = SolveRoute.THOMAS,
+    net_internal_flux: float | None = None,
+    bottom_convective_flux: float = 0.0,
 ) -> RadiationResult:
     """Pure-array radiative transfer core (NumPy).
 
@@ -98,6 +122,9 @@ def radiation_core(
     bottom_up_flux_band   (n_band,) F↑ at interface 0 per band [W m⁻²]
     diffusivity_factor    scalar D > 0
     route                 which solver to use
+    net_internal_flux     if set, ignore bottom_up_flux_band and impose
+                          F_rad,net(0) + F_conv(0) = net_internal_flux
+    bottom_convective_flux  F_conv(0) used only with net_internal_flux
     """
     n_layer = temperature.shape[0]
     n_band = kappa.shape[0]
@@ -121,16 +148,29 @@ def radiation_core(
         ef_b = emission_frac[b]
         s_b = source[b]
         f_down_top = top_down_flux_band[b]
-        f_up_bot = bottom_up_flux_band[b]
 
         if route == SolveRoute.SWEEP:
-            fu, fd = _sweep(n_layer, t_b, ef_b, s_b, f_down_top, f_up_bot)
+            fd = _sweep_down(n_layer, t_b, ef_b, s_b, f_down_top)
         elif route == SolveRoute.DENSE:
-            fu, fd = _dense_solve(n_layer, t_b, ef_b, s_b, f_down_top, f_up_bot)
+            fd = _dense_down(n_layer, t_b, ef_b, s_b, f_down_top)
         elif route == SolveRoute.THOMAS:
-            fu, fd = _thomas_solve_band(n_layer, t_b, ef_b, s_b, f_down_top, f_up_bot)
+            fd = _thomas_down(n_layer, t_b, ef_b, s_b, f_down_top)
         else:
             raise ValueError(f"Unknown route: {route}")
+
+        if net_internal_flux is not None:
+            f_up_bot = net_internal_upward_band(
+                fd[0], band_weights[b], net_internal_flux, bottom_convective_flux
+            )
+        else:
+            f_up_bot = bottom_up_flux_band[b]
+
+        if route == SolveRoute.SWEEP:
+            fu = _sweep_up(n_layer, t_b, ef_b, s_b, f_up_bot)
+        elif route == SolveRoute.DENSE:
+            fu = _dense_up(n_layer, t_b, ef_b, s_b, f_up_bot)
+        else:
+            fu = _thomas_up(n_layer, t_b, ef_b, s_b, f_up_bot)
 
         flux_up[b] = fu
         flux_down[b] = fd
@@ -153,6 +193,54 @@ def radiation_core(
 
 # ── Directional sweep (independent reference) ───────────────────────
 
+def net_internal_upward_band(
+    flux_down_bottom: float,
+    band_weight: float,
+    f_int: float,
+    f_conv_bottom: float,
+) -> float:
+    """F_b↑(0) = F_b↓(0) + w_b [F_int − F_conv(0)]."""
+    return float(flux_down_bottom + band_weight * (f_int - f_conv_bottom))
+
+
+def net_internal_residual(
+    result: RadiationResult,
+    f_int: float,
+    f_conv_bottom: float = 0.0,
+) -> float:
+    """|Σ_b (F_b↑(0) − F_b↓(0)) + F_conv(0) − F_int|."""
+    rad_net0 = float(np.sum(result.flux_up[:, 0] - result.flux_down[:, 0]))
+    return abs(rad_net0 + f_conv_bottom - f_int)
+
+
+def _sweep_down(
+    n_layer: int,
+    trans: NDArray,
+    emission_frac: NDArray,
+    source: NDArray,
+    f_down_top: float,
+) -> NDArray:
+    fd = np.zeros(n_layer + 1, dtype=np.float64)
+    fd[n_layer] = f_down_top
+    for i in range(n_layer - 1, -1, -1):
+        fd[i] = trans[i] * fd[i + 1] + emission_frac[i] * source[i]
+    return fd
+
+
+def _sweep_up(
+    n_layer: int,
+    trans: NDArray,
+    emission_frac: NDArray,
+    source: NDArray,
+    f_up_bot: float,
+) -> NDArray:
+    fu = np.zeros(n_layer + 1, dtype=np.float64)
+    fu[0] = f_up_bot
+    for i in range(n_layer):
+        fu[i + 1] = trans[i] * fu[i] + emission_frac[i] * source[i]
+    return fu
+
+
 def _sweep(
     n_layer: int,
     trans: NDArray,
@@ -161,24 +249,56 @@ def _sweep(
     f_down_top: float,
     f_up_bot: float,
 ) -> tuple[NDArray, NDArray]:
-    n_iface = n_layer + 1
-    fd = np.zeros(n_iface, dtype=np.float64)
-    fu = np.zeros(n_iface, dtype=np.float64)
-
-    # downward: from top (interface N) to bottom
-    fd[n_layer] = f_down_top
-    for i in range(n_layer - 1, -1, -1):
-        fd[i] = trans[i] * fd[i + 1] + emission_frac[i] * source[i]
-
-    # upward: from bottom (interface 0) to top
-    fu[0] = f_up_bot
-    for i in range(n_layer):
-        fu[i + 1] = trans[i] * fu[i] + emission_frac[i] * source[i]
-
+    fd = _sweep_down(n_layer, trans, emission_frac, source, f_down_top)
+    fu = _sweep_up(n_layer, trans, emission_frac, source, f_up_bot)
     return fu, fd
 
 
 # ── Dense solve (same linear system) ────────────────────────────────
+
+def _dense_down(
+    n_layer: int,
+    trans: NDArray,
+    emission_frac: NDArray,
+    source: NDArray,
+    f_down_top: float,
+) -> NDArray:
+    A_down = np.zeros((n_layer, n_layer), dtype=np.float64)
+    b_down = np.zeros(n_layer, dtype=np.float64)
+    for i in range(n_layer):
+        A_down[i, i] = 1.0
+        if i + 1 < n_layer:
+            A_down[i, i + 1] = -trans[i]
+        b_down[i] = emission_frac[i] * source[i]
+    b_down[n_layer - 1] += trans[n_layer - 1] * f_down_top
+    x_down = np.linalg.solve(A_down, b_down)
+    fd = np.zeros(n_layer + 1, dtype=np.float64)
+    fd[:n_layer] = x_down
+    fd[n_layer] = f_down_top
+    return fd
+
+
+def _dense_up(
+    n_layer: int,
+    trans: NDArray,
+    emission_frac: NDArray,
+    source: NDArray,
+    f_up_bot: float,
+) -> NDArray:
+    A_up = np.zeros((n_layer, n_layer), dtype=np.float64)
+    b_up = np.zeros(n_layer, dtype=np.float64)
+    for i in range(n_layer):
+        A_up[i, i] = 1.0
+        if i - 1 >= 0:
+            A_up[i, i - 1] = -trans[i]
+        b_up[i] = emission_frac[i] * source[i]
+    b_up[0] += trans[0] * f_up_bot
+    x_up = np.linalg.solve(A_up, b_up)
+    fu = np.zeros(n_layer + 1, dtype=np.float64)
+    fu[0] = f_up_bot
+    fu[1:] = x_up
+    return fu
+
 
 def _dense_solve(
     n_layer: int,
@@ -188,54 +308,50 @@ def _dense_solve(
     f_down_top: float,
     f_up_bot: float,
 ) -> tuple[NDArray, NDArray]:
-    # Downward: x↓ = (F↓[0], ..., F↓[N-1])
-    # F↓[i] = 𝒯_i F↓[i+1] + ε_i B_i
-    # For i=N-1: F↓[N-1] = 𝒯_{N-1} F↓[N] + ε_{N-1} B_{N-1}
-    #   F↓[N] is the top BC (known)
-    # The equation is: F↓[i] - 𝒯_i F↓[i+1] = ε_i B_i
-    # For i < N-1: unknowns couple adjacent; for i = N-1: F↓[N] = f_down_top (known)
-
-    # downward system: row i is F↓[i] - 𝒯_i F↓[i+1] = ε_i B_i
-    # unknowns ordered as F↓[0], F↓[1], ..., F↓[N-1]
-    A_down = np.zeros((n_layer, n_layer), dtype=np.float64)
-    b_down = np.zeros(n_layer, dtype=np.float64)
-    for i in range(n_layer):
-        A_down[i, i] = 1.0
-        if i + 1 < n_layer:
-            A_down[i, i + 1] = -trans[i]
-        b_down[i] = emission_frac[i] * source[i]
-    # top layer: F↓[N-1] - 𝒯_{N-1} F↓[N] = ε_{N-1} B_{N-1}
-    # F↓[N] known => move to RHS
-    b_down[n_layer - 1] += trans[n_layer - 1] * f_down_top
-
-    x_down = np.linalg.solve(A_down, b_down)
-    fd = np.zeros(n_layer + 1, dtype=np.float64)
-    fd[:n_layer] = x_down
-    fd[n_layer] = f_down_top
-
-    # upward system: F↑[i+1] = 𝒯_i F↑[i] + ε_i B_i
-    # unknowns: F↑[1], ..., F↑[N]
-    # row i: F↑[i+1] - 𝒯_i F↑[i] = ε_i B_i
-    # For i=0: F↑[0] = f_up_bot known
-    A_up = np.zeros((n_layer, n_layer), dtype=np.float64)
-    b_up = np.zeros(n_layer, dtype=np.float64)
-    for i in range(n_layer):
-        A_up[i, i] = 1.0
-        if i - 1 >= 0:
-            A_up[i, i - 1] = -trans[i]
-        b_up[i] = emission_frac[i] * source[i]
-    # bottom layer: F↑[1] - 𝒯_0 F↑[0] = ε_0 B_0; F↑[0] known
-    b_up[0] += trans[0] * f_up_bot
-
-    x_up = np.linalg.solve(A_up, b_up)
-    fu = np.zeros(n_layer + 1, dtype=np.float64)
-    fu[0] = f_up_bot
-    fu[1:] = x_up
-
+    fd = _dense_down(n_layer, trans, emission_frac, source, f_down_top)
+    fu = _dense_up(n_layer, trans, emission_frac, source, f_up_bot)
     return fu, fd
 
 
 # ── Thomas solve (same system, tridiagonal) ─────────────────────────
+
+def _thomas_down(
+    n_layer: int,
+    trans: NDArray,
+    emission_frac: NDArray,
+    source: NDArray,
+    f_down_top: float,
+) -> NDArray:
+    diag_d = np.ones(n_layer, dtype=np.float64)
+    upper_d = -trans[:n_layer - 1]
+    lower_d = np.zeros(n_layer - 1, dtype=np.float64)
+    rhs_d = emission_frac * source
+    rhs_d[n_layer - 1] += trans[n_layer - 1] * f_down_top
+    x_down = thomas_solve(lower_d, diag_d, upper_d, rhs_d)
+    fd = np.zeros(n_layer + 1, dtype=np.float64)
+    fd[:n_layer] = x_down
+    fd[n_layer] = f_down_top
+    return fd
+
+
+def _thomas_up(
+    n_layer: int,
+    trans: NDArray,
+    emission_frac: NDArray,
+    source: NDArray,
+    f_up_bot: float,
+) -> NDArray:
+    diag_u = np.ones(n_layer, dtype=np.float64)
+    lower_u = -trans[1:]
+    upper_u = np.zeros(n_layer - 1, dtype=np.float64)
+    rhs_u = emission_frac * source
+    rhs_u[0] += trans[0] * f_up_bot
+    x_up = thomas_solve(lower_u, diag_u, upper_u, rhs_u)
+    fu = np.zeros(n_layer + 1, dtype=np.float64)
+    fu[0] = f_up_bot
+    fu[1:] = x_up
+    return fu
+
 
 def _thomas_solve_band(
     n_layer: int,
@@ -245,33 +361,8 @@ def _thomas_solve_band(
     f_down_top: float,
     f_up_bot: float,
 ) -> tuple[NDArray, NDArray]:
-    # These are bidiagonal systems (sub- or super-diagonal only), but
-    # Thomas handles them as tridiagonal with zero off-diag.
-
-    # Downward: diag = 1, upper = -𝒯_i
-    diag_d = np.ones(n_layer, dtype=np.float64)
-    upper_d = -trans[:n_layer - 1]
-    lower_d = np.zeros(n_layer - 1, dtype=np.float64)
-    rhs_d = emission_frac * source
-    rhs_d[n_layer - 1] += trans[n_layer - 1] * f_down_top
-
-    x_down = thomas_solve(lower_d, diag_d, upper_d, rhs_d)
-    fd = np.zeros(n_layer + 1, dtype=np.float64)
-    fd[:n_layer] = x_down
-    fd[n_layer] = f_down_top
-
-    # Upward: diag = 1, lower = -𝒯_i
-    diag_u = np.ones(n_layer, dtype=np.float64)
-    lower_u = -trans[1:]
-    upper_u = np.zeros(n_layer - 1, dtype=np.float64)
-    rhs_u = emission_frac * source
-    rhs_u[0] += trans[0] * f_up_bot
-
-    x_up = thomas_solve(lower_u, diag_u, upper_u, rhs_u)
-    fu = np.zeros(n_layer + 1, dtype=np.float64)
-    fu[0] = f_up_bot
-    fu[1:] = x_up
-
+    fd = _thomas_down(n_layer, trans, emission_frac, source, f_down_top)
+    fu = _thomas_up(n_layer, trans, emission_frac, source, f_up_bot)
     return fu, fd
 
 
@@ -283,9 +374,10 @@ def solve_radiation(
     opacity: PrescribedOpacity,
     pressure: NDArray[np.float64],
     top_bc: TopIrradiation,
-    lower_bc: LowerFlux | LowerTemperature,
+    lower_bc: LowerBoundary,
     diffusivity_factor: float = DEFAULT_DIFFUSIVITY,
     route: SolveRoute = SolveRoute.THOMAS,
+    bottom_convective_flux: float = 0.0,
 ) -> RadiationResult:
     """Solve absorption-only radiative transfer with prescribed opacity.
 
@@ -296,9 +388,10 @@ def solve_radiation(
     opacity        prescribed opacity provider
     pressure       (n_layer,) layer-centre pressure [Pa], for opacity evaluation
     top_bc         top irradiation boundary condition
-    lower_bc       lower flux or lower temperature boundary condition
+    lower_bc       Stage 3 F↑, black T, or Stage 4 net internal flux
     diffusivity_factor  D > 0
     route          solver route
+    bottom_convective_flux  F_conv(0); used only with LowerNetInternalFlux
     """
     n_layer = temperature.shape[0]
     _validate_inputs(temperature, mass_path, pressure, diffusivity_factor)
@@ -312,17 +405,21 @@ def solve_radiation(
 
     _validate_band_weights(weights)
 
-    if isinstance(lower_bc, LowerFlux) and isinstance(lower_bc, LowerTemperature):
-        raise ValueError("Cannot have both LowerFlux and LowerTemperature")
-
-    # expand top BC
     top_band = _expand_top_bc(top_bc, weights, n_band)
 
-    # expand lower BC
+    if isinstance(lower_bc, LowerNetInternalFlux):
+        dummy_bot = np.zeros(n_band, dtype=np.float64)
+        return radiation_core(
+            temperature, mass_path, kappa, weights,
+            top_band, dummy_bot, diffusivity_factor, route,
+            net_internal_flux=float(lower_bc.flux),
+            bottom_convective_flux=float(bottom_convective_flux),
+        )
+
     if isinstance(lower_bc, LowerTemperature):
         bot_total = STEFAN_BOLTZMANN * lower_bc.temperature ** 4
         bot_band = weights * bot_total
-    elif isinstance(lower_bc, LowerFlux):
+    elif isinstance(lower_bc, LowerUpwardFlux):
         bot_band = _expand_lower_flux_bc(lower_bc, weights, n_band)
     else:
         raise TypeError(f"Unknown lower BC type: {type(lower_bc)}")
@@ -347,7 +444,7 @@ def _expand_top_bc(
 
 
 def _expand_lower_flux_bc(
-    bc: LowerFlux,
+    bc: LowerUpwardFlux,
     weights: NDArray[np.float64],
     n_band: int,
 ) -> NDArray[np.float64]:

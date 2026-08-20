@@ -51,28 +51,32 @@ def _thomas_solve_jax(lower, diag, upper, rhs):
     return x
 
 
-def _solve_band_jax(trans, emission_frac, source, f_down_top, f_up_bot):
-    """Solve one band using Thomas (bidiagonal)."""
+def _solve_down_jax(trans, emission_frac, source, f_down_top):
     n_layer = trans.shape[0]
-
-    # downward
     diag_d = jnp.ones(n_layer, dtype=jnp.float64)
     upper_d = -trans[:n_layer - 1]
     lower_d = jnp.zeros(n_layer - 1, dtype=jnp.float64)
     rhs_d = emission_frac * source
     rhs_d = rhs_d.at[n_layer - 1].add(trans[n_layer - 1] * f_down_top)
     x_down = _thomas_solve_jax(lower_d, diag_d, upper_d, rhs_d)
-    fd = jnp.concatenate([x_down, f_down_top[None]])
+    return jnp.concatenate([x_down, f_down_top[None]])
 
-    # upward
+
+def _solve_up_jax(trans, emission_frac, source, f_up_bot):
+    n_layer = trans.shape[0]
     diag_u = jnp.ones(n_layer, dtype=jnp.float64)
     lower_u = -trans[1:]
     upper_u = jnp.zeros(n_layer - 1, dtype=jnp.float64)
     rhs_u = emission_frac * source
     rhs_u = rhs_u.at[0].add(trans[0] * f_up_bot)
     x_up = _thomas_solve_jax(lower_u, diag_u, upper_u, rhs_u)
-    fu = jnp.concatenate([f_up_bot[None], x_up])
+    return jnp.concatenate([f_up_bot[None], x_up])
 
+
+def _solve_band_jax(trans, emission_frac, source, f_down_top, f_up_bot):
+    """Solve one band using Thomas (bidiagonal)."""
+    fd = _solve_down_jax(trans, emission_frac, source, f_down_top)
+    fu = _solve_up_jax(trans, emission_frac, source, f_up_bot)
     return fu, fd
 
 
@@ -111,6 +115,49 @@ def radiation_core_jax(
     flux_net = jnp.sum(flux_net_band, axis=0)
     heating = (flux_net[:-1] - flux_net[1:]) / mass_path
 
+    return JaxRadiationResult(
+        flux_up=flux_up,
+        flux_down=flux_down,
+        flux_net_band=flux_net_band,
+        flux_net=flux_net,
+        heating=heating,
+        optical_depth=dtau,
+        transmissivity=trans,
+    )
+
+
+def radiation_core_jax_net_internal(
+    temperature: jax.Array,
+    mass_path: jax.Array,
+    kappa: jax.Array,
+    band_weights: jax.Array,
+    top_down_flux_band: jax.Array,
+    f_int: jax.Array,
+    f_conv_bottom: jax.Array,
+    diffusivity_factor: float,
+) -> JaxRadiationResult:
+    """JAX radiation_core with F_rad,net(0) + F_conv(0) = F_int."""
+    dtau = kappa * mass_path[None, :]
+    d_dtau = diffusivity_factor * dtau
+    trans = jnp.exp(-d_dtau)
+    emission_frac = -jnp.expm1(-d_dtau)
+    planck_total = STEFAN_BOLTZMANN * temperature ** 4
+    source = band_weights[:, None] * planck_total[None, :]
+    excess = f_int - f_conv_bottom
+
+    def _one_band(b):
+        fd = _solve_down_jax(
+            trans[b], emission_frac[b], source[b], top_down_flux_band[b]
+        )
+        f_up_bot = fd[0] + band_weights[b] * excess
+        fu = _solve_up_jax(trans[b], emission_frac[b], source[b], f_up_bot)
+        return fu, fd
+
+    n_band = kappa.shape[0]
+    flux_up, flux_down = jax.vmap(_one_band)(jnp.arange(n_band))
+    flux_net_band = flux_up - flux_down
+    flux_net = jnp.sum(flux_net_band, axis=0)
+    heating = (flux_net[:-1] - flux_net[1:]) / mass_path
     return JaxRadiationResult(
         flux_up=flux_up,
         flux_down=flux_down,

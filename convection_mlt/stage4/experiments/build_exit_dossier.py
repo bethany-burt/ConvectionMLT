@@ -12,7 +12,7 @@ from convection_mlt import (
     ConstantGreyOpacity,
     ConstantH2Thermo,
     HeliosAdapter,
-    LowerFlux,
+    LowerNetInternalFlux,
     PhysicsConfig,
     PrescribedBandOpacity,
     RCEConfig,
@@ -74,7 +74,7 @@ def _run(route: RCERoute, opacity, initial, manufactured=None, cfg=None, solver=
     )
     return solve_adaptive_rce(
         grid, initial, physics, solver, thermo, opacity, p,
-        TopIrradiation(flux=120.0), LowerFlux(flux=300.0),
+        TopIrradiation(flux=120.0), LowerNetInternalFlux(flux=300.0),
         gravity=ConstantGravity(15.0),
         route=route,
         config=cfg,
@@ -127,7 +127,7 @@ def _bottleneck(grid, p, t_target, opacity):
     state = build_column_state(grid, t_target * 1.01, thermo, ConstantGravity(15.0))
     closure, rad, f_conv, f_rad, f_total = _run_unsplit(
         grid, state, physics, thermo, opacity, p,
-        TopIrradiation(120.0), LowerFlux(300.0), cfg, None, ConstantGravity(15.0),
+        TopIrradiation(120.0), LowerNetInternalFlux(300.0), cfg, None, ConstantGravity(15.0),
     )
     from convection_mlt.energy import enthalpy_tendency
     from convection_mlt.rce import _dt_mlt_estimate, _dt_rad_estimate
@@ -143,7 +143,7 @@ def _bottleneck(grid, p, t_target, opacity):
     def _stable(dt):
         res = solve_adaptive_rce(
             grid, state.temperature, physics, solver, thermo, opacity, p,
-            TopIrradiation(120.0), LowerFlux(300.0),
+            TopIrradiation(120.0), LowerNetInternalFlux(300.0),
             gravity=ConstantGravity(15.0),
             route=RCERoute.UNSPLIT,
             config=RCEConfig(max_steps=1, n_consec=99, stall_window=10, prescribed_dt=dt),
@@ -168,7 +168,7 @@ def _bottleneck(grid, p, t_target, opacity):
     for _ in range(20):
         _run_unsplit(
             grid, state, physics, thermo, opacity, p,
-            TopIrradiation(120.0), LowerFlux(300.0), cfg, None, ConstantGravity(15.0),
+            TopIrradiation(120.0), LowerNetInternalFlux(300.0), cfg, None, ConstantGravity(15.0),
         )
     t_rad = (time.perf_counter() - t0) / 20.0
     return {

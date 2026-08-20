@@ -7,7 +7,7 @@ from convection_mlt import (
     ConstantGreyOpacity,
     ConstantH2Thermo,
     HeliosAdapter,
-    LowerFlux,
+    LowerNetInternalFlux,
     PhysicsConfig,
     PrescribedBandOpacity,
     RCEConfig,
@@ -38,7 +38,7 @@ def _case(n_layers: int = 24):
     p = grid.pressure_centres
     t_target = 900.0 * (p / p[0]) ** 0.58
     top = TopIrradiation(flux=120.0)
-    bot = LowerFlux(flux=300.0)
+    bot = LowerNetInternalFlux(flux=300.0)
     return grid, thermo, physics, solver, p, t_target, top, bot
 
 
@@ -73,6 +73,13 @@ def test_one_accepted_unsplit_step_energy_identity():
     # Instantaneous telescoping identity must be at roundoff on a manufactured step.
     assert abs(d.energy_residual) / scale < 1e-12
     assert d.energy_residual_rel < 1e-12
+    committed_scale = max(abs(d.energy_committed), abs(d.flux_boundary_work), 1e-30)
+    # Algebraic identity is tight. Committed Δh can lose ULPs against |h|.
+    assert abs(d.energy_committed_residual) <= max(8.0 * d.energy_ulp_floor, 1e-12 * committed_scale)
+    assert d.energy_ulp_floor > 0.0
+    assert d.temp_change > 0.0
+    assert res.convergence.temp_change > 0.0
+    assert np.isclose(d.dt, 1.0e-6)
 
 
 def test_tiny_split_macrosteps_match_unsplit_at_common_dt():

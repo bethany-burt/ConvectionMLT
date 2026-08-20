@@ -12,7 +12,7 @@ from convection_mlt import (
     ConstantGreyOpacity,
     ConstantH2Thermo,
     HeliosAdapter,
-    LowerFlux,
+    LowerNetInternalFlux,
     PhysicsConfig,
     RCEConfig,
     RCERoute,
@@ -60,7 +60,7 @@ def _run_mlt_reference(n_layers: int, *, convection_off: bool = False):
     cfg = RCEConfig(max_steps=1, n_consec=99, stall_window=10)
     res = solve_adaptive_rce(
         grid, t0, physics, solver, thermo, ConstantGreyOpacity(2.0e-4), p,
-        TopIrradiation(flux=120.0), LowerFlux(flux=300.0),
+        TopIrradiation(flux=120.0), LowerNetInternalFlux(flux=300.0),
         gravity=ConstantGravity(gravity),
         route=RCERoute.UNSPLIT,
         config=cfg,
