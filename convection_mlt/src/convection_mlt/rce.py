@@ -14,6 +14,11 @@ from .energy import enthalpy_tendency
 from .gravity import ConstantGravity, GravityLaw
 from .grid import PressureGrid, build_grid
 from .hydrostatics import HydrostaticDomainError
+from .implicit_convection import (
+    ImplicitConvectionConfig,
+    ImplicitConvectionDiagnostics,
+    solve_implicit_convection,
+)
 from .opacity import AnalyticGreyOpacity, PrescribedOpacity
 from .radiation import (
     DEFAULT_DIFFUSIVITY,
@@ -39,6 +44,9 @@ class RCERoute(str, Enum):
     UNSPLIT = "unsplit"
     SPLIT_RAD_THEN_CONV = "split_rad_then_conv"
     SPLIT_CONV_THEN_RAD = "split_conv_then_rad"
+    SPLIT_RAD_THEN_IMPLICIT_CONV = "split_rad_then_implicit_conv"
+    SPLIT_IMPLICIT_CONV_THEN_RAD = "split_implicit_conv_then_rad"
+    SPLIT_STRANG_RAD_IMPLICIT_CONV = "split_strang_rad_implicit_conv"
 
 
 class RCETerminalStatus(str, Enum):
@@ -81,6 +89,11 @@ class RCEStepDiagnostics:
     energy_committed_residual_rel: float = float("nan")
     energy_ulp_floor: float = float("nan")
     rejection_reason: str | None = None
+    nonlinear_residual: float = float("nan")
+    newton_iterations: int = 0
+    line_search_backtracks: int = 0
+    mask_outer_iterations: int = 0
+    mlt_evals: int = 0
 
 
 @dataclass(frozen=True)
@@ -126,6 +139,17 @@ class RCEConfig:
     flux_scale_floor: float = 1e-30
     temp_scale_floor: float = 1e-12
     energy_scale_floor: float = 1e-30
+    # Optional macrostep accuracy bound for implicit convection only.
+    dt_accuracy: float | None = None
+    implicit_convection: ImplicitConvectionConfig | None = None
+
+
+def _uses_implicit_convection(route: RCERoute) -> bool:
+    return route in (
+        RCERoute.SPLIT_RAD_THEN_IMPLICIT_CONV,
+        RCERoute.SPLIT_IMPLICIT_CONV_THEN_RAD,
+        RCERoute.SPLIT_STRANG_RAD_IMPLICIT_CONV,
+    )
 
 
 @dataclass(frozen=True)
@@ -605,6 +629,43 @@ class _SplitAttempt:
     f_rad: NDArray[np.float64]
     boundary_work: float
     energy_lhs: float
+    implicit: ImplicitConvectionDiagnostics | None = None
+
+
+def _external_flux_at_state(
+    grid: PressureGrid,
+    state: ColumnState,
+    physics: PhysicsConfig,
+    thermo: ThermoProvider,
+    opacity: PrescribedOpacity,
+    pressure: NDArray[np.float64],
+    top_bc: TopIrradiation,
+    lower_bc: LowerBoundary,
+    cfg: RCEConfig,
+    manufactured: ManufacturedRadiativeTarget | None,
+    gravity: GravityLaw,
+    *,
+    prescribed_f_ext: NDArray[np.float64] | None = None,
+) -> NDArray[np.float64]:
+    """Stage 3 radiation, manufactured F_ext, or a prescribed interface flux."""
+    if prescribed_f_ext is not None:
+        f = np.asarray(prescribed_f_ext, dtype=np.float64)
+        if f.shape != (grid.n_layers + 1,):
+            raise ValueError("prescribed_f_ext must have length n_layers+1")
+        return f
+    if manufactured is None:
+        f_conv0 = float(_evaluate_closure(grid, state, physics, thermo).flux[0])
+        rr = solve_radiation(
+            state.temperature, state.mass_path, opacity, pressure, top_bc, lower_bc,
+            cfg.diffusivity_factor, cfg.radiation_route,
+            bottom_convective_flux=f_conv0,
+        )
+        return rr.flux_net
+    target_state = build_column_state(grid, manufactured.target_temperature, thermo, gravity)
+    closure_target = _evaluate_closure(grid, target_state, physics, thermo)
+    return _build_rad_from_target(
+        grid, state, closure_target, manufactured, target_enthalpy=target_state.enthalpy
+    )
 
 
 def _run_split_macrostep(
@@ -622,27 +683,19 @@ def _run_split_macrostep(
     cfg: RCEConfig,
     manufactured: ManufacturedRadiativeTarget | None,
     solver: SolverConfig,
+    *,
+    prescribed_f_ext: NDArray[np.float64] | None = None,
 ) -> _SplitAttempt:
     nan_f = np.full(grid.n_layers + 1, np.nan)
 
-    def _fail(reason: str) -> _SplitAttempt:
-        return _SplitAttempt(False, reason, state, nan_f, nan_f, float("nan"), float("nan"))
+    def _fail(reason: str, implicit: ImplicitConvectionDiagnostics | None = None) -> _SplitAttempt:
+        return _SplitAttempt(False, reason, state, nan_f, nan_f, float("nan"), float("nan"), implicit)
 
     def rad_substep(s: ColumnState) -> tuple[ColumnState, NDArray[np.float64], float, float]:
-        if manufactured is None:
-            f_conv0 = float(_evaluate_closure(grid, s, physics, thermo).flux[0])
-            rr = solve_radiation(
-                s.temperature, s.mass_path, opacity, pressure, top_bc, lower_bc,
-                cfg.diffusivity_factor, cfg.radiation_route,
-                bottom_convective_flux=f_conv0,
-            )
-            f_rad = rr.flux_net
-        else:
-            target_state = build_column_state(grid, manufactured.target_temperature, thermo, gravity)
-            closure_target = _evaluate_closure(grid, target_state, physics, thermo)
-            f_rad = _build_rad_from_target(
-                grid, s, closure_target, manufactured, target_enthalpy=target_state.enthalpy
-            )
+        f_rad = _external_flux_at_state(
+            grid, s, physics, thermo, opacity, pressure, top_bc, lower_bc, cfg,
+            manufactured, gravity, prescribed_f_ext=prescribed_f_ext,
+        )
         dhdt = enthalpy_tendency(grid, f_rad, s.mass_path)
         s_new, reason = _trial_atomic_state(grid, s, dhdt, dt, thermo, gravity, solver)
         if s_new is None:
@@ -662,23 +715,86 @@ def _run_split_macrostep(
         lhs = float(dt * np.sum(s.mass_path * dhdt))
         return s_new, f_conv, work, lhs
 
+    def implicit_conv_substep(
+        s_commit: ColumnState,
+        h_star: NDArray[np.float64],
+        dt_conv: float,
+    ) -> tuple[ColumnState, NDArray[np.float64], float, float, ImplicitConvectionDiagnostics]:
+        mass = s_commit.mass_path
+        result = solve_implicit_convection(
+            grid,
+            s_commit,
+            np.asarray(h_star, dtype=np.float64).copy(),
+            physics,
+            thermo,
+            gravity,
+            mass,
+            dt_conv,
+            solver,
+            cfg=cfg.implicit_convection,
+        )
+        if not result.ok:
+            raise ThermoDomainError(result.diagnostics.rejection_reason or "implicit convection failed")
+        f_conv = result.f_conv
+        work = dt_conv * float(f_conv[0] - f_conv[-1])  # ~0 by construction
+        lhs = float(np.sum(mass * (result.state.enthalpy - h_star)))
+        return result.state, f_conv, work, lhs, result.diagnostics
+
+    def rad_substep_dt(
+        s: ColumnState, dt_rad_step: float
+    ) -> tuple[ColumnState, NDArray[np.float64], float, float]:
+        f_rad = _external_flux_at_state(
+            grid, s, physics, thermo, opacity, pressure, top_bc, lower_bc, cfg,
+            manufactured, gravity, prescribed_f_ext=prescribed_f_ext,
+        )
+        dhdt = enthalpy_tendency(grid, f_rad, s.mass_path)
+        s_new, reason = _trial_atomic_state(grid, s, dhdt, dt_rad_step, thermo, gravity, solver)
+        if s_new is None:
+            raise ThermoDomainError(reason or "radiation substep failed")
+        work = dt_rad_step * float(f_rad[0] - f_rad[-1])
+        lhs = float(dt_rad_step * np.sum(s.mass_path * dhdt))
+        return s_new, f_rad, work, lhs
+
     try:
         if route == RCERoute.SPLIT_RAD_THEN_CONV:
             s1, f_rad, w1, lhs1 = rad_substep(state)
             s2, f_conv, w2, lhs2 = conv_substep(s1)
-        elif route == RCERoute.SPLIT_CONV_THEN_RAD:
+            crossed = _crossing_reason(
+                _evaluate_closure(grid, state, physics, thermo),
+                _evaluate_closure(grid, s2, physics, thermo),
+                solver,
+            )
+            if crossed is not None:
+                return _fail(crossed)
+            return _SplitAttempt(True, None, s2, f_conv, f_rad, w1 + w2, lhs1 + lhs2)
+        if route == RCERoute.SPLIT_CONV_THEN_RAD:
             s1, f_conv, w1, lhs1 = conv_substep(state)
             s2, f_rad, w2, lhs2 = rad_substep(s1)
-        else:
-            return _fail(f"Unsupported split route {route}")
-        crossed = _crossing_reason(
-            _evaluate_closure(grid, state, physics, thermo),
-            _evaluate_closure(grid, s2, physics, thermo),
-            solver,
-        )
-        if crossed is not None:
-            return _fail(crossed)
-        return _SplitAttempt(True, None, s2, f_conv, f_rad, w1 + w2, lhs1 + lhs2)
+            crossed = _crossing_reason(
+                _evaluate_closure(grid, state, physics, thermo),
+                _evaluate_closure(grid, s2, physics, thermo),
+                solver,
+            )
+            if crossed is not None:
+                return _fail(crossed)
+            return _SplitAttempt(True, None, s2, f_conv, f_rad, w1 + w2, lhs1 + lhs2)
+        if route == RCERoute.SPLIT_RAD_THEN_IMPLICIT_CONV:
+            s1, f_rad, w1, lhs1 = rad_substep(state)
+            s2, f_conv, w2, lhs2, idiag = implicit_conv_substep(s1, s1.enthalpy, dt)
+            return _SplitAttempt(True, None, s2, f_conv, f_rad, w1 + w2, lhs1 + lhs2, idiag)
+        if route == RCERoute.SPLIT_IMPLICIT_CONV_THEN_RAD:
+            s1, f_conv, w1, lhs1, idiag = implicit_conv_substep(state, state.enthalpy, dt)
+            s2, f_rad, w2, lhs2 = rad_substep(s1)
+            return _SplitAttempt(True, None, s2, f_conv, f_rad, w1 + w2, lhs1 + lhs2, idiag)
+        if route == RCERoute.SPLIT_STRANG_RAD_IMPLICIT_CONV:
+            # Half radiation, full implicit convection, half radiation.
+            s_a, f_rad_a, w_a, lhs_a = rad_substep_dt(state, 0.5 * dt)
+            s_b, f_conv, w_b, lhs_b, idiag = implicit_conv_substep(s_a, s_a.enthalpy, dt)
+            s_c, f_rad_c, w_c, lhs_c = rad_substep_dt(s_b, 0.5 * dt)
+            return _SplitAttempt(
+                True, None, s_c, f_conv, f_rad_c, w_a + w_b + w_c, lhs_a + lhs_b + lhs_c, idiag
+            )
+        return _fail(f"Unsupported split route {route}")
     except (ThermoDomainError, EnthalpyInversionError, HydrostaticDomainError) as exc:
         return _fail(str(exc))
 
@@ -907,7 +1023,18 @@ def solve_adaptive_rce(
             break
 
         dt_temp = _dt_temp_estimate(state, dhdt_total, solver, thermo)
-        dt_est = min(dt_mlt, dt_rad, dt_temp)
+        if _uses_implicit_convection(route):
+            # Radiation / external forcing only — never include explicit MLT CFL.
+            dhdt_rad_only = enthalpy_tendency(grid, f_rad_for_dt, state.mass_path)
+            dt_rad_T = _dt_temp_estimate(state, dhdt_rad_only, solver, thermo)
+            candidates = [dt_rad, dt_rad_T]
+            if cfg.dt_accuracy is not None and np.isfinite(cfg.dt_accuracy):
+                candidates.append(float(cfg.dt_accuracy))
+            dt_est = min(candidates)
+            dt_mlt = float("inf")  # reported as unused for implicit convection
+            dt_temp = dt_rad_T
+        else:
+            dt_est = min(dt_mlt, dt_rad, dt_temp)
 
         prescribed = cfg.prescribed_dt is not None
         if prescribed:
@@ -1004,6 +1131,7 @@ def solve_adaptive_rce(
                 energy_lhs = float(dt * np.sum(state.mass_path * dhdt))
                 energy_resid = energy_lhs - boundary_work
                 energy_committed = float(np.sum(old_state.mass_path * (trial_state.enthalpy - old_state.enthalpy)))
+                implicit_diag = None
             else:
                 attempt = _run_split_macrostep(
                     route, grid, state, dt, physics, thermo, grav, opacity, pressure,
@@ -1027,11 +1155,13 @@ def solve_adaptive_rce(
                 energy_lhs = attempt.energy_lhs
                 energy_resid = energy_lhs - boundary_work
                 energy_committed = float(np.sum(old_state.mass_path * (trial_state.enthalpy - old_state.enthalpy)))
+                # Recompute coupled metrics from F(T^{n+1}), not cached substep fluxes.
                 closure, rad, f_conv, f_rad, f_total = _run_unsplit(
                     grid, trial_state, physics, thermo, opacity, pressure, top_bc, lower_bc,
                     cfg, manufactured, grav,
                 )
                 dhdt = enthalpy_tendency(grid, f_total, trial_state.mass_path)
+                implicit_diag = attempt.implicit
 
             energy_committed_resid = energy_committed - boundary_work
             ulp_floor = _ulp_energy_floor(old_state.mass_path, trial_state.enthalpy)
@@ -1074,6 +1204,17 @@ def solve_adaptive_rce(
                     energy_committed_residual=energy_committed_resid,
                     energy_committed_residual_rel=abs(energy_committed_resid) / e_committed_scale,
                     energy_ulp_floor=ulp_floor,
+                    nonlinear_residual=(
+                        float("nan") if implicit_diag is None else implicit_diag.residual_norm
+                    ),
+                    newton_iterations=0 if implicit_diag is None else implicit_diag.newton_iterations,
+                    line_search_backtracks=(
+                        0 if implicit_diag is None else implicit_diag.line_search_backtracks
+                    ),
+                    mask_outer_iterations=(
+                        0 if implicit_diag is None else implicit_diag.mask_outer_iterations
+                    ),
+                    mlt_evals=0 if implicit_diag is None else implicit_diag.mlt_evals,
                 )
             )
 
@@ -1158,6 +1299,265 @@ def solve_adaptive_rce(
         final_state=state,
         final_closure=final_closure,
         final_radiation=final_rad if final_rad is not None else _empty_radiation(grid.n_layers),
+        final_flux_total=final_f_total,
+        final_flux_conv=final_f_conv,
+        final_flux_rad=final_f_rad,
+        primary_rcb_log10p=final_rcb,
+        convective_regions=final_regions,
+        detached_convective_regions=final_detached,
+        convergence=final_conv,
+        diagnostics=diagnostics,
+    )
+
+
+def solve_adaptive_rce_with_prescribed_external_flux(
+    grid: PressureGrid,
+    initial_temperature: NDArray[np.float64],
+    physics: PhysicsConfig,
+    solver: SolverConfig,
+    thermo: ThermoProvider,
+    f_ext: NDArray[np.float64],
+    *,
+    gravity: GravityLaw | None = None,
+    config: RCEConfig | None = None,
+    f0: float | None = None,
+) -> RCEResult:
+    """Convection-on RCE with a prescribed interface external flux (MLT remains active).
+
+    α=0 is a radiation-only control and must not be used as a convection-only
+    helper. This path keeps α>0 and injects F_ext as the explicit operator.
+    """
+    if physics.alpha <= 0.0:
+        raise ValueError("prescribed-external convection helper requires alpha > 0")
+    grav = gravity or ConstantGravity(physics.gravity)
+    # Opaque dummy: radiation is never evaluated when prescribed_f_ext is set,
+    # but solve_adaptive_rce still needs an opacity object for the final audit.
+    from .opacity import ConstantGreyOpacity
+
+    opacity = ConstantGreyOpacity(0.0)
+    pressure = grid.pressure_centres
+    top = TopIrradiation(0.0)
+    bot = LowerNetInternalFlux(float(f0) if f0 is not None else float(f_ext[0]))
+    cfg = config or RCEConfig()
+    # Wrap manufactured so flux reference uses f0; F_ext itself comes from prescribed.
+    manufactured = None
+    if f0 is not None:
+        manufactured = ManufacturedRadiativeTarget(
+            target_temperature=np.asarray(initial_temperature, dtype=np.float64),
+            f0=float(f0),
+            relaxation_coeff=0.0,
+        )
+
+    # Local copy of solve loop is heavy; reuse split path via a thin adapter.
+    # Inject prescribed F_ext by monkey-patching through _run_split_macrostep kw.
+    cfg_local = cfg
+    route = RCERoute.SPLIT_RAD_THEN_IMPLICIT_CONV
+
+    # Inline driver that passes prescribed_f_ext into the split macrostep.
+    state = build_column_state(grid, np.asarray(initial_temperature, dtype=np.float64), thermo, grav)
+    f_int = float(f0) if f0 is not None else float(f_ext[0])
+    accepted_consec = 0
+    prev_rcb: float | None = None
+    diagnostics: list[RCEStepDiagnostics] = []
+    simulated_time = 0.0
+    rejections = 0
+    best_resid = np.inf
+    stall_counter = 0
+    steps_accepted = 0
+    dt_hold: float | None = None
+    last_temp_change = float("inf")
+    final_closure = _evaluate_closure(grid, state, physics, thermo)
+    final_rad = None
+    final_f_conv = np.zeros(grid.n_layers + 1)
+    final_f_rad = np.asarray(f_ext, dtype=np.float64).copy()
+    final_f_total = final_f_rad + final_f_conv
+    final_regions: list[tuple[int, int]] = []
+    final_detached: list[tuple[int, int]] = []
+    final_conv = RCEConvergence(np.inf, np.inf, np.inf, False, False)
+    final_rcb = None
+    status = RCETerminalStatus.MAX_STEPS
+    reason = "maximum step budget reached"
+
+    for _step in range(cfg_local.max_steps):
+        if cfg_local.t_final is not None and simulated_time >= cfg_local.t_final:
+            status = (
+                RCETerminalStatus.CONVERGED
+                if _gate_ok(final_conv, cfg_local, manufactured=manufactured, temperature=state.temperature)
+                else RCETerminalStatus.MAX_STEPS
+            )
+            reason = "reached t_final"
+            break
+
+        f_rad_for_dt = np.asarray(f_ext, dtype=np.float64)
+        closure_for_dt = _evaluate_closure(grid, state, physics, thermo)
+        f_total_for_dt = f_rad_for_dt + closure_for_dt.flux
+        dhdt_rad = enthalpy_tendency(grid, f_rad_for_dt, state.mass_path)
+        dt_rad = _dt_rad_estimate(state, dhdt_rad, solver, thermo)
+        dt_rad_T = _dt_temp_estimate(state, dhdt_rad, solver, thermo)
+        candidates = [dt_rad, dt_rad_T]
+        if cfg_local.dt_accuracy is not None:
+            candidates.append(float(cfg_local.dt_accuracy))
+        dt_est = min(candidates)
+        dt_mlt = float("inf")
+        dt_temp = dt_rad_T
+
+        prescribed = cfg_local.prescribed_dt is not None
+        if prescribed:
+            dt = float(cfg_local.prescribed_dt)
+        else:
+            dt = dt_est
+            if dt_hold is not None and np.isfinite(dt_hold):
+                dt = min(dt, dt_hold) if np.isfinite(dt) else dt_hold
+            if cfg_local.t_final is not None:
+                remaining = cfg_local.t_final - simulated_time
+                if remaining <= 0.0:
+                    break
+                if np.isfinite(dt):
+                    dt = min(dt, remaining)
+
+        if not np.isfinite(dt) or dt < cfg_local.dt_min:
+            status = RCETerminalStatus.DT_MIN_FAILURE
+            reason = f"timestep below dt_min: dt={dt}"
+            break
+
+        accepted = False
+        for _attempt in range(1 if prescribed else (cfg_local.max_rejections + 1)):
+            old_state = state
+            attempt = _run_split_macrostep(
+                route, grid, state, dt, physics, thermo, grav, opacity, pressure,
+                top, bot, cfg_local, manufactured, solver, prescribed_f_ext=f_rad_for_dt,
+            )
+            if not attempt.ok:
+                rejections += 1
+                diagnostics.append(
+                    _rejected_diag(dt, route, dt_mlt, dt_rad, dt_temp, attempt.reason or "failed")
+                )
+                if prescribed:
+                    status = RCETerminalStatus.PRESCRIBED_DT_REJECTED
+                    reason = f"prescribed_dt rejected: {attempt.reason}"
+                    break
+                dt *= cfg_local.f_back
+                dt_hold = dt
+                if dt < cfg_local.dt_min:
+                    break
+                continue
+
+            trial_state = attempt.state
+            f_conv = attempt.f_conv
+            f_rad = attempt.f_rad
+            f_total = f_rad + f_conv
+            # Re-evaluate ordinary MLT at committed T for metrics.
+            closure = _evaluate_closure(grid, trial_state, physics, thermo)
+            f_conv = closure.flux
+            f_total = f_rad + f_conv
+            dhdt = enthalpy_tendency(grid, f_total, trial_state.mass_path)
+            boundary_work = attempt.boundary_work
+            energy_lhs = attempt.energy_lhs
+            energy_resid = energy_lhs - boundary_work
+            energy_committed = float(
+                np.sum(old_state.mass_path * (trial_state.enthalpy - old_state.enthalpy))
+            )
+            energy_committed_resid = energy_committed - boundary_work
+            ulp_floor = _ulp_energy_floor(old_state.mass_path, trial_state.enthalpy)
+            conv, _f_ref, rcb, bottom_regions, detached_regions, f_scale, boundary_mismatch = (
+                _convergence_metrics(
+                    grid, old_state, trial_state, f_total, dhdt, closure, solver,
+                    cfg_local, prev_rcb, f_int,
+                )
+            )
+            e_scale = _energy_scale(boundary_work, f_scale, dt, cfg_local)
+            e_committed_scale = max(e_scale, ulp_floor)
+            idiag = attempt.implicit
+
+            state = trial_state
+            simulated_time += dt
+            steps_accepted += 1
+            accepted = True
+            last_temp_change = conv.temp_change
+            if not prescribed:
+                dt_hold = min(dt / cfg_local.f_back, dt_est) if np.isfinite(dt_est) else dt / cfg_local.f_back
+
+            diagnostics.append(
+                RCEStepDiagnostics(
+                    dt=dt,
+                    accepted=True,
+                    route=route,
+                    dt_mlt=dt_mlt,
+                    dt_rad=dt_rad,
+                    dt_temp=dt_temp,
+                    flux_boundary_work=boundary_work,
+                    energy_lhs=energy_lhs,
+                    energy_residual=energy_resid,
+                    energy_residual_rel=abs(energy_resid) / e_scale,
+                    flux_flatness=conv.flux_flatness,
+                    boundary_mismatch=boundary_mismatch,
+                    temp_change=conv.temp_change,
+                    tendency_norm=conv.tendency_norm,
+                    primary_rcb_log10p=rcb,
+                    n_bottom_connected_regions=len(bottom_regions),
+                    energy_committed=energy_committed,
+                    energy_committed_residual=energy_committed_resid,
+                    energy_committed_residual_rel=abs(energy_committed_resid) / e_committed_scale,
+                    energy_ulp_floor=ulp_floor,
+                    nonlinear_residual=float("nan") if idiag is None else idiag.residual_norm,
+                    newton_iterations=0 if idiag is None else idiag.newton_iterations,
+                    line_search_backtracks=0 if idiag is None else idiag.line_search_backtracks,
+                    mask_outer_iterations=0 if idiag is None else idiag.mask_outer_iterations,
+                    mlt_evals=0 if idiag is None else idiag.mlt_evals,
+                )
+            )
+            final_closure = closure
+            final_f_conv = f_conv
+            final_f_rad = f_rad
+            final_f_total = f_total
+            final_regions = bottom_regions + detached_regions
+            final_detached = detached_regions
+            final_conv = conv
+            final_rcb = rcb
+            if _gate_ok(conv, cfg_local, manufactured=manufactured, temperature=state.temperature):
+                accepted_consec += 1
+            else:
+                accepted_consec = 0
+            resid_scalar = max(conv.flux_flatness, conv.tendency_norm, conv.temp_change)
+            if resid_scalar < best_resid * (1.0 - cfg_local.stall_rel_improvement):
+                best_resid = resid_scalar
+                stall_counter = 0
+            else:
+                stall_counter += 1
+            prev_rcb = rcb
+            if accepted_consec >= cfg_local.n_consec:
+                status = RCETerminalStatus.CONVERGED
+                reason = f"converged for {cfg_local.n_consec} consecutive accepted steps"
+            elif stall_counter >= cfg_local.stall_window:
+                status = RCETerminalStatus.STALLED
+                reason = "residuals/mask stalled"
+            break
+
+        if accepted and status in (RCETerminalStatus.CONVERGED, RCETerminalStatus.STALLED):
+            break
+        if status == RCETerminalStatus.PRESCRIBED_DT_REJECTED:
+            break
+        if not accepted:
+            if dt < cfg_local.dt_min:
+                status = RCETerminalStatus.DT_MIN_FAILURE
+                reason = "dt fell below dt_min after rejections"
+                break
+            continue
+    else:
+        status = RCETerminalStatus.MAX_STEPS
+        reason = "maximum step budget reached"
+
+    return RCEResult(
+        status=status,
+        reason=reason,
+        route=route,
+        steps_attempted=len(diagnostics),
+        steps_accepted=steps_accepted,
+        rejections=rejections,
+        simulated_time=simulated_time,
+        final_state=state,
+        final_closure=final_closure,
+        final_radiation=_empty_radiation(grid.n_layers),
         final_flux_total=final_f_total,
         final_flux_conv=final_f_conv,
         final_flux_rad=final_f_rad,

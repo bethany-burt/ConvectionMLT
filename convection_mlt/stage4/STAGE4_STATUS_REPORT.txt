@@ -1,0 +1,234 @@
+Stage 4 status report
+Fixed-composition H2 radiative-convective equilibrium (handbook points 35-40)
+Date: 2026-08-19
+Repo commit: 1bc1f24371cf1fbbee4dd64634dc9f1f9646538c
+GitHub: https://github.com/bethany-burt/ConvectionMLT/commit/1bc1f24371cf1fbbee4dd64634dc9f1f9646538c
+Claim: NOT CLOSED. full_stage4_claim = false.
+
+Most recent results files (local, authoritative for this report)
+--------------------------------------------------------------
+Primary audit:
+  convection_mlt/stage4/results/exit_gate_audit.json
+
+Live HELIOS pilot comparison:
+  convection_mlt/stage4/results/live_helios_comparison.json
+
+Supporting figures (pilot, not gate evidence):
+  convection_mlt/stage4/plots/generated/figure1_manufactured_recovery.png
+  convection_mlt/stage4/plots/generated/figure2_split_vs_unsplit.png
+
+Cluster HELIOS outputs (pilot only; unmatched setup):
+  /project/ls-heng/Bethany.Burt/helios_stage4_output/stage4_live_conv_on/
+  /project/ls-heng/Bethany.Burt/helios_stage4_output/stage4_live_conv_off/
+
+Cluster job that completed the live HELIOS executable:
+  Slurm job 15880014, partition=cluster, node=th-cl-naples03, COMPLETED
+  HELIOS pin: b0800f9ea4366263241c13bb926e8ca68f266cc5
+
+
+Bottom line
+-----------
+HELIOS ran on the cluster. That does not close Stage 4.
+
+The first audit that said "status": "pass" and "full_stage4_claim": true contradicted its own metrics and has been withdrawn. The regenerated audit computes pass/fail from observed vs tolerance rows. The conjunction of required rows is false.
+
+Standalone RCE is not formally converged. HELIOS vs MLT is an unmatched pilot, not parity.
+
+
+What worked
+-----------
+1. Package / tests
+   - Unsplit RCE stepper exists in convection_mlt/src/convection_mlt/rce.py.
+   - Atomic split routes exist (radiation then convection, convection then radiation).
+   - Thin HELIOS adapter exists (orientation/units/parsers only).
+   - Frozen HELIOS fixtures parse and round-trip exactly.
+   - Stage 0-3 plus Stage 4 tests: 198 passed, 1 skipped (jax optional).
+
+2. Manufactured operator identity (point 35, no time integration)
+   - At T = T*, F_rad* + F_conv(T*) = F0 exactly.
+   - Enthalpy tendency at T* is 0.
+   - This means orientation/indexing of the manufactured interface flux is correct.
+   - Audit rows:
+       35_manufactured_identity_flux      observed 0.0   PASS
+       35_manufactured_identity_tendency  observed 0.0   PASS
+
+3. One accepted unsplit step energy identity (point 36 local contract)
+   - After using the applied tendency rather than h_new - h_old, the relative residual is at roundoff.
+   - Audit row:
+       36_one_step_energy_residual_rel    observed 0.0   PASS
+       36_time_integrated_energy_residual_max  2.81e-16  PASS
+
+4. Tiny common-dt split vs unsplit (not a long-run RCE proof)
+   - One prescribed-dt macrostep, both split orders vs unsplit:
+       unsplit vs rad->conv  7.75e-13  PASS against 1e-8 (one-step only)
+       unsplit vs conv->rad  1.18e-14  PASS against 1e-8 (one-step only)
+   - This is splitting-truncation evidence at one dt, not timestep-refinement to equilibrium.
+
+5. HELIOS adapter orientation (point 38 partial)
+   - Exact round-trip of layer and interface arrays.
+   - Audit row:
+       38_orientation_roundtrip_exact     PASS
+   - Fixture checksum recorded:
+       sample_integrated_flux.dat
+       sha256 61a481312c284cb2ee48618fa1bb579c77599a45ca7fedf4ef1c27336a6aedf7
+
+6. Point 39 field presence (not a physics close)
+   - dt_MLT, dt_rad, bracketed stable dt, operator call timings, wall times, and a manufactured relaxation time are now recorded.
+   - Audit row 39_bottleneck_fields_complete PASS (fields present).
+   - Current numbers (pilot):
+       dt_mlt ~ 0.79 s
+       dt_rad ~ 1567 s
+       physical_relaxation_tau_s ~ 0.97 s (from manufactured Newtonian cooling)
+   - Bracketing still needs work: "stable dt" high values (~1600-3200 s) are "one step accepted", not a CFL proof.
+
+7. Cluster / HELIOS executable
+   - HELIOS cloned and pinned on the LMU cluster.
+   - Input bundle downloaded from Zenodo on a compute node (not the login node).
+   - CUDA toolkit loaded via Spack cuda@12.4.0 (there is no standalone cuda module).
+   - Python 3.12 venv used; PyCUDA 2026.x built and imported.
+   - Conv-on and conv-off HELIOS cases both finished:
+       stage4_live_conv_on  and  stage4_live_conv_off
+   - This is execution success, not scientific parity.
+
+
+What failed
+-----------
+Gate table from the current audit (exit_gate_audit.json):
+
+  35 manufactured hot recovery     1.87e-8   gate 1e-8   FAIL  (max_steps, not auditable)
+  35 manufactured cold recovery    1.87e-8   gate 1e-8   FAIL  (max_steps, not auditable)
+  36 unsplit vs rad->conv (long)   not a converged RCE comparison
+  36 real RCE flux flatness        0.885     gate 1e-8   FAIL  (max_steps)
+  36 real RCE boundary mismatch    3.38e-5   gate 1e-8   FAIL  (max_steps)
+  37 HELIOS temperature            0.973     unmatched   FAIL  (pilot, not parity)
+  37 HELIOS flux                   1.014     unmatched   FAIL  (pilot, not parity)
+  38 convection-off quantitative   null      gate 1e-8   FAIL  (no measured dF/scale/checksum)
+  40 hot/cold path independence    3.75e-8   gate 1e-8   FAIL  (same non-converged runs)
+
+Earlier withdrawn audit (do not use):
+  manufactured hot     8.06e-2
+  manufactured cold    5.99e-2
+  unsplit vs rad->conv 1.73
+  unsplit vs conv->rad 2.07e-4
+  flux flatness        1.009
+  boundary mismatch    1.008
+  energy residual      6.73e-8   (wrong normalisation: divided by near-zero RHS)
+  HELIOS T             0.973
+  HELIOS F             1.014
+  hot/cold             0.130
+  That file had incorrectly set full_stage4_claim true.
+
+
+Why it failed
+-------------
+This is a Stage 4 core / coupling problem first, a HELIOS problem second.
+
+1. Formal convergence was not required before auditing.
+   Tests and the first dossier accepted stalled and max_steps terminals as if they were RCE.
+   The plan requires simultaneous flatness, tendency, dT, RCB stability, and a finite state for N_consec accepted steps.
+   A max_steps or stalled run is not evidence.
+
+2. Manufactured T* attraction is not unique without extra restoring physics.
+   Frozen F_rad* = F0 - F_conv(T*) is a fixed point (identity passes).
+   For T* ~ P^beta, a multiplicative hot/cold shift nearly preserves nabla, so F_conv barely changes and there is little restoring force on T itself.
+   The first restoring term used q = -kappa (T - T*) with kappa = 1e-3, which is an enthalpy rate of kappa * dT. With cp ~ 1e4 J kg^-1 K^-1 the thermal time was ~ cp/kappa ~ 1e7 s. Attraction could not finish.
+
+3. Split rad->conv could accept a no-op.
+   On ThermoDomainError the macrostep returned the original committed state (finite), and the outer loop treated that as success.
+   Rad-then-conv therefore often did not advance while conv-then-rad did. That produced the 1.73 vs 2e-4 split asymmetry.
+
+4. Manufactured final fluxes were overwritten by a real RT solve.
+   After a manufactured run, rad is None, so the epilogue called solve_radiation and replaced F_rad* with grey two-stream fluxes.
+   Flatness then looked ~1 even when the manufactured operator was fine.
+
+5. Energy residual used stored enthalpy differences.
+   h_new = h_old + dt * dh/dt loses the O(dt) update against large |h| in float64.
+   Dividing that residual by |boundary work| ~ 0 near equilibrium inflated the reported 6.7e-8.
+
+6. Real grey RCE from the 0.58 power-law IC is violently convective.
+   F_conv max ~ 1e9 W m^-2. Flux is not flat after a short run. LowerFlux sets F_up, not net flux, so F_net at the bottom is ~ 300 - sigma T^4 ~ -3e4 W m^-2 on a 900 K profile. The column is not at RCE.
+
+7. Live HELIOS was not a matched comparison.
+   MLT used grey kappa = 2e-4, g = 15, LowerFlux(300), TopIrradiation(120), N = HELIOS layer count.
+   HELIOS used its default k-table case (r50_kdistr_solar_eq.h5), Teff ~ 679 K, Tint = 30 K, its own grid/EOS/opacity.
+   Differences near unity are expected for unmatched setups. The plan forbids freezing 37-38 gates from that.
+
+8. Point 38 was only a Boolean.
+   finite_flux: true and a sign check do not measure convection-off recovery.
+   The live file path was an absolute cluster path with no checksum and no (observed, scale, tolerance, status) row.
+
+
+What was already tried
+----------------------
+Cluster / HELIOS bring-up (all compute on Slurm, not the login node):
+  - Job 15873191 FAILED: PyCUDA build, cuda.h missing. No cuda module on this site.
+  - Added module load cuda and common CUDA roots: still missing.
+  - Probe found Spack cuda@12.4.0. Load via setup-env.sh + `spack load --sh cuda@12.4.0`.
+  - Job 15878471: PyCUDA wheel built; import failed, numpy missing in the probe venv.
+  - Job 15878695: PyCUDA 2026.1 imported on Python 3.9 then crashed on PEP 604 type hints (needs >=3.10).
+  - Switched to python/3.12-2024.10 and venv stage4-helios-py312.
+  - Job 15878968: PyCUDA OK; HELIOS started; missing opacity file r50_kdistr_solar_eq.h5 (input/ only had species.dat).
+  - Job 15879430: Zenodo input zip downloaded (~2.5 GB); HELIOS then failed on a doubled parameter-file path (absolute path joined onto HELIOS_ROOT).
+  - Job 15880014 COMPLETED after using relative param_stage4_conv_on/off.dat. Both HELIOS cases finished.
+
+Solver / audit corrections already in the tree:
+  - Split rollback now returns ok=False; a failed macrostep is rejected, dt reduced, original state kept.
+  - Manufactured epilogue no longer replaces F_rad* with real RT.
+  - Fractional-T bound and Stage 2 crossing rule added to unsplit/split trials.
+  - Manufactured restoring flux is now q = -kappa (h - h*), kappa in 1/s, zero at T*.
+  - Structured mid-column hot/cold bumps used instead of purely multiplicative profiles.
+  - Energy residual taken from dt * sum(mass * dhdt) vs boundary work, scaled by max(|RHS|, F_scale dt, E_floor).
+  - Audit rows always record observed/tolerance/criterion/status/scale/category/source.
+  - Non-converged terminals cannot pass, even if a number looks small.
+  - full_stage4_claim is the conjunction of required PASS rows, never written by hand.
+  - Live HELIOS comparison status is "pilot", not "pass".
+
+Not yet done (next debug order, unchanged):
+  - Require CONVERGED before any 35/36/40 number is auditable.
+  - Run an actual dt-refinement sequence of unsplit vs both splits to a common final time.
+  - Get standalone grey RCE to formal convergence (flat F_total, tiny boundary mismatch) from a sane IC, constant g.
+  - Only then export matched P, T, F_rad, F_conv, F_total from MLT and HELIOS with the same EOS, g, opacity, BCs.
+  - Fill point 38 with measured convection-off flux difference, normalisation, tolerance, portable name, checksum.
+  - Freeze numerical gates from a declared pilot, then apply unchanged to a held-out case.
+
+
+Point-by-point (35-40)
+----------------------
+35 Manufactured equilibrium
+  Identity at T* works. Attraction from perturbed ICs reached ~1.87e-8 in 250 steps but terminated max_steps, so FAIL.
+
+36 Constant total flux / split agreement / energy
+  One-step energy and one-step splits pass as local contracts.
+  Real unsplit RCE is not at equilibrium (flatness 0.885, max_steps). Long-run split equivalence is not claimed.
+
+37 MLT vs HELIOS efficient-convection equilibrium
+  Live executable ran against the pinned commit. T and F differences ~1. Setup unmatched. FAIL / pilot.
+
+38 Convection-off + orientation
+  Adapter round-trip exact: PASS.
+  Quantitative convection-off recovery: missing measured residual. FAIL.
+
+39 Frozen-operator bottleneck
+  Separate dt_rad and dt_MLT from one committed state: recorded.
+  Bracket, call timings, wall times, relaxation tau: recorded.
+  Bracket interpretation and radiation-only vs convection-only wall-time split still crude.
+
+40 Restart / hot-cold path independence
+  Hot and cold manufactured paths differ by 3.75e-8 and both are max_steps. FAIL.
+
+
+Files in this Stage 4 drop
+--------------------------
+  convection_mlt/src/convection_mlt/rce.py
+  convection_mlt/src/convection_mlt/adapters/helios.py
+  convection_mlt/stage4/tests/
+  convection_mlt/stage4/experiments/build_exit_dossier.py
+  convection_mlt/stage4/experiments/live_helios_compare.py
+  convection_mlt/stage4/cluster/run_stage4_helios_live.sh
+  convection_mlt/stage4/cluster/stage4_helios_live.slurm
+  convection_mlt/stage4/fixtures/helios/
+  convection_mlt/stage4/results/exit_gate_audit.json
+  convection_mlt/stage4/results/live_helios_comparison.json
+  .github/workflows/stage4-helios-live.yml
+
+Pushed to origin/main as an in-progress Stage 4 drop. It is still being developed. Do not treat this commit as Stage 4 exit.

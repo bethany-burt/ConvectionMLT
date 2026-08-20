@@ -66,6 +66,16 @@ from .rce import (
     radiative_convective_initial_temperature,
     analytic_opacity_pressure_edges,
     solve_adaptive_rce,
+    solve_adaptive_rce_with_prescribed_external_flux,
+)
+from .implicit_convection import (
+    ImplicitConvectionConfig,
+    ImplicitConvectionDiagnostics,
+    ImplicitConvectionResult,
+    assemble_dense_jacobian,
+    assemble_tridiagonal_jacobian,
+    provisional_support,
+    solve_implicit_convection,
 )
 from .adapters.helios import (
     HeliosAdapter,
@@ -90,6 +100,9 @@ __all__ = [
     "ConvergenceMetrics",
     "EnthalpyInversionError",
     "HydrostaticDomainError",
+    "ImplicitConvectionConfig",
+    "ImplicitConvectionDiagnostics",
+    "ImplicitConvectionResult",
     "HeliosAdapter",
     "HeliosFluxProfile",
     "HeliosFixtureMetadata",
@@ -144,6 +157,11 @@ __all__ = [
     "radiative_convective_initial_temperature",
     "solve_adaptive",
     "solve_adaptive_rce",
+    "solve_adaptive_rce_with_prescribed_external_flux",
+    "solve_implicit_convection",
+    "assemble_dense_jacobian",
+    "assemble_tridiagonal_jacobian",
+    "provisional_support",
     "solve_radiation",
     "SolveRoute",
     "STEFAN_BOLTZMANN",

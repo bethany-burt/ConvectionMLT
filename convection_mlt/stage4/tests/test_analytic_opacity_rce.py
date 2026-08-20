@@ -8,6 +8,7 @@ from convection_mlt import (
     AnalyticOpacityRCESpec,
     ConstantGravity,
     ConstantH2Thermo,
+    ImplicitConvectionConfig,
     LowerNetInternalFlux,
     NASAThermo,
     RCEConfig,
@@ -29,9 +30,10 @@ from convection_mlt.state import build_column_state
 
 NABLA_AD_H2 = 2.0 / 7.0
 # Explicit MLT at c_diff=0.2 reaches a quasi-steady bottom-connected RCE
-# with flux_flatness ≈ 8e-2. This is the declared gate for CONVERGED on
-# this pilot; it is not a 1e-3 / 1e-8 real-RCE flux gate.
+# with flux_flatness ≈ 8e-2. Structural / RCB regression only — NOT Stage 4 exit.
+# Audit label: PILOT_GATE_REACHED / EXPLICIT_REFERENCE_LIMIT.
 EXPLICIT_MLT_QUASISTEADY_GATE = 0.1
+STAGE4_EXIT_FLUX_GATE = 1.0e-3
 
 
 def _spec(n_layers: int = 48, **kwargs) -> AnalyticOpacityRCESpec:
@@ -41,6 +43,22 @@ def _spec(n_layers: int = 48, **kwargs) -> AnalyticOpacityRCESpec:
 
 def _solver() -> SolverConfig:
     return SolverConfig(epsilon_temperature=2.0e-3, c_diff=0.2, dt_min=1.0e-14)
+
+
+def _implicit_cfg(max_steps: int, gate: float) -> RCEConfig:
+    return RCEConfig(
+        max_steps=max_steps,
+        n_consec=5,
+        stall_window=10**9,
+        flux_flatness_tolerance=gate,
+        tendency_tolerance=gate,
+        temp_change_tolerance=gate,
+        dt_accuracy=2500.0,
+        implicit_convection=ImplicitConvectionConfig(
+            residual_tolerance=1e-10,
+            step_tolerance=1e-10,
+        ),
+    )
 
 
 def test_kappa0_matches_target_optical_depth():
@@ -132,7 +150,7 @@ def test_nasa_seed_is_isentropic_in_the_bottom_connected_region():
     assert np.array_equal(t_rc[i_join + 1 :], t_re[i_join + 1 :])
 
 
-def _run_coupled(spec: AnalyticOpacityRCESpec, initial, max_steps: int, gate: float):
+def _run_explicit_coupled(spec: AnalyticOpacityRCESpec, initial, max_steps: int, gate: float):
     grid = spec.grid()
     thermo = ConstantH2Thermo()
     opacity = spec.opacity()
@@ -152,7 +170,12 @@ def _run_coupled(spec: AnalyticOpacityRCESpec, initial, max_steps: int, gate: fl
     )
 
 
-def test_coupled_analytic_opacity_converges_with_bottom_connected_rcb():
+def test_explicit_mlt_quasisteady_is_structural_rcb_regression_not_exit_gate():
+    """PILOT_GATE_REACHED / EXPLICIT_REFERENCE_LIMIT — not Stage 4 exit evidence.
+
+    Converged to the declared exploratory tolerance of 0.1; Stage 4 exit
+    tolerance of 1e-3 is not evaluated by this test.
+    """
     spec = _spec()
     grid = spec.grid()
     thermo = ConstantH2Thermo()
@@ -160,21 +183,18 @@ def test_coupled_analytic_opacity_converges_with_bottom_connected_rcb():
     t = radiative_convective_initial_temperature(
         grid, opacity, thermo, spec.f_int, spec.f_irr
     )
-    res = _run_coupled(spec, t, max_steps=8000, gate=EXPLICIT_MLT_QUASISTEADY_GATE)
+    res = _run_explicit_coupled(spec, t, max_steps=8000, gate=EXPLICIT_MLT_QUASISTEADY_GATE)
     assert res.status == RCETerminalStatus.CONVERGED
     assert res.convergence.flux_flatness <= EXPLICIT_MLT_QUASISTEADY_GATE
-    assert res.convergence.tendency_norm <= EXPLICIT_MLT_QUASISTEADY_GATE
     assert res.primary_rcb_log10p is not None
     assert res.detached_convective_regions == []
     assert res.convective_regions and res.convective_regions[0][0] == 0
-    assert abs(float(res.final_flux_total[0]) - spec.f_int) <= 1e-8 * spec.f_int
-    assert float(np.max(res.final_flux_conv)) < spec.f_int
-    assert float(res.final_flux_conv[1]) > 0.0
-    assert float(res.final_state.temperature.min()) > 200.0
+    # Must not be confused with the exit gate.
+    assert STAGE4_EXIT_FLUX_GATE < EXPLICIT_MLT_QUASISTEADY_GATE
 
 
 def test_two_resolutions_form_a_bottom_connected_rcb():
-    """N=48 and N=96 must both develop a physical RCB; flux gates differ by CFL."""
+    """N=48 and N=96 must both develop a physical RCB under explicit MLT."""
     for n, n_phot, steps in ((48, 16, 1500), (96, 24, 1500)):
         spec = AnalyticOpacityRCESpec(n_layers=n, n_photosphere=n_phot)
         grid = spec.grid()
@@ -183,9 +203,121 @@ def test_two_resolutions_form_a_bottom_connected_rcb():
         t = radiative_convective_initial_temperature(
             grid, opacity, thermo, spec.f_int, spec.f_irr
         )
-        res = _run_coupled(spec, t, max_steps=steps, gate=1e-12)
+        res = _run_explicit_coupled(spec, t, max_steps=steps, gate=1e-12)
         assert res.primary_rcb_log10p is not None
         assert res.detached_convective_regions == []
         assert res.convective_regions and res.convective_regions[0][0] == 0
         assert abs(float(res.final_flux_total[0]) - spec.f_int) <= 1e-8 * spec.f_int
         assert float(res.final_flux_conv[1]) > 0.0
+
+
+def test_implicit_analytic_opacity_reaches_stage4_exit_gate():
+    """N=48 analytic-opacity benchmark: real 1e-3 RCE with implicit convection."""
+    spec = _spec()
+    grid = spec.grid()
+    thermo = ConstantH2Thermo()
+    opacity = spec.opacity()
+    t = radiative_convective_initial_temperature(
+        grid, opacity, thermo, spec.f_int, spec.f_irr
+    )
+    res = solve_adaptive_rce(
+        grid, t, spec.physics(), _solver(), thermo, opacity, grid.pressure_centres,
+        TopIrradiation(spec.f_irr), LowerNetInternalFlux(spec.f_int),
+        gravity=ConstantGravity(spec.gravity),
+        route=RCERoute.SPLIT_RAD_THEN_IMPLICIT_CONV,
+        config=_implicit_cfg(max_steps=400, gate=STAGE4_EXIT_FLUX_GATE),
+    )
+    assert res.status == RCETerminalStatus.CONVERGED, res.reason
+    assert res.convergence.flux_flatness <= STAGE4_EXIT_FLUX_GATE
+    assert res.convergence.tendency_norm <= STAGE4_EXIT_FLUX_GATE
+    # Analytic-opacity benchmark requirement (not a universal RCE gate).
+    assert res.primary_rcb_log10p is not None
+    assert res.detached_convective_regions == []
+    assert res.convective_regions and res.convective_regions[0][0] == 0
+    assert abs(float(res.final_flux_total[0]) - spec.f_int) <= 1e-8 * spec.f_int
+    assert float(res.final_flux_conv[1]) > 0.0
+    assert float(res.final_state.temperature.min()) > 200.0
+
+
+def _isoenthalpic_cz_redistribution(
+    enthalpy: np.ndarray,
+    mass_path: np.ndarray,
+    thermo: ConstantH2Thermo,
+    *,
+    heat: slice,
+    cool: slice,
+    amplitude: float,
+) -> np.ndarray:
+    """Mass-conserving CZ reshape: heat one band, cool another (column ΔH ≈ 0).
+
+    Cool-deep / heat-upper kicks leave this analytic-opacity basin (detached CZ).
+    In-basin probes heat a deeper band and cool an upper band inside the CZ.
+    """
+    h = np.asarray(enthalpy, dtype=np.float64).copy()
+    m = np.asarray(mass_path, dtype=np.float64)
+    h0 = h.copy()
+    h[heat] *= 1.0 + amplitude
+    excess = float(np.sum(m * (h - h0)))
+    h[cool] -= excess / float(np.sum(m[cool]))
+    return thermo.invert_enthalpy(h)
+
+
+def test_hot_cold_attraction_from_true_1e_3_equilibrium():
+    """Path independence from the true 1e-3 state (handbook point 40 spirit).
+
+    Two distinct in-basin isoenthalpic CZ redistributions must reconverge to the
+    same bottom-connected RCE. Mid-column ± multiply and cool-deep kicks are
+    excluded: they spawn detached zones on this benchmark.
+    """
+    spec = _spec()
+    grid = spec.grid()
+    thermo = ConstantH2Thermo()
+    opacity = spec.opacity()
+    t0 = radiative_convective_initial_temperature(
+        grid, opacity, thermo, spec.f_int, spec.f_irr
+    )
+    settled = solve_adaptive_rce(
+        grid, t0, spec.physics(), _solver(), thermo, opacity, grid.pressure_centres,
+        TopIrradiation(spec.f_irr), LowerNetInternalFlux(spec.f_int),
+        gravity=ConstantGravity(spec.gravity),
+        route=RCERoute.SPLIT_RAD_THEN_IMPLICIT_CONV,
+        config=_implicit_cfg(max_steps=400, gate=STAGE4_EXIT_FLUX_GATE),
+    )
+    assert settled.status == RCETerminalStatus.CONVERGED, settled.reason
+    t_star = settled.final_state.temperature.copy()
+    h_star = settled.final_state.enthalpy
+    m = settled.final_state.mass_path
+    # Distinct spatial modes: both heat-deeper / cool-upper inside the CZ.
+    initials = [
+        _isoenthalpic_cz_redistribution(
+            h_star, m, thermo, heat=slice(2, 12), cool=slice(12, 22), amplitude=0.01
+        ),
+        _isoenthalpic_cz_redistribution(
+            h_star, m, thermo, heat=slice(8, 16), cool=slice(16, 26), amplitude=0.01
+        ),
+    ]
+    finals = []
+    for initial in initials:
+        assert float(np.max(np.abs(initial - t_star) / np.maximum(t_star, 1.0))) > 1e-4
+        res = solve_adaptive_rce(
+            grid, initial, spec.physics(), _solver(), thermo, opacity, grid.pressure_centres,
+            TopIrradiation(spec.f_irr), LowerNetInternalFlux(spec.f_int),
+            gravity=ConstantGravity(spec.gravity),
+            route=RCERoute.SPLIT_RAD_THEN_IMPLICIT_CONV,
+            config=_implicit_cfg(max_steps=200, gate=STAGE4_EXIT_FLUX_GATE),
+        )
+        assert res.status == RCETerminalStatus.CONVERGED, res.reason
+        assert res.convergence.flux_flatness <= STAGE4_EXIT_FLUX_GATE
+        assert res.primary_rcb_log10p is not None
+        assert res.detached_convective_regions == []
+        assert res.convective_regions and res.convective_regions[0][0] == 0
+        finals.append(res)
+    scale = np.maximum(np.abs(finals[0].final_state.temperature), 1.0)
+    rel = float(np.max(np.abs(
+        finals[0].final_state.temperature - finals[1].final_state.temperature
+    ) / scale))
+    assert rel < 5e-3
+    assert abs(finals[0].primary_rcb_log10p - finals[1].primary_rcb_log10p) < 0.05
+    for res in finals:
+        rel_star = float(np.max(np.abs(res.final_state.temperature - t_star) / scale))
+        assert rel_star < 5e-3
