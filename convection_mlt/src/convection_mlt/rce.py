@@ -12,9 +12,9 @@ from .closure import ClosureResult, mixing_length_flux
 from .config import PhysicsConfig, SolverConfig
 from .energy import enthalpy_tendency
 from .gravity import ConstantGravity, GravityLaw
-from .grid import PressureGrid
+from .grid import PressureGrid, build_grid
 from .hydrostatics import HydrostaticDomainError
-from .opacity import PrescribedOpacity
+from .opacity import AnalyticGreyOpacity, PrescribedOpacity
 from .radiation import (
     DEFAULT_DIFFUSIVITY,
     LowerBoundary,
@@ -26,7 +26,13 @@ from .radiation import (
 )
 from .solvers_enthalpy import _crossing_reason
 from .state import ColumnState, build_column_state
-from .thermodynamics import EnthalpyInversionError, ThermoDomainError, ThermoProvider
+from .thermodynamics import (
+    ConstantH2Thermo,
+    EnthalpyInversionError,
+    ThermoDomainError,
+    ThermoProvider,
+    invert_psi_newton,
+)
 
 
 class RCERoute(str, Enum):
@@ -116,9 +122,105 @@ class RCEConfig:
     radiation_route: SolveRoute = SolveRoute.THOMAS
     prescribed_dt: float | None = None
     t_final: float | None = None
+    attraction_temperature_tolerance: float | None = None
     flux_scale_floor: float = 1e-30
     temp_scale_floor: float = 1e-12
     energy_scale_floor: float = 1e-30
+
+
+@dataclass(frozen=True)
+class AnalyticOpacityRCESpec:
+    """Pressure-dependent grey column for a bottom-connected coupled RCE.
+
+    κ(P) = κ₀ (P/P₀)^a with b = 0 keeps the discrete radiative seed exact.
+    At depth ∇_rad → (a+1)/4; a > 1/7 is required for a deep convective
+    region in diatomic H₂ (∇_ad = 2/7). A log-P grid puts almost all of
+    τ into the bottom cell and never recovers that gradient, so the
+    coupled column is built uniform in τ in the interior with a
+    geometrically refined photosphere.
+    """
+
+    gravity: float = 15.0
+    p_bottom: float = 1.0e6
+    p_top: float = 1.0
+    a: float = 0.5
+    b: float = 0.0
+    tau_total: float = 100.0
+    f_int: float = 300.0
+    f_irr: float = 120.0
+    n_layers: int = 48
+    n_photosphere: int = 16
+    tau_photosphere: float = 1.0
+    tau_photosphere_min: float = 1.0e-4
+    alpha: float = 1.0
+    closure_prefactor: float = 0.5
+    diffusivity_factor: float = DEFAULT_DIFFUSIVITY
+
+    @property
+    def kappa0(self) -> float:
+        return self.tau_total * self.gravity * (self.a + 1.0) / self.p_bottom
+
+    def opacity(self) -> AnalyticGreyOpacity:
+        return AnalyticGreyOpacity(
+            kappa0=self.kappa0,
+            P0=self.p_bottom,
+            T0=1.0,
+            a=self.a,
+            b=self.b,
+        )
+
+    def pressure_edges(self) -> NDArray[np.float64]:
+        return analytic_opacity_pressure_edges(self)
+
+    def grid(self) -> PressureGrid:
+        return build_grid(self.pressure_edges(), self.gravity)
+
+    def physics(self) -> PhysicsConfig:
+        return PhysicsConfig(
+            gravity=self.gravity,
+            alpha=self.alpha,
+            closure_prefactor=self.closure_prefactor,
+        )
+
+
+def analytic_opacity_pressure_edges(spec: AnalyticOpacityRCESpec) -> NDArray[np.float64]:
+    """Interior uniform in τ, geometrically refined photosphere.
+
+    For κ ∝ P^a, τ(P) ∝ P^{a+1} − P_top^{a+1}. Equal-τ spacing recovers
+    ∇_rad → (a+1)/4 at depth. Extra photospheric layers keep DΔτ_top ≪ 1
+    and prevent a single top cell from spanning decades of pressure.
+    """
+    if spec.n_photosphere < 2 or spec.n_photosphere >= spec.n_layers - 1:
+        raise ValueError("n_photosphere must be in [2, n_layers-2]")
+    if spec.tau_photosphere <= spec.tau_photosphere_min:
+        raise ValueError("tau_photosphere must exceed tau_photosphere_min")
+    if spec.tau_photosphere >= spec.tau_total:
+        raise ValueError("tau_photosphere must be less than tau_total")
+    a = spec.a
+    exponent = a + 1.0
+
+    def p_of_tau(tau: NDArray[np.float64]) -> NDArray[np.float64]:
+        return (
+            spec.p_top ** exponent + (tau / spec.tau_total) * spec.p_bottom ** exponent
+        ) ** (1.0 / exponent)
+
+    n_deep = spec.n_layers - spec.n_photosphere
+    tau_top = np.concatenate(
+        [
+            np.asarray([0.0]),
+            np.geomspace(spec.tau_photosphere_min, spec.tau_photosphere, spec.n_photosphere),
+        ]
+    )
+    tau_deep = np.linspace(spec.tau_photosphere, spec.tau_total, n_deep + 1)[1:]
+    tau = np.concatenate([tau_top, tau_deep])
+    if tau.size != spec.n_layers + 1:
+        raise ValueError("optical-depth edge count must be n_layers+1")
+    pressure = p_of_tau(tau)[::-1]
+    pressure[0] = spec.p_bottom
+    pressure[-1] = spec.p_top
+    if np.any(np.diff(pressure) >= 0.0):
+        raise ValueError("analytic-opacity pressure edges must be strictly decreasing")
+    return pressure
 
 
 @dataclass(frozen=True)
@@ -263,6 +365,41 @@ def grey_radiative_equilibrium_temperature(
     return (source / STEFAN_BOLTZMANN) ** 0.25
 
 
+def grey_layer_optical_thickness(
+    grid: PressureGrid,
+    opacity: PrescribedOpacity,
+    temperature: NDArray[np.float64],
+    *,
+    diffusivity_factor: float = DEFAULT_DIFFUSIVITY,
+    pressure: NDArray[np.float64] | None = None,
+) -> NDArray[np.float64]:
+    """D Δτ per layer for a grey (single-band) opacity."""
+    p = grid.pressure_centres if pressure is None else np.asarray(pressure, dtype=np.float64)
+    kappa = opacity.evaluate(np.asarray(temperature, dtype=np.float64), p)
+    if kappa.shape[0] != 1:
+        raise ValueError("grey_layer_optical_thickness requires a single opacity band")
+    return diffusivity_factor * kappa[0] * grid.layer_mass
+
+
+def _temperature_on_adiabat(
+    thermo: ThermoProvider,
+    t_join: float,
+    p_join: float,
+    pressure: NDArray[np.float64],
+) -> NDArray[np.float64]:
+    """Deep convective seed: power-law for ConstantH2Thermo, isentrope otherwise."""
+    if isinstance(thermo, ConstantH2Thermo):
+        return t_join * (pressure / p_join) ** float(thermo.nabla_ad)
+    s_join = float(thermo.entropy(np.asarray([t_join]), np.asarray([p_join]))[0])
+    target_psi = s_join + thermo.gas_constant * np.log(pressure / thermo.p_ref)
+    return invert_psi_newton(
+        thermo,
+        target_psi,
+        t_min=float(thermo.t_min),
+        t_max=float(thermo.t_max),
+    )
+
+
 def radiative_convective_initial_temperature(
     grid: PressureGrid,
     opacity: PrescribedOpacity,
@@ -276,8 +413,12 @@ def radiative_convective_initial_temperature(
 ) -> NDArray[np.float64]:
     """Grey RE estimate with an adiabat only in the bottom-connected unstable region.
 
-    Smooths solely across the radiative–convective join. Does not cap F_conv,
-    reduce α, or clip superadiabaticity after the join is set.
+    If the first internal interface is stable, detached upper unstable segments
+    are left on the radiative-equilibrium seed. Smooths solely across the
+    radiative–convective join. Does not cap F_conv, reduce α, or clip
+    superadiabaticity after the join is set. Production thermodynamics use a
+    constant-entropy inversion; ConstantH2Thermo keeps the exact power-law
+    adiabat.
     """
     t_re = grey_radiative_equilibrium_temperature(
         grid, opacity, f_int, f_irr,
@@ -286,28 +427,27 @@ def radiative_convective_initial_temperature(
     n = t_re.size
     if n < 2:
         return t_re
-    nabla_ad = float(np.mean(thermo.nabla_ad_at(t_re)))
     log_t = np.log(t_re)
     log_p = np.log(grid.pressure_centres)
     nabla = (log_t[:-1] - log_t[1:]) / (log_p[:-1] - log_p[1:])
-    t = t_re.copy()
-    n_int = nabla.size
+    nabla_ad = thermo.nabla_ad_at(t_re)
+    nabla_ad_iface = 0.5 * (nabla_ad[:-1] + nabla_ad[1:])
+    if nabla[0] <= nabla_ad_iface[0]:
+        return t_re
     i = 0
-    while i < n_int:
-        if nabla[i] <= nabla_ad:
-            i += 1
-            continue
-        i_lo = i
-        while i < n_int and nabla[i] > nabla_ad:
-            i += 1
-        i_join = min(i, n - 1)
-        p_join = grid.pressure_centres[i_join]
-        t_join = t_re[i_join]
-        t_ad = t_join * (grid.pressure_centres / p_join) ** nabla_ad
-        t[i_lo:i_join] = t_ad[i_lo:i_join]
-        width = max(int(join_layers), 0)
-        for k in range(max(i_lo, i_join - width), i_join):
-            t[k] = np.sqrt(t_ad[k] * t_re[k])
+    n_int = nabla.size
+    while i < n_int and nabla[i] > nabla_ad_iface[i]:
+        i += 1
+    i_join = min(i, n - 1)
+    p_join = float(grid.pressure_centres[i_join])
+    t_join = float(t_re[i_join])
+    t = t_re.copy()
+    p_cz = grid.pressure_centres[:i_join]
+    t_ad_cz = _temperature_on_adiabat(thermo, t_join, p_join, p_cz)
+    t[:i_join] = t_ad_cz
+    width = max(int(join_layers), 0)
+    for k in range(max(0, i_join - width), i_join):
+        t[k] = np.sqrt(t_ad_cz[k] * t_re[k])
     if np.any(t <= 0.0) or not np.all(np.isfinite(t)):
         raise ValueError("radiative–convective initial temperature must be finite and positive")
     return t
@@ -631,7 +771,36 @@ def _rejected_diag(
     )
 
 
-def _gate_ok(conv: RCEConvergence, cfg: RCEConfig) -> bool:
+def _attraction_temperature_residual(
+    temperature: NDArray[np.float64],
+    target: NDArray[np.float64],
+    floor: float,
+) -> float:
+    scale = np.maximum(np.abs(target), floor)
+    return float(np.max(np.abs(temperature - target) / scale, initial=0.0))
+
+
+def _gate_ok(
+    conv: RCEConvergence,
+    cfg: RCEConfig,
+    *,
+    manufactured: ManufacturedRadiativeTarget | None = None,
+    temperature: NDArray[np.float64] | None = None,
+) -> bool:
+    if (
+        manufactured is not None
+        and cfg.attraction_temperature_tolerance is not None
+        and temperature is not None
+    ):
+        t_rel = _attraction_temperature_residual(
+            temperature, manufactured.target_temperature, cfg.temp_scale_floor
+        )
+        return (
+            t_rel <= cfg.attraction_temperature_tolerance
+            and conv.temp_change <= cfg.temp_change_tolerance
+            and conv.finite_state
+            and conv.rcb_stable
+        )
     return (
         conv.flux_flatness <= cfg.flux_flatness_tolerance
         and conv.tendency_norm <= cfg.tendency_tolerance
@@ -687,7 +856,11 @@ def solve_adaptive_rce(
 
     for _step in range(cfg.max_steps):
         if cfg.t_final is not None and simulated_time >= cfg.t_final:
-            status = RCETerminalStatus.CONVERGED if _gate_ok(final_conv, cfg) else RCETerminalStatus.MAX_STEPS
+            status = (
+                RCETerminalStatus.CONVERGED
+                if _gate_ok(final_conv, cfg, manufactured=manufactured, temperature=state.temperature)
+                else RCETerminalStatus.MAX_STEPS
+            )
             reason = "reached t_final"
             break
 
@@ -705,8 +878,10 @@ def solve_adaptive_rce(
         conv_now, _, rcb_now, bottom_now, detached_now, _, _ = _convergence_metrics(
             grid, state, state, f_total_for_dt, dhdt_total, closure_for_dt, solver, cfg, prev_rcb, f_int
         )
+        radiation_only_control = physics.alpha == 0.0 and manufactured is None
         already_equilibrated = (
-            conv_now.flux_flatness <= cfg.flux_flatness_tolerance
+            radiation_only_control
+            and conv_now.flux_flatness <= cfg.flux_flatness_tolerance
             and conv_now.tendency_norm <= cfg.tendency_tolerance
             and conv_now.finite_state
             and cfg.prescribed_dt is None
@@ -744,7 +919,11 @@ def solve_adaptive_rce(
             if cfg.t_final is not None:
                 remaining = cfg.t_final - simulated_time
                 if remaining <= 0.0:
-                    status = RCETerminalStatus.CONVERGED if _gate_ok(final_conv, cfg) else RCETerminalStatus.MAX_STEPS
+                    status = (
+                        RCETerminalStatus.CONVERGED
+                        if _gate_ok(final_conv, cfg, manufactured=manufactured, temperature=state.temperature)
+                        else RCETerminalStatus.MAX_STEPS
+                    )
                     reason = "reached t_final"
                     break
                 if np.isfinite(dt):
@@ -770,7 +949,13 @@ def solve_adaptive_rce(
             final_detached = detached0
             final_conv = conv0
             final_rcb = rcb0
-            if conv0.flux_flatness <= cfg.flux_flatness_tolerance and conv0.tendency_norm <= cfg.tendency_tolerance and conv0.finite_state:
+            if (
+                physics.alpha == 0.0
+                and manufactured is None
+                and conv0.flux_flatness <= cfg.flux_flatness_tolerance
+                and conv0.tendency_norm <= cfg.tendency_tolerance
+                and conv0.finite_state
+            ):
                 status = RCETerminalStatus.CONVERGED
                 reason = "equilibrium: all timestep estimates infinite or below dt_min with residuals in tolerance"
             else:
@@ -902,7 +1087,7 @@ def solve_adaptive_rce(
             final_conv = conv
             final_rcb = rcb
 
-            if _gate_ok(conv, cfg):
+            if _gate_ok(conv, cfg, manufactured=manufactured, temperature=state.temperature):
                 accepted_consec += 1
             else:
                 accepted_consec = 0

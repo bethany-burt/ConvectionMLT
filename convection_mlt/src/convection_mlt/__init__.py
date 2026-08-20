@@ -53,15 +53,18 @@ from .radiation import (
     solve_radiation,
 )
 from .rce import (
+    AnalyticOpacityRCESpec,
     ManufacturedRadiativeTarget,
     RCEConfig,
     RCEResult,
     RCERoute,
     RCEStepDiagnostics,
     RCETerminalStatus,
+    grey_layer_optical_thickness,
     manufactured_operator_identity,
     grey_radiative_equilibrium_temperature,
     radiative_convective_initial_temperature,
+    analytic_opacity_pressure_edges,
     solve_adaptive_rce,
 )
 from .adapters.helios import (
@@ -78,6 +81,8 @@ from .trace import IntegrationTrace, TraceLevel, make_trace
 __all__ = [
     "AnalyticGreyOpacity",
     "AnalyticIdealGasThermo",
+    "AnalyticOpacityRCESpec",
+    "analytic_opacity_pressure_edges",
     "ClosureResult",
     "ConstantGreyOpacity",
     "ConstantGravity",
@@ -134,6 +139,7 @@ __all__ = [
     "RCEStepDiagnostics",
     "RCETerminalStatus",
     "manufactured_operator_identity",
+    "grey_layer_optical_thickness",
     "grey_radiative_equilibrium_temperature",
     "radiative_convective_initial_temperature",
     "solve_adaptive",
