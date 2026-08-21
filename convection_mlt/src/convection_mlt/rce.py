@@ -18,6 +18,7 @@ from .implicit_convection import (
     ImplicitConvectionConfig,
     ImplicitConvectionDiagnostics,
     require_constant_gravity,
+    scaled_residual_norm,
     solve_implicit_convection,
 )
 from .opacity import AnalyticGreyOpacity, PrescribedOpacity
@@ -95,6 +96,8 @@ class RCEStepDiagnostics:
     line_search_backtracks: int = 0
     mask_outer_iterations: int = 0
     mlt_evals: int = 0
+    picard_iterations: int = 0
+    coupled_defect: float = float("nan")
 
 
 @dataclass(frozen=True)
@@ -146,6 +149,12 @@ class RCEConfig:
     # Optional macrostep accuracy bound for implicit convection only.
     dt_accuracy: float | None = None
     implicit_convection: ImplicitConvectionConfig | None = None
+    # Outer radiation–implicit-convection defect iteration (production implicit route).
+    coupled_picard: bool = True
+    max_picard: int = 12
+    picard_tolerance: float = 1.0e-10
+    picard_relax: float = 1.0
+    use_coupled_tendency_dt: bool = True
 
 
 def _uses_implicit_convection(route: RCERoute) -> bool:
@@ -215,6 +224,9 @@ class AnalyticOpacityRCESpec:
     alpha: float = 1.0
     closure_prefactor: float = 0.5
     diffusivity_factor: float = DEFAULT_DIFFUSIVITY
+    # If set, pressure edges are coarsened from this master rather than rebuilt.
+    nested_master_layers: int | None = None
+    nested_master_photosphere: int | None = None
 
     @property
     def kappa0(self) -> float:
@@ -230,6 +242,8 @@ class AnalyticOpacityRCESpec:
         )
 
     def pressure_edges(self) -> NDArray[np.float64]:
+        if self.nested_master_layers is not None:
+            return coarsened_analytic_opacity_pressure_edges(self)
         return analytic_opacity_pressure_edges(self)
 
     def grid(self) -> PressureGrid:
@@ -280,6 +294,97 @@ def analytic_opacity_pressure_edges(spec: AnalyticOpacityRCESpec) -> NDArray[np.
     pressure[-1] = spec.p_top
     if np.any(np.diff(pressure) >= 0.0):
         raise ValueError("analytic-opacity pressure edges must be strictly decreasing")
+    return pressure
+
+
+NESTED_MASTER_LAYERS = 384
+NESTED_MASTER_PHOTOSPHERE = 64
+
+
+def nested_analytic_opacity_spec(
+    n_layers: int,
+    *,
+    n_master: int = NESTED_MASTER_LAYERS,
+    n_photosphere_master: int = NESTED_MASTER_PHOTOSPHERE,
+    **kwargs,
+) -> AnalyticOpacityRCESpec:
+    """Member of the nested τ-grid family coarsened from a fine master.
+
+    τ=1 is an edge of the master and is retained at every even coarsening.
+    Coarser members are every-stride master edges, not independently rebuilt
+    photosphere counts.
+    """
+    if n_master % n_layers != 0:
+        raise ValueError(f"n_master={n_master} must be divisible by n_layers={n_layers}")
+    stride = n_master // n_layers
+    if n_photosphere_master % stride != 0:
+        raise ValueError("photosphere edge index must survive even coarsening")
+    n_phot = n_photosphere_master // stride
+    kwargs.pop("n_photosphere", None)
+    kwargs.pop("n_layers", None)
+    kwargs.pop("nested_master_layers", None)
+    kwargs.pop("nested_master_photosphere", None)
+    return AnalyticOpacityRCESpec(
+        n_layers=n_layers,
+        n_photosphere=n_phot,
+        nested_master_layers=n_master,
+        nested_master_photosphere=n_photosphere_master,
+        **kwargs,
+    )
+
+
+def analytic_opacity_tau_edges(spec: AnalyticOpacityRCESpec) -> NDArray[np.float64]:
+    """Optical-depth edges from TOA (τ=0) to the bottom (τ=τ_total)."""
+    if spec.n_photosphere < 2 or spec.n_photosphere >= spec.n_layers - 1:
+        raise ValueError("n_photosphere must be in [2, n_layers-2]")
+    n_deep = spec.n_layers - spec.n_photosphere
+    tau_top = np.concatenate(
+        [
+            np.asarray([0.0]),
+            np.geomspace(spec.tau_photosphere_min, spec.tau_photosphere, spec.n_photosphere),
+        ]
+    )
+    tau_deep = np.linspace(spec.tau_photosphere, spec.tau_total, n_deep + 1)[1:]
+    tau = np.concatenate([tau_top, tau_deep])
+    tau[0] = 0.0
+    tau[-1] = spec.tau_total
+    tau[spec.n_photosphere] = spec.tau_photosphere
+    return tau
+
+
+def coarsened_analytic_opacity_pressure_edges(
+    spec: AnalyticOpacityRCESpec,
+) -> NDArray[np.float64]:
+    if spec.nested_master_layers is None or spec.nested_master_photosphere is None:
+        raise ValueError("nested master counts are required for coarsened edges")
+    master = AnalyticOpacityRCESpec(
+        gravity=spec.gravity,
+        p_bottom=spec.p_bottom,
+        p_top=spec.p_top,
+        a=spec.a,
+        b=spec.b,
+        tau_total=spec.tau_total,
+        f_int=spec.f_int,
+        f_irr=spec.f_irr,
+        n_layers=spec.nested_master_layers,
+        n_photosphere=spec.nested_master_photosphere,
+        tau_photosphere=spec.tau_photosphere,
+        tau_photosphere_min=spec.tau_photosphere_min,
+        alpha=spec.alpha,
+        closure_prefactor=spec.closure_prefactor,
+        diffusivity_factor=spec.diffusivity_factor,
+    )
+    p_master = analytic_opacity_pressure_edges(master)
+    stride = spec.nested_master_layers // spec.n_layers
+    pressure = p_master[::stride]
+    if pressure.size != spec.n_layers + 1:
+        raise ValueError("coarsened edge count must be n_layers+1")
+    if abs(float(pressure[0]) - spec.p_bottom) > 1e-12 * spec.p_bottom:
+        pressure = pressure.copy()
+        pressure[0] = spec.p_bottom
+    pressure[-1] = spec.p_top
+    if np.any(np.diff(pressure) >= 0.0):
+        raise ValueError("coarsened analytic-opacity edges must be strictly decreasing")
     return pressure
 
 
@@ -666,6 +771,8 @@ class _SplitAttempt:
     boundary_work: float
     energy_lhs: float
     implicit: ImplicitConvectionDiagnostics | None = None
+    picard_iterations: int = 0
+    coupled_defect: float = float("nan")
 
 
 def _external_flux_at_state(
@@ -701,6 +808,123 @@ def _external_flux_at_state(
     closure_target = _evaluate_closure(grid, target_state, physics, thermo)
     return _build_rad_from_target(
         grid, state, closure_target, manufactured, target_enthalpy=target_state.enthalpy
+    )
+
+
+def _invert_enthalpy_state(
+    grid: PressureGrid,
+    h: NDArray[np.float64],
+    thermo: ThermoProvider,
+    gravity: GravityLaw,
+) -> ColumnState | None:
+    try:
+        t = thermo.invert_enthalpy(h)
+        if not np.all(np.isfinite(t)) or np.any(t <= 0.0):
+            return None
+        _ = thermo.specific_heat(t)
+        return build_column_state(grid, t, thermo, gravity, enthalpy=h)
+    except (ThermoDomainError, EnthalpyInversionError, HydrostaticDomainError):
+        return None
+
+
+def _coupled_defect(
+    h_new: NDArray[np.float64],
+    h_n: NDArray[np.float64],
+    q_total: NDArray[np.float64],
+    dt: float,
+    temperature: NDArray[np.float64],
+    thermo: ThermoProvider,
+) -> float:
+    residual = h_new - h_n - dt * q_total
+    cp = thermo.specific_heat(temperature)
+    return scaled_residual_norm(residual, h_n, temperature, cp, 1.0e-30)
+
+
+def _run_coupled_picard_macrostep(
+    grid: PressureGrid,
+    state_n: ColumnState,
+    dt: float,
+    physics: PhysicsConfig,
+    thermo: ThermoProvider,
+    gravity: GravityLaw,
+    opacity: PrescribedOpacity,
+    pressure: NDArray[np.float64],
+    top_bc: TopIrradiation,
+    lower_bc: LowerBoundary,
+    cfg: RCEConfig,
+    manufactured: ManufacturedRadiativeTarget | None,
+    solver: SolverConfig,
+    *,
+    prescribed_f_ext: NDArray[np.float64] | None = None,
+) -> _SplitAttempt:
+    """Defect-correction: freeze mass from t^n, iterate F_rad then implicit MLT."""
+    nan_f = np.full(grid.n_layers + 1, np.nan)
+    h_n = np.asarray(state_n.enthalpy, dtype=np.float64).copy()
+    mass = np.asarray(state_n.mass_path, dtype=np.float64).copy()
+    state_k = state_n
+    omega = float(cfg.picard_relax)
+    last_diag: ImplicitConvectionDiagnostics | None = None
+    last_defect = float("inf")
+
+    for k in range(1, cfg.max_picard + 1):
+        f_rad_k = _external_flux_at_state(
+            grid, state_k, physics, thermo, opacity, pressure, top_bc, lower_bc,
+            cfg, manufactured, gravity, prescribed_f_ext=prescribed_f_ext,
+        )
+        q_rad = enthalpy_tendency(grid, f_rad_k, mass)
+        h_star = h_n + dt * q_rad
+        state_star = _invert_enthalpy_state(grid, h_star, thermo, gravity)
+        if state_star is None:
+            return _SplitAttempt(
+                False, "coupled_picard_failure: h* invert", state_n, nan_f, nan_f,
+                float("nan"), float("nan"), last_diag, k, last_defect,
+            )
+        result = solve_implicit_convection(
+            grid, state_star, h_star, physics, thermo, gravity, mass, dt, solver,
+            cfg=cfg.implicit_convection,
+        )
+        last_diag = result.diagnostics
+        if not result.ok:
+            return _SplitAttempt(
+                False,
+                result.diagnostics.rejection_reason or "coupled_picard_failure: implicit convection",
+                state_n, nan_f, nan_f, float("nan"), float("nan"), last_diag, k, last_defect,
+            )
+        h_be = np.asarray(result.state.enthalpy, dtype=np.float64)
+        h_trial = omega * h_be + (1.0 - omega) * np.asarray(state_k.enthalpy, dtype=np.float64)
+        state_trial = _invert_enthalpy_state(grid, h_trial, thermo, gravity)
+        if state_trial is None:
+            return _SplitAttempt(
+                False, "coupled_picard_failure: trial invert", state_n, nan_f, nan_f,
+                float("nan"), float("nan"), last_diag, k, last_defect,
+            )
+        f_rad = _external_flux_at_state(
+            grid, state_trial, physics, thermo, opacity, pressure, top_bc, lower_bc,
+            cfg, manufactured, gravity, prescribed_f_ext=prescribed_f_ext,
+        )
+        closure = _evaluate_closure(grid, state_trial, physics, thermo)
+        f_conv = np.asarray(closure.flux, dtype=np.float64).copy()
+        f_conv[0] = 0.0
+        f_conv[-1] = 0.0
+        q_tot = enthalpy_tendency(grid, f_rad + f_conv, mass)
+        defect = _coupled_defect(
+            h_trial, h_n, q_tot, dt, state_trial.temperature, thermo
+        )
+        if defect > last_defect and omega > 0.3:
+            omega = max(0.5 * omega, 0.3)
+        last_defect = defect
+        state_k = state_trial
+        if defect <= cfg.picard_tolerance:
+            work = dt * float((f_rad[0] + f_conv[0]) - (f_rad[-1] + f_conv[-1]))
+            lhs = float(np.sum(mass * (h_trial - h_n)))
+            return _SplitAttempt(
+                True, None, state_trial, f_conv, f_rad, work, lhs, last_diag, k, defect
+            )
+
+    return _SplitAttempt(
+        False,
+        f"coupled_picard_failure: defect {last_defect}",
+        state_n, nan_f, nan_f, float("nan"), float("nan"), last_diag, cfg.max_picard, last_defect,
     )
 
 
@@ -792,6 +1016,12 @@ def _run_split_macrostep(
         return s_new, f_rad, work, lhs
 
     try:
+        if cfg.coupled_picard and _uses_implicit_convection(route):
+            return _run_coupled_picard_macrostep(
+                grid, state, dt, physics, thermo, gravity, opacity, pressure,
+                top_bc, lower_bc, cfg, manufactured, solver,
+                prescribed_f_ext=prescribed_f_ext,
+            )
         if route == RCERoute.SPLIT_RAD_THEN_CONV:
             s1, f_rad, w1, lhs1 = rad_substep(state)
             s2, f_conv, w2, lhs2 = conv_substep(s1)
@@ -1064,15 +1294,26 @@ def solve_adaptive_rce(
 
         dt_temp = _dt_temp_estimate(state, dhdt_total, solver, thermo)
         if _uses_implicit_convection(route):
-            # Radiation / external forcing only — never include explicit MLT CFL.
             dhdt_rad_only = enthalpy_tendency(grid, f_rad_for_dt, state.mass_path)
             dt_rad_T = _dt_temp_estimate(state, dhdt_rad_only, solver, thermo)
-            candidates = [dt_rad, dt_rad_T]
-            if cfg.dt_accuracy is not None and np.isfinite(cfg.dt_accuracy):
-                candidates.append(float(cfg.dt_accuracy))
+            dt_mlt = float("inf")
+            if cfg.coupled_picard and cfg.use_coupled_tendency_dt:
+                # Picard handles the cancelled Q_rad+Q_conv pair. Do not CFL on
+                # radiation-only heating, and do not let a small leftover
+                # residual cap the macrostep below dt_accuracy.
+                candidates = []
+                if cfg.dt_accuracy is not None and np.isfinite(cfg.dt_accuracy):
+                    candidates.append(float(cfg.dt_accuracy))
+                else:
+                    candidates.append(dt_temp)
+                dt_temp_report = dt_temp
+            else:
+                candidates = [dt_rad, dt_rad_T]
+                dt_temp_report = dt_rad_T
+                if cfg.dt_accuracy is not None and np.isfinite(cfg.dt_accuracy):
+                    candidates.append(float(cfg.dt_accuracy))
             dt_est = min(candidates)
-            dt_mlt = float("inf")  # reported as unused for implicit convection
-            dt_temp = dt_rad_T
+            dt_temp = dt_temp_report
         else:
             dt_est = min(dt_mlt, dt_rad, dt_temp)
 
@@ -1172,6 +1413,8 @@ def solve_adaptive_rce(
                 energy_resid = energy_lhs - boundary_work
                 energy_committed = float(np.sum(old_state.mass_path * (trial_state.enthalpy - old_state.enthalpy)))
                 implicit_diag = None
+                picard_iters = 0
+                coupled_def = float("nan")
             else:
                 attempt = _run_split_macrostep(
                     route, grid, state, dt, physics, thermo, grav, opacity, pressure,
@@ -1202,6 +1445,8 @@ def solve_adaptive_rce(
                 )
                 dhdt = enthalpy_tendency(grid, f_total, trial_state.mass_path)
                 implicit_diag = attempt.implicit
+                picard_iters = attempt.picard_iterations
+                coupled_def = attempt.coupled_defect
 
             energy_committed_resid = energy_committed - boundary_work
             ulp_floor = _ulp_energy_floor(old_state.mass_path, trial_state.enthalpy)
@@ -1259,6 +1504,8 @@ def solve_adaptive_rce(
                         0 if implicit_diag is None else implicit_diag.mask_outer_iterations
                     ),
                     mlt_evals=0 if implicit_diag is None else implicit_diag.mlt_evals,
+                    picard_iterations=picard_iters,
+                    coupled_defect=coupled_def,
                 )
             )
 
@@ -1439,14 +1686,26 @@ def solve_adaptive_rce_with_prescribed_external_flux(
         closure_for_dt = _evaluate_closure(grid, state, physics, thermo)
         f_total_for_dt = f_rad_for_dt + closure_for_dt.flux
         dhdt_rad = enthalpy_tendency(grid, f_rad_for_dt, state.mass_path)
+        dhdt_total = enthalpy_tendency(grid, f_total_for_dt, state.mass_path)
         dt_rad = _dt_rad_estimate(state, dhdt_rad, solver, thermo)
         dt_rad_T = _dt_temp_estimate(state, dhdt_rad, solver, thermo)
-        candidates = [dt_rad, dt_rad_T]
-        if cfg_local.dt_accuracy is not None:
-            candidates.append(float(cfg_local.dt_accuracy))
-        dt_est = min(candidates)
+        dt_coupled_T = _dt_temp_estimate(state, dhdt_total, solver, thermo)
         dt_mlt = float("inf")
-        dt_temp = dt_rad_T
+        if cfg_local.coupled_picard and cfg_local.use_coupled_tendency_dt:
+            candidates = []
+            if cfg_local.dt_accuracy is not None:
+                candidates.append(float(cfg_local.dt_accuracy))
+            else:
+                candidates.append(dt_coupled_T)
+            dt_temp = dt_coupled_T
+            if not candidates:
+                candidates.append(dt_coupled_T)
+        else:
+            candidates = [dt_rad, dt_rad_T]
+            dt_temp = dt_rad_T
+            if cfg_local.dt_accuracy is not None:
+                candidates.append(float(cfg_local.dt_accuracy))
+        dt_est = min(candidates)
 
         prescribed = cfg_local.prescribed_dt is not None
         if prescribed:
@@ -1558,6 +1817,8 @@ def solve_adaptive_rce_with_prescribed_external_flux(
                     line_search_backtracks=0 if idiag is None else idiag.line_search_backtracks,
                     mask_outer_iterations=0 if idiag is None else idiag.mask_outer_iterations,
                     mlt_evals=0 if idiag is None else idiag.mlt_evals,
+                    picard_iterations=attempt.picard_iterations,
+                    coupled_defect=attempt.coupled_defect,
                 )
             )
             final_closure = closure

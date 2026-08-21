@@ -18,11 +18,13 @@ from convection_mlt import (
     TopIrradiation,
     grey_layer_optical_thickness,
     grey_radiative_equilibrium_temperature,
+    nested_analytic_opacity_spec,
     radiative_convective_initial_temperature,
     solve_adaptive_rce,
 )
 from convection_mlt.rce import (
     DEFAULT_DIFFUSIVITY,
+    analytic_opacity_tau_edges,
     _evaluate_closure,
 )
 from convection_mlt.state import build_column_state
@@ -350,3 +352,54 @@ def test_nasa_h2_coupled_smoke_accepts_implicit_steps():
     assert np.all(np.isfinite(res.final_state.temperature))
     assert float(res.final_state.temperature.min()) > 0.0
     assert res.status != RCETerminalStatus.DT_MIN_FAILURE
+
+
+def test_nested_optical_depth_family_retains_tau1_and_endpoints():
+    master = nested_analytic_opacity_spec(384)
+    tau_master = analytic_opacity_tau_edges(
+        AnalyticOpacityRCESpec(
+            n_layers=master.nested_master_layers,
+            n_photosphere=master.nested_master_photosphere,
+        )
+    )
+    assert abs(float(tau_master[64]) - 1.0) <= 1e-15
+    p_master = master.pressure_edges()
+    for n, stride in ((192, 2), (96, 4), (48, 8)):
+        spec = nested_analytic_opacity_spec(n)
+        p = spec.pressure_edges()
+        assert p.size == n + 1
+        assert abs(float(p[0]) - spec.p_bottom) <= 1e-9 * spec.p_bottom
+        assert abs(float(p[-1]) - spec.p_top) <= 1e-12
+        np.testing.assert_allclose(p, p_master[::stride], rtol=0.0, atol=1e-9 * spec.p_bottom)
+        tau = analytic_opacity_tau_edges(
+            AnalyticOpacityRCESpec(
+                n_layers=spec.nested_master_layers,
+                n_photosphere=spec.nested_master_photosphere,
+            )
+        )[::stride]
+        assert abs(float(tau[spec.n_photosphere]) - spec.tau_photosphere) <= 1e-12
+
+
+def test_coupled_picard_reduces_defect_on_short_n16_run():
+    spec = _spec(n_layers=16, n_photosphere=6)
+    grid = spec.grid()
+    thermo = ConstantH2Thermo()
+    opacity = spec.opacity()
+    t0 = radiative_convective_initial_temperature(
+        grid, opacity, thermo, spec.f_int, spec.f_irr
+    )
+    cfg = _implicit_cfg(max_steps=12, gate=1e-12)
+    res = solve_adaptive_rce(
+        grid, t0, spec.physics(), _solver(), thermo, opacity, grid.pressure_centres,
+        TopIrradiation(spec.f_irr), LowerNetInternalFlux(spec.f_int),
+        gravity=ConstantGravity(spec.gravity),
+        route=RCERoute.SPLIT_RAD_THEN_IMPLICIT_CONV,
+        config=cfg,
+    )
+    accepted = [d for d in res.diagnostics if d.accepted]
+    assert accepted
+    assert any(d.picard_iterations >= 1 for d in accepted)
+    finite_def = [d.coupled_defect for d in accepted if np.isfinite(d.coupled_defect)]
+    assert finite_def
+    assert min(finite_def) <= 1e-8
+    assert np.all(np.isfinite(res.final_state.temperature))

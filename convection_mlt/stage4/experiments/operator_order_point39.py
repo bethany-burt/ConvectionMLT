@@ -94,20 +94,26 @@ def _summarize(res, wall: float) -> dict:
 def operator_order_refinement(
     *,
     n_layers: int = 24,
-    t_final: float = 2.0e4,
-    dt0: float = 500.0,
+    t_final: float = 2.0e3,
+    explicit_dt0: float = 25.0,
+    implicit_dt0: float = 500.0,
 ) -> dict:
-    """Same t_final with Δt, Δt/2, Δt/4 for four operator routes."""
+    """Same t_final for every route. Explicit dts sit below the 50 s success bracket."""
     spec = _spec(n_layers)
     grid, thermo, opacity, t0 = _initial(spec)
     routes = {
-        "unsplit_explicit": RCERoute.UNSPLIT,
-        "rad_then_implicit_conv": RCERoute.SPLIT_RAD_THEN_IMPLICIT_CONV,
-        "implicit_conv_then_rad": RCERoute.SPLIT_IMPLICIT_CONV_THEN_RAD,
-        "strang_rad_implicit_conv": RCERoute.SPLIT_STRANG_RAD_IMPLICIT_CONV,
+        "unsplit_explicit": (RCERoute.UNSPLIT, explicit_dt0),
+        "rad_then_implicit_conv": (RCERoute.SPLIT_RAD_THEN_IMPLICIT_CONV, implicit_dt0),
+        "implicit_conv_then_rad": (RCERoute.SPLIT_IMPLICIT_CONV_THEN_RAD, implicit_dt0),
+        "strang_rad_implicit_conv": (RCERoute.SPLIT_STRANG_RAD_IMPLICIT_CONV, implicit_dt0),
     }
-    out: dict = {"t_final": t_final, "dt0": dt0, "routes": {}}
-    for name, route in routes.items():
+    out: dict = {
+        "t_final": t_final,
+        "explicit_dt0": explicit_dt0,
+        "implicit_dt0": implicit_dt0,
+        "routes": {},
+    }
+    for name, (route, dt0) in routes.items():
         out["routes"][name] = {}
         for factor in (1.0, 0.5, 0.25):
             dt = dt0 * factor
@@ -119,6 +125,7 @@ def operator_order_refinement(
                 flux_flatness_tolerance=1e-12,
                 tendency_tolerance=1e-12,
                 temp_change_tolerance=1e-12,
+                coupled_picard=(route != RCERoute.UNSPLIT),
             )
             wall0 = time.perf_counter()
             res = solve_adaptive_rce(
@@ -181,6 +188,79 @@ def operator_order_refinement(
     return out
 
 
+def _probe_prescribed_dt(
+    *,
+    dt: float,
+    n_required: int,
+    route: RCERoute,
+    physics: PhysicsConfig,
+    grid,
+    t0,
+    thermo,
+    opacity,
+    spec: AnalyticOpacityRCESpec,
+    prescribed_f_ext=None,
+) -> dict:
+    t_probe = float(n_required) * dt
+    cfg = _base_cfg(
+        max_steps=n_required + 2,
+        t_final=t_probe,
+        prescribed_dt=dt,
+        n_consec=10**9,
+        flux_flatness_tolerance=1e-12,
+        tendency_tolerance=1e-12,
+        temp_change_tolerance=1e-12,
+        coupled_picard=(route != RCERoute.UNSPLIT),
+    )
+    wall0 = time.perf_counter()
+    if prescribed_f_ext is not None:
+        res = solve_adaptive_rce_with_prescribed_external_flux(
+            grid, t0, physics, _solver(), thermo, prescribed_f_ext,
+            gravity=ConstantGravity(spec.gravity), config=cfg,
+        )
+    else:
+        res = solve_adaptive_rce(
+            grid, t0, physics, _solver(), thermo, opacity, grid.pressure_centres,
+            TopIrradiation(spec.f_irr), LowerNetInternalFlux(spec.f_int),
+            gravity=ConstantGravity(spec.gravity), route=route, config=cfg,
+        )
+    wall = time.perf_counter() - wall0
+    accepted = [d for d in res.diagnostics if d.accepted]
+    rejected = [d for d in res.diagnostics if not d.accepted]
+    flats = [d.flux_flatness for d in accepted if np.isfinite(d.flux_flatness)]
+    residual_ok = True
+    if len(flats) >= 2:
+        residual_ok = flats[-1] <= max(10.0 * flats[0], flats[0])
+    ok = (
+        res.status not in (
+            RCETerminalStatus.PRESCRIBED_DT_REJECTED,
+            RCETerminalStatus.DT_MIN_FAILURE,
+        )
+        and res.steps_accepted >= n_required
+        and res.rejections == 0
+        and res.simulated_time >= 0.99 * t_probe
+        and np.all(np.isfinite(res.final_state.temperature))
+        and float(np.min(res.final_state.temperature)) > 0.0
+        and res.detached_convective_regions == []
+        and residual_ok
+        and res.convergence.finite_state
+    )
+    return {
+        "dt": dt,
+        "ok": ok,
+        "t_probe": t_probe,
+        "status": res.status.value,
+        "reason": res.reason,
+        "steps_accepted": res.steps_accepted,
+        "rejections": res.rejections,
+        "simulated_time": res.simulated_time,
+        "wall_time_s": wall,
+        "flux_flatness": res.convergence.flux_flatness,
+        "n_rejected_reasons": [d.rejection_reason for d in rejected],
+        "detached": res.detached_convective_regions,
+    }
+
+
 def _largest_stable_dt(
     *,
     route: RCERoute,
@@ -191,106 +271,75 @@ def _largest_stable_dt(
     opacity,
     spec: AnalyticOpacityRCESpec,
     prescribed_f_ext=None,
-    t_probe: float = 5.0e3,
+    n_required: int = 20,
     dt_candidates: list[float] | None = None,
+    max_bisections: int = 6,
 ) -> dict:
     if dt_candidates is None:
         dt_candidates = [
-            1.0e6, 2.0e5, 5.0e4, 2.0e4, 1.0e4, 5.0e3, 2.5e3, 1.0e3, 200.0, 50.0, 10.0, 1.0
+            1.0e6, 2.0e5, 5.0e4, 2.0e4, 1.0e4, 5.0e3, 2.5e3, 1.0e3, 200.0, 50.0, 25.0, 10.0, 1.0
         ]
     trials = []
-    largest_success = None
-    smallest_fail_above = None
+    last_success = None
+    first_failure = None
     for dt in dt_candidates:
-        cfg = _base_cfg(
-            max_steps=int(t_probe / dt) + 20,
-            t_final=t_probe,
-            prescribed_dt=dt,
-            n_consec=10**9,
-            flux_flatness_tolerance=1e-12,
-            tendency_tolerance=1e-12,
-            temp_change_tolerance=1e-12,
+        entry = _probe_prescribed_dt(
+            dt=dt, n_required=n_required, route=route, physics=physics, grid=grid,
+            t0=t0, thermo=thermo, opacity=opacity, spec=spec,
+            prescribed_f_ext=prescribed_f_ext,
         )
-        wall0 = time.perf_counter()
-        if prescribed_f_ext is not None:
-            res = solve_adaptive_rce_with_prescribed_external_flux(
-                grid,
-                t0,
-                physics,
-                _solver(),
-                thermo,
-                prescribed_f_ext,
-                gravity=ConstantGravity(spec.gravity),
-                config=cfg,
-            )
-        else:
-            res = solve_adaptive_rce(
-                grid,
-                t0,
-                physics,
-                _solver(),
-                thermo,
-                opacity,
-                grid.pressure_centres,
-                TopIrradiation(spec.f_irr),
-                LowerNetInternalFlux(spec.f_int),
-                gravity=ConstantGravity(spec.gravity),
-                route=route,
-                config=cfg,
-            )
-        wall = time.perf_counter() - wall0
-        ok = (
-            res.status
-            in (RCETerminalStatus.CONVERGED, RCETerminalStatus.MAX_STEPS)
-            and res.steps_accepted > 0
-            and res.simulated_time >= 0.9 * t_probe
-            and np.all(np.isfinite(res.final_state.temperature))
-            and res.convergence.finite_state
-        )
-        if res.status in (
-            RCETerminalStatus.PRESCRIBED_DT_REJECTED,
-            RCETerminalStatus.DT_MIN_FAILURE,
-        ):
-            ok = False
-        entry = {
-            "dt": dt,
-            "ok": ok,
-            "status": res.status.value,
-            "reason": res.reason,
-            "steps_accepted": res.steps_accepted,
-            "rejections": res.rejections,
-            "wall_time_s": wall,
-            "flux_flatness": res.convergence.flux_flatness,
-        }
         trials.append(entry)
-        if ok:
-            largest_success = entry
+        if entry["ok"]:
+            last_success = entry
             break
-        smallest_fail_above = entry
-    if largest_success is None:
-        note = "no successful prescribed_dt in the tested set"
-        dt_stable_report = None
-    elif smallest_fail_above is None:
+        first_failure = entry
+    if last_success is not None and first_failure is not None:
+        lo = last_success["dt"]
+        hi = first_failure["dt"]
+        # dt_candidates are descending, so hi > lo.
+        if hi < lo:
+            lo, hi = hi, lo
+            last_success, first_failure = first_failure, last_success
+        for _ in range(max_bisections):
+            if hi / max(lo, 1e-30) <= 2.0:
+                break
+            mid = float(np.sqrt(lo * hi))
+            entry = _probe_prescribed_dt(
+                dt=mid, n_required=n_required, route=route, physics=physics, grid=grid,
+                t0=t0, thermo=thermo, opacity=opacity, spec=spec,
+                prescribed_f_ext=prescribed_f_ext,
+            )
+            trials.append(entry)
+            if entry["ok"]:
+                lo = mid
+                last_success = entry
+            else:
+                hi = mid
+                first_failure = entry
+    if last_success is None:
+        note = "no successful multi-step prescribed_dt in the tested set"
+        dt_stable = None
+    elif first_failure is None:
         note = (
-            f"dt_stable >= {largest_success['dt']}: largest timestep tested succeeded; "
-            "not a measured upper threshold"
+            f"dt_stable >= {last_success['dt']}: largest timestep tested succeeded "
+            "over 20 consecutive steps; not a measured upper threshold"
         )
-        dt_stable_report = largest_success["dt"]
+        dt_stable = last_success["dt"]
     else:
         note = (
-            f"bracket: last success {largest_success['dt']}, "
-            f"first failure above {smallest_fail_above['dt']}"
+            f"bracket: last success {last_success['dt']}, "
+            f"first failure at {first_failure['dt']}"
         )
-        dt_stable_report = largest_success["dt"]
+        dt_stable = last_success["dt"]
     return {
-        "largest_stable_dt": dt_stable_report,
-        "largest_stable_dt_is_lower_bound_only": smallest_fail_above is None
-        and largest_success is not None,
-        "failed_upper_dt": None if smallest_fail_above is None else smallest_fail_above["dt"],
+        "largest_stable_dt": dt_stable,
+        "largest_stable_dt_is_lower_bound_only": first_failure is None and last_success is not None,
+        "failed_upper_dt": None if first_failure is None else first_failure["dt"],
+        "failed_upper_phrasing": "first failure at X",
+        "n_required_accepted": n_required,
         "note": note,
-        "probe": largest_success,
-        "failed_upper": smallest_fail_above,
-        "t_probe": t_probe,
+        "probe": last_success,
+        "failed_upper": first_failure,
         "trials": trials,
     }
 

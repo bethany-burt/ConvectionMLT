@@ -3,11 +3,11 @@
     "n_layers": 48,
     "status": "converged",
     "reason": "converged for 5 consecutive accepted steps",
-    "steps_accepted": 200,
-    "simulated_time": 423435.78400000004,
-    "flux_flatness": 0.00036856165283666087,
-    "tendency_norm": 0.0005707878848776696,
-    "primary_rcb_log10p": 5.4186210823516605,
+    "steps_accepted": 196,
+    "simulated_time": 424833.856,
+    "flux_flatness": 0.000348462467594383,
+    "tendency_norm": 0.0005698311685061223,
+    "primary_rcb_log10p": 5.418620960998222,
     "convective_regions": [
       [
         0,
@@ -17,19 +17,19 @@
     "detached_convective_regions": [],
     "dtau_top": 7.801878721640416e-05,
     "dtau_bottom": 5.135507430163297,
-    "energy_residual_rel": 2.647653066863616e-12,
-    "energy_committed_residual": -3.921300447018439e-06,
-    "energy_ulp_floor": 3.953831458783407e-05
+    "energy_residual_rel": 1.0831990537478001e-10,
+    "energy_committed_residual": 8.123992903108501e-05,
+    "energy_ulp_floor": 3.953831458781609e-05
   },
   "96": {
     "n_layers": 96,
     "status": "converged",
     "reason": "converged for 5 consecutive accepted steps",
-    "steps_accepted": 1456,
-    "simulated_time": 714472.2895506425,
-    "flux_flatness": 0.0009994354668485055,
-    "tendency_norm": 0.0006737407143949289,
-    "primary_rcb_log10p": 5.141761579251209,
+    "steps_accepted": 1472,
+    "simulated_time": 714238.5007840986,
+    "flux_flatness": 0.0009994695204719997,
+    "tendency_norm": 0.0006738009903646495,
+    "primary_rcb_log10p": 5.141761585321018,
     "convective_regions": [
       [
         0,
@@ -39,8 +39,8 @@
     "detached_convective_regions": [],
     "dtau_top": 7.801878721640416e-05,
     "dtau_bottom": 2.282489705703357,
-    "energy_residual_rel": 5.548266008674229e-12,
-    "energy_committed_residual": -2.0885932091596615e-06,
-    "energy_ulp_floor": 5.016226456042391e-05
+    "energy_residual_rel": 2.283253412414668e-09,
+    "energy_committed_residual": -0.00028545345901237473,
+    "energy_ulp_floor": 5.0162264560403626e-05
   }
 }

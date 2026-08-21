@@ -65,6 +65,7 @@ from .rce import (
     grey_radiative_equilibrium_temperature,
     radiative_convective_initial_temperature,
     analytic_opacity_pressure_edges,
+    nested_analytic_opacity_spec,
     solve_adaptive_rce,
     solve_adaptive_rce_with_prescribed_external_flux,
 )
@@ -94,6 +95,7 @@ __all__ = [
     "AnalyticIdealGasThermo",
     "AnalyticOpacityRCESpec",
     "analytic_opacity_pressure_edges",
+    "nested_analytic_opacity_spec",
     "ClosureResult",
     "ConstantGreyOpacity",
     "ConstantGravity",

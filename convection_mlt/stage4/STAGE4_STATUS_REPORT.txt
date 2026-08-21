@@ -1,61 +1,60 @@
 Stage 4 status report
 Fixed-composition H2 radiative-convective equilibrium (handbook points 35-40)
 
-Current claim (2026-08-21, implicit convection)
-------------------------------------------------
+Current claim (2026-08-21, Picard coupling + nested τ-grids)
+-----------------------------------------------------------
 core_single_resolution_status: PASS
-  Analytic-opacity implicit RCE (radiation then backward-Euler convection)
-  with ConstantH2Thermo reaches the physical 1e-3 flux-flatness / tendency gate
-  at N=48 (flatness ≈ 3.69e-4, 200 accepted steps) and N=96 (flatness ≈ 9.99e-4,
-  1456 accepted steps, rejection/acceptance ≈ 0.086 after the controller fix).
-  The 0.1 explicit unsplit run remains a structural/RCB regression only.
-
 spatial_and_operator_convergence_status: NOT_PASSED
-  Gate-converged N=96 vs N=48: max rel T = 11.1%, RCB shift = 0.277 dex,
-  column enthalpy = 27.1%. That is a resolution-sensitivity regression, not
-  grid independence. N=192 at 12000 accepted steps is still at flatness ≈ 3.65e-3
-  and is not a gate-converged comparison. N=384 was not run.
-
-  Timestep refinement at fixed N=96 (accuracy Δt = 800 s vs 400 s, both at 1e-3):
-  max rel T ≈ 6.5e-9, so the N=48/N=96 profile difference is spatial, not mixed
-  with that particular temporal error.
-
-  Operator-order, identical t_final: explicit unsplit trajectories that miss
-  t_final are marked failed and excluded from fitted orders. Implicit routes
-  that complete t_final show ~first-order temperature ratios. Equilibrium
-  contract at N=24: only rad→implicit convection reached 1e-3; reverse and
-  Strang did not (flatness 2.58 and 1.57) and are failed, not compared.
-
 helios_parity_status: NOT_RUN_OR_PILOT_ONLY
 full_stage4_claim: false
 
-Controller (2026-08-21)
-  Implicit dt grows by f_grow=1.2 after an accept, holds a post-reject ceiling
-  for n_hold_after_reject=8 accepted steps, Newton 1e-12 / projection 1e-10,
-  projection residual continues Newton instead of immediately rejecting.
-  N=96 rejection ratio fell from ~1.0 (625/1250 chatter) to ~0.086.
+Statuses are computed from current rows in stage4/results/exit_gate_audit.json.
+The pre-implicit 1e-8 / 0.885 audit is archived as
+stage4/results/exit_gate_audit_preimplicit_2026-08-19.json.
 
-Point 39 stability (N=24 prescribed-dt probe, genuine failed upper)
-  radiation-only explicit: last success 2e5 s, first failure 1e6 s
-  convection-only frozen rad: last success 5e4 s, first failure 2e5 s
-  coupled explicit: last success 50 s, first failure 200 s
-  coupled semi-implicit: last success 5e4 s, first failure 2e5 s
+Gates
+  algebraic identities: 1e-12
+  physical RCE: 1e-3
+  spatial: max rel T 0.02 and 0.05 dex RCB (not met)
+  HELIOS: not run
 
-EOS
-  The 1e-3 analytic-opacity benchmark is ConstantH2Thermo (fixed ∇_ad = 2/7).
-  NASA H2 has a coupled implicit smoke (accepted steps, finite T) but is not a
-  gate-passing parity run. Do not mix EOS closures when comparing to HELIOS.
+Physical RCE (ConstantH2Thermo, independent N=48 n_phot=16 / N=96 n_phot=24)
+  N=48: converged, 196 accepted, flatness 3.48e-4, RCB log10P 5.419
+  N=96: converged, 1472 accepted, flatness 9.99e-4, RCB log10P 5.142
+  N=192 nested (master 384/64): 12000 accepted, 1022 rejected, median dt ≈ 97 s,
+        flatness 3.65e-3, NOT at the 1e-3 gate. Complete profiles, residual
+        history and checksum are in stage4/results/n192_implicit_rce.json
+        sha256 b71ab7480837fcf9147b7f1ed1fde59c991caf8ebfe28e4c3b07846741647528
+  N=384 was not run.
 
-Scope
-  Implicit Jacobian requires ConstantGravity; InverseSquareGravity is rejected
-  at runtime. In-basin isoenthalpic CZ redistributions show local path
-  independence, not a global hot/cold attractor.
+Picard / coupled defect
+  Production implicit macrostep iterates F_rad(T^k) → h* → backward-Euler
+  convection until the coupled enthalpy defect is ≤ 1e-10. Reverse and Strang
+  use the same coupled step when coupled_picard is on, so those orders match
+  radiation→convection at equilibrium (N=24 flatness 4.91e-4 all three).
+  Fine-grid dt is still limited by Picard rejection (~100 s at N=192), not by
+  radiation-only CFL. Cancellation stiffness remains the cost driver.
 
-No embedded stage4.zip is present in the tree.
+Nested optical-depth family
+  Master N=384, n_phot=64, τ=1 is an edge. N=192/96/48 are every 2nd/4th/8th
+  master edge. N=48 with n_phot=16 remains the low-cost regression grid.
 
-The remainder of this file is the 2026-08-19 pre-implicit HELIOS-pilot report
-and is retained as archive of that snapshot. It does not describe the current
-implicit solver.
+Timestep at N=96 (800 vs 400 s, both at 1e-3): max rel T 6.5e-9 PASS.
+N=192 timestep control was not repeated because N=192 is not gate-converged.
+
+Operator-order fixed time
+  Explicit unsplit redone at Δt=25, 12.5, 6.25 s (below the 50 s success
+  bracket); all three reach the same t_final; fitted ratio ≈ 2.20.
+  Implicit Picard routes also complete t_final and are identical to each other.
+
+Point 39 (20 consecutive accepted steps, t_probe=20 Δt, bisection, first failure at X)
+  radiation-only explicit: last success 4.47e5 s, first failure at 6.69e5 s
+  convection-only frozen rad: last success 1e4 s, first failure at 2e4 s
+  coupled explicit: last success 50 s, first failure at 100 s
+  coupled semi-implicit: last success 2e4 s, first failure at 3.16e4 s
+
+EOS / gravity / attractor naming unchanged. HELIOS still waits on nested
+gate-converged N=96/192/384 with matched opacity, EOS, g, and F_int.
 
 
 Archive: 2026-08-19 HELIOS-pilot snapshot

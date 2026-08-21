@@ -1,45 +1,41 @@
 {
   "operator_order_fixed_time": {
-    "t_final": 20000.0,
-    "dt0": 500.0,
+    "t_final": 2000.0,
+    "explicit_dt0": 25.0,
+    "implicit_dt0": 500.0,
     "routes": {
       "unsplit_explicit": {
         "1.0": {
-          "status": "prescribed_dt_rejected",
-          "reason": "prescribed_dt rejected: fractional-temperature bound exceeded",
-          "steps_accepted": 1,
-          "rejections": 1,
-          "simulated_time": 500.0,
-          "wall_time_s": 0.002819916931912303,
-          "flux_flatness": 3284.1180121923103,
-          "tendency_norm": 3284.205257107907,
+          "status": "max_steps",
+          "reason": "reached t_final",
+          "steps_accepted": 80,
+          "rejections": 0,
+          "simulated_time": 2000.0,
+          "wall_time_s": 0.0989181250333786,
+          "flux_flatness": 0.11962105411395725,
+          "tendency_norm": 0.045543243601584134,
           "newton_iterations": 0,
           "mlt_evals": 0,
           "line_search_backtracks": 0,
-          "primary_rcb_log10p": 5.7770325734289045,
-          "detached": [
-            [
-              9,
-              10
-            ]
-          ],
-          "prescribed_dt": 500.0,
+          "primary_rcb_log10p": 5.726084748591293,
+          "detached": [],
+          "prescribed_dt": 25.0,
           "temperature": [
-            535.2622521207531,
-            528.5692072909205,
-            521.495760165639,
-            513.9886039824323,
-            505.9832489156022,
-            497.39893135800844,
-            488.1324724477602,
-            478.0488736133998,
-            466.96628124801003,
-            454.6306485376809,
-            440.25983660993256,
-            424.96195443645735,
-            406.0454880688551,
-            384.6585200299537,
-            358.95799733967294,
+            535.2622100953386,
+            528.5698897236579,
+            521.4962431647166,
+            513.9889025343163,
+            505.9833829259069,
+            497.39892608685705,
+            488.13235823866773,
+            478.04868387937734,
+            466.9660477582048,
+            454.63038627716213,
+            440.7085037667488,
+            424.5411181318776,
+            406.04550717958716,
+            384.6585200343886,
+            358.9579973396735,
             326.12925800634054,
             292.074865677648,
             272.03133376985585,
@@ -50,51 +46,40 @@
             262.69744069759247,
             262.68807613233724
           ],
-          "reached_t_final": false,
-          "contract": "fixed_physical_time",
-          "failed": true,
-          "failure_reason": "truncated/failed trajectory: status=prescribed_dt_rejected t=500.0 < t_final=20000.0"
+          "reached_t_final": true,
+          "contract": "fixed_physical_time"
         },
         "0.5": {
-          "status": "prescribed_dt_rejected",
-          "reason": "prescribed_dt rejected: fractional-temperature bound exceeded",
-          "steps_accepted": 1,
-          "rejections": 1,
-          "simulated_time": 250.0,
-          "wall_time_s": 0.001833832822740078,
-          "flux_flatness": 843.4289726206874,
-          "tendency_norm": 843.5162187733515,
+          "status": "max_steps",
+          "reason": "reached t_final",
+          "steps_accepted": 160,
+          "rejections": 0,
+          "simulated_time": 2000.0,
+          "wall_time_s": 0.07365587493404746,
+          "flux_flatness": 0.11975084507574821,
+          "tendency_norm": 0.04565138950711533,
           "newton_iterations": 0,
           "mlt_evals": 0,
           "line_search_backtracks": 0,
-          "primary_rcb_log10p": 5.961776004301045,
-          "detached": [
-            [
-              5,
-              8
-            ],
-            [
-              9,
-              10
-            ]
-          ],
-          "prescribed_dt": 250.0,
+          "primary_rcb_log10p": 5.726060338887819,
+          "detached": [],
+          "prescribed_dt": 12.5,
           "temperature": [
-            535.2618063380562,
-            528.5692302352896,
-            521.4957846702358,
-            513.988630270432,
-            505.9832772881923,
-            497.3989622027816,
-            488.1325062762951,
-            478.048911122352,
-            466.96632342410965,
-            454.6306897022198,
-            440.5042551227257,
-            424.73300353517027,
-            406.0454880690601,
-            384.6585200299537,
-            358.95799733967294,
+            535.2622094432045,
+            528.569889128713,
+            521.4962426866514,
+            513.9889022384327,
+            505.9833828717693,
+            497.39892630537213,
+            488.13235869270204,
+            478.048684417632,
+            466.9660481542943,
+            454.6303864995052,
+            440.7085100122684,
+            424.54111226958076,
+            406.04550712852284,
+            384.6585200343942,
+            358.95799733967345,
             326.12925800634054,
             292.074865677648,
             272.03133376985585,
@@ -105,51 +90,45 @@
             262.69744069759247,
             262.68807613233724
           ],
-          "reached_t_final": false,
-          "contract": "fixed_physical_time",
-          "failed": true,
-          "failure_reason": "truncated/failed trajectory: status=prescribed_dt_rejected t=250.0 < t_final=20000.0"
+          "reached_t_final": true,
+          "contract": "fixed_physical_time"
         },
         "0.25": {
-          "status": "prescribed_dt_rejected",
-          "reason": "prescribed_dt rejected: fractional-temperature bound exceeded",
-          "steps_accepted": 3,
-          "rejections": 1,
-          "simulated_time": 375.0,
-          "wall_time_s": 0.005190750118345022,
-          "flux_flatness": 3214.169657472022,
-          "tendency_norm": 3214.309530850784,
+          "status": "max_steps",
+          "reason": "reached t_final",
+          "steps_accepted": 320,
+          "rejections": 0,
+          "simulated_time": 2000.0,
+          "wall_time_s": 0.14651850005611777,
+          "flux_flatness": 0.11981519595397988,
+          "tendency_norm": 0.04585246988523352,
           "newton_iterations": 0,
           "mlt_evals": 0,
           "line_search_backtracks": 0,
-          "primary_rcb_log10p": 5.961858615319452,
+          "primary_rcb_log10p": 5.726048035674312,
           "detached": [
             [
-              2,
-              8
-            ],
-            [
-              9,
-              10
+              10,
+              11
             ]
           ],
-          "prescribed_dt": 125.0,
+          "prescribed_dt": 6.25,
           "temperature": [
-            535.2617862930117,
-            528.5692422326479,
-            521.4959813995162,
-            513.9886171101205,
-            505.98326308282344,
-            497.39894675777214,
-            488.13248933455395,
-            478.04889233833944,
-            466.68696429445686,
-            454.81743088424867,
-            440.7020105966336,
-            424.61849839775897,
-            406.04549568531206,
-            384.65852003029426,
-            358.95799733967294,
+            535.2622091160446,
+            528.5698888303466,
+            521.4962424471212,
+            513.988902090523,
+            505.9833828451948,
+            497.3989264151348,
+            488.13235891930145,
+            478.04868468454936,
+            466.96604834957645,
+            454.6303866067527,
+            440.70851285206595,
+            424.5411096050081,
+            406.04550710983534,
+            384.6585200343998,
+            358.9579973396732,
             326.12925800634054,
             292.074865677648,
             272.03133376985585,
@@ -160,50 +139,54 @@
             262.69744069759247,
             262.68807613233724
           ],
-          "reached_t_final": false,
-          "contract": "fixed_physical_time",
-          "failed": true,
-          "failure_reason": "truncated/failed trajectory: status=prescribed_dt_rejected t=375.0 < t_final=20000.0"
+          "reached_t_final": true,
+          "contract": "fixed_physical_time"
         },
         "refinement": {
-          "valid": false,
-          "reason": "truncated or failed trajectories excluded from fitted orders",
-          "n_completed": 0
+          "valid": true,
+          "err_dt_vs_dt2": 1.4171542941045528e-08,
+          "err_dt2_vs_dt4": 6.443709338389725e-09,
+          "ratio": 2.199283393590652
         }
       },
       "rad_then_implicit_conv": {
         "1.0": {
           "status": "max_steps",
           "reason": "reached t_final",
-          "steps_accepted": 40,
+          "steps_accepted": 4,
           "rejections": 0,
-          "simulated_time": 20000.0,
-          "wall_time_s": 0.3833474579732865,
-          "flux_flatness": 0.0551044387889336,
-          "tendency_norm": 0.04506596352117716,
-          "newton_iterations": 270,
-          "mlt_evals": 2274,
-          "line_search_backtracks": 214,
-          "primary_rcb_log10p": 5.721884105251053,
-          "detached": [],
+          "simulated_time": 2000.0,
+          "wall_time_s": 0.06458058417774737,
+          "flux_flatness": 0.12402264614765064,
+          "tendency_norm": 0.16929931545931745,
+          "newton_iterations": 27,
+          "mlt_evals": 226,
+          "line_search_backtracks": 20,
+          "primary_rcb_log10p": 5.725399926681222,
+          "detached": [
+            [
+              10,
+              11
+            ]
+          ],
           "prescribed_dt": 500.0,
           "temperature": [
-            535.2632638685955,
-            528.5709172585929,
-            521.4972275149297,
-            513.9898231828638,
-            505.98421569862853,
-            497.3996437495417,
-            488.13293267448415,
-            478.04909171355905,
-            466.9662825550512,
-            454.6304778673191,
-            440.70431688585074,
-            424.5398888722224,
-            406.04567520985154,
-            384.65852040734944,
-            358.9579973400386,
-            326.1292580063407,
+            535.2621812120522,
+            528.569863704743,
+            521.4962229345954,
+            513.9888909799574,
+            505.98338212900984,
+            497.3989362329037,
+            488.1323764657193,
+            478.04870406357196,
+            466.9660634843398,
+            454.63039634827896,
+            440.7088135894643,
+            424.5408277406297,
+            406.0455066623671,
+            384.65852003476414,
+            358.9579973396736,
+            326.12925800634054,
             292.074865677648,
             272.03133376985585,
             265.3010276855582,
@@ -219,35 +202,40 @@
         "0.5": {
           "status": "max_steps",
           "reason": "reached t_final",
-          "steps_accepted": 80,
+          "steps_accepted": 8,
           "rejections": 0,
-          "simulated_time": 20000.0,
-          "wall_time_s": 0.5137747079133987,
-          "flux_flatness": 0.0551003950844112,
-          "tendency_norm": 0.045054365630943116,
-          "newton_iterations": 481,
-          "mlt_evals": 3534,
-          "line_search_backtracks": 6,
-          "primary_rcb_log10p": 5.721883845241076,
-          "detached": [],
+          "simulated_time": 2000.0,
+          "wall_time_s": 0.08848466584458947,
+          "flux_flatness": 0.12218459516062978,
+          "tendency_norm": 0.07819585190880617,
+          "newton_iterations": 49,
+          "mlt_evals": 360,
+          "line_search_backtracks": 0,
+          "primary_rcb_log10p": 5.725646912554154,
+          "detached": [
+            [
+              10,
+              11
+            ]
+          ],
           "prescribed_dt": 250.0,
           "temperature": [
-            535.2632633852207,
-            528.5709167787663,
-            521.4972270359556,
-            513.9898227015317,
-            505.98421521122106,
-            497.39964325188566,
-            488.13293216210957,
-            478.0490911819984,
-            466.9662820002969,
-            454.6304772856703,
-            440.70425375659704,
-            424.5399488399145,
-            406.0456780233503,
-            384.65852042315055,
-            358.9579973400689,
-            326.1292580063407,
+            535.2621952542028,
+            528.5698762624604,
+            521.4962325148349,
+            513.9888961971033,
+            505.9833821380647,
+            497.39893123835213,
+            488.1323680734767,
+            478.04869498700873,
+            466.9660561258454,
+            454.6303912447986,
+            440.7086332157734,
+            424.5409967583778,
+            406.0455067873062,
+            384.65852003429956,
+            358.9579973396735,
+            326.12925800634054,
             292.074865677648,
             272.03133376985585,
             265.3010276855582,
@@ -263,35 +251,40 @@
         "0.25": {
           "status": "max_steps",
           "reason": "reached t_final",
-          "steps_accepted": 160,
+          "steps_accepted": 16,
           "rejections": 0,
-          "simulated_time": 20000.0,
-          "wall_time_s": 0.8698122079949826,
-          "flux_flatness": 0.0550980573691398,
-          "tendency_norm": 0.045047669198077074,
-          "newton_iterations": 804,
-          "mlt_evals": 5792,
-          "line_search_backtracks": 0,
-          "primary_rcb_log10p": 5.721883723448781,
-          "detached": [],
+          "simulated_time": 2000.0,
+          "wall_time_s": 0.13583412487059832,
+          "flux_flatness": 0.12109578694744035,
+          "tendency_norm": 0.05684705128042007,
+          "newton_iterations": 83,
+          "mlt_evals": 626,
+          "line_search_backtracks": 20,
+          "primary_rcb_log10p": 5.725818605592296,
+          "detached": [
+            [
+              10,
+              11
+            ]
+          ],
           "prescribed_dt": 125.0,
           "temperature": [
-            535.2632631275392,
-            528.5709165232738,
-            521.4972267815699,
-            513.9898224469573,
-            505.98421495494006,
-            497.3996429921647,
-            488.1329318970377,
-            478.04909090955493,
-            466.96628171841223,
-            454.63047699176286,
-            440.70421730728594,
-            424.5399834139125,
-            406.04567948967593,
-            384.6585204313549,
-            358.9579973400849,
-            326.1292580063407,
+            535.2622021101945,
+            528.5698824595536,
+            521.4962373724248,
+            513.9888990191188,
+            505.98338238758345,
+            497.39892881774995,
+            488.1323636557813,
+            478.0486901065431,
+            466.966052371485,
+            454.6303889024082,
+            440.70856932183585,
+            424.54105664495785,
+            406.04550688888156,
+            384.6585200342383,
+            358.9579973396735,
+            326.12925800634054,
             292.074865677648,
             272.03133376985585,
             265.3010276855582,
@@ -306,44 +299,49 @@
         },
         "refinement": {
           "valid": true,
-          "err_dt_vs_dt2": 1.4324631175391433e-07,
-          "err_dt2_vs_dt4": 8.270697139950711e-08,
-          "ratio": 1.7319738509342635
+          "err_dt_vs_dt2": 4.0928110653073646e-07,
+          "err_dt2_vs_dt4": 1.4498002074357847e-07,
+          "ratio": 2.82301729873952
         }
       },
       "implicit_conv_then_rad": {
         "1.0": {
           "status": "max_steps",
           "reason": "reached t_final",
-          "steps_accepted": 40,
+          "steps_accepted": 4,
           "rejections": 0,
-          "simulated_time": 20000.0,
-          "wall_time_s": 0.3154496250208467,
-          "flux_flatness": 2.6061588516934724,
-          "tendency_norm": 2.6112634381616364,
-          "newton_iterations": 275,
-          "mlt_evals": 2189,
-          "line_search_backtracks": 119,
-          "primary_rcb_log10p": 5.721835315279615,
-          "detached": [],
+          "simulated_time": 2000.0,
+          "wall_time_s": 0.0650939168408513,
+          "flux_flatness": 0.12402264614765064,
+          "tendency_norm": 0.16929931545931745,
+          "newton_iterations": 27,
+          "mlt_evals": 226,
+          "line_search_backtracks": 20,
+          "primary_rcb_log10p": 5.725399926681222,
+          "detached": [
+            [
+              10,
+              11
+            ]
+          ],
           "prescribed_dt": 500.0,
           "temperature": [
-            535.264134793343,
-            528.5708511215806,
-            521.4971585328889,
-            513.9897509286609,
-            505.9841395920531,
-            497.3995630411546,
-            488.13284637134876,
-            478.0489984583661,
-            466.9661804183089,
-            454.63037026431493,
-            440.70427244670617,
-            424.53993160518365,
-            406.04568032005324,
-            384.6585204277966,
-            358.9579973400685,
-            326.1292580063407,
+            535.2621812120522,
+            528.569863704743,
+            521.4962229345954,
+            513.9888909799574,
+            505.98338212900984,
+            497.3989362329037,
+            488.1323764657193,
+            478.04870406357196,
+            466.9660634843398,
+            454.63039634827896,
+            440.7088135894643,
+            424.5408277406297,
+            406.0455066623671,
+            384.65852003476414,
+            358.9579973396736,
+            326.12925800634054,
             292.074865677648,
             272.03133376985585,
             265.3010276855582,
@@ -359,35 +357,40 @@
         "0.5": {
           "status": "max_steps",
           "reason": "reached t_final",
-          "steps_accepted": 80,
+          "steps_accepted": 8,
           "rejections": 0,
-          "simulated_time": 20000.0,
-          "wall_time_s": 0.5182184590958059,
-          "flux_flatness": 1.0650243772441044,
-          "tendency_norm": 1.0728329682212447,
-          "newton_iterations": 479,
-          "mlt_evals": 3569,
-          "line_search_backtracks": 45,
-          "primary_rcb_log10p": 5.721858824305272,
-          "detached": [],
+          "simulated_time": 2000.0,
+          "wall_time_s": 0.09094637492671609,
+          "flux_flatness": 0.12218459516062978,
+          "tendency_norm": 0.07819585190880617,
+          "newton_iterations": 49,
+          "mlt_evals": 360,
+          "line_search_backtracks": 0,
+          "primary_rcb_log10p": 5.725646912554154,
+          "detached": [
+            [
+              10,
+              11
+            ]
+          ],
           "prescribed_dt": 250.0,
           "temperature": [
-            535.2636988540519,
-            528.570883716488,
-            521.4971925505276,
-            513.9897865790365,
-            505.9841771611568,
-            497.39960289911346,
-            488.132889009753,
-            478.04904455108385,
-            466.9662309259956,
-            454.6304234662041,
-            440.70423154876505,
-            424.5399701962142,
-            406.0456805822013,
-            384.65852043352527,
-            358.9579973400845,
-            326.1292580063407,
+            535.2621952542028,
+            528.5698762624604,
+            521.4962325148349,
+            513.9888961971033,
+            505.9833821380647,
+            497.39893123835213,
+            488.1323680734767,
+            478.04869498700873,
+            466.9660561258454,
+            454.6303912447986,
+            440.7086332157734,
+            424.5409967583778,
+            406.0455067873062,
+            384.65852003429956,
+            358.9579973396735,
+            326.12925800634054,
             292.074865677648,
             272.03133376985585,
             265.3010276855582,
@@ -403,35 +406,40 @@
         "0.25": {
           "status": "max_steps",
           "reason": "reached t_final",
-          "steps_accepted": 160,
+          "steps_accepted": 16,
           "rejections": 0,
-          "simulated_time": 20000.0,
-          "wall_time_s": 0.8489427911117673,
-          "flux_flatness": 0.4584930089034242,
-          "tendency_norm": 0.46765076045434173,
-          "newton_iterations": 804,
-          "mlt_evals": 5819,
-          "line_search_backtracks": 21,
-          "primary_rcb_log10p": 5.721871049666909,
-          "detached": [],
+          "simulated_time": 2000.0,
+          "wall_time_s": 0.13614212512038648,
+          "flux_flatness": 0.12109578694744035,
+          "tendency_norm": 0.05684705128042007,
+          "newton_iterations": 83,
+          "mlt_evals": 626,
+          "line_search_backtracks": 20,
+          "primary_rcb_log10p": 5.725818605592296,
+          "detached": [
+            [
+              10,
+              11
+            ]
+          ],
           "prescribed_dt": 125.0,
           "temperature": [
-            535.2634808632212,
-            528.5708999933627,
-            521.497209539961,
-            513.9898043866245,
-            505.98419593055536,
-            497.3996228160786,
-            488.1329103207328,
-            478.0490675934832,
-            466.9662561801429,
-            454.6304500778029,
-            440.7042062062159,
-            424.5399940896375,
-            406.0456807702026,
-            384.65852043658157,
-            358.9579973400928,
-            326.1292580063407,
+            535.2622021101945,
+            528.5698824595536,
+            521.4962373724248,
+            513.9888990191188,
+            505.98338238758345,
+            497.39892881774995,
+            488.1323636557813,
+            478.0486901065431,
+            466.966052371485,
+            454.6303889024082,
+            440.70856932183585,
+            424.54105664495785,
+            406.04550688888156,
+            384.6585200342383,
+            358.9579973396735,
+            326.12925800634054,
             292.074865677648,
             272.03133376985585,
             265.3010276855582,
@@ -446,44 +454,49 @@
         },
         "refinement": {
           "valid": true,
-          "err_dt_vs_dt2": 8.144386955896996e-07,
-          "err_dt2_vs_dt4": 4.0725892670329943e-07,
-          "ratio": 1.999805632702664
+          "err_dt_vs_dt2": 4.0928110653073646e-07,
+          "err_dt2_vs_dt4": 1.4498002074357847e-07,
+          "ratio": 2.82301729873952
         }
       },
       "strang_rad_implicit_conv": {
         "1.0": {
           "status": "max_steps",
           "reason": "reached t_final",
-          "steps_accepted": 40,
+          "steps_accepted": 4,
           "rejections": 0,
-          "simulated_time": 20000.0,
-          "wall_time_s": 0.3315346247982234,
-          "flux_flatness": 1.0649684967781956,
-          "tendency_norm": 1.0727858354053543,
-          "newton_iterations": 272,
-          "mlt_evals": 2235,
-          "line_search_backtracks": 171,
-          "primary_rcb_log10p": 5.721859112659053,
-          "detached": [],
+          "simulated_time": 2000.0,
+          "wall_time_s": 0.06450887490063906,
+          "flux_flatness": 0.12402264614765064,
+          "tendency_norm": 0.16929931545931745,
+          "newton_iterations": 27,
+          "mlt_evals": 226,
+          "line_search_backtracks": 20,
+          "primary_rcb_log10p": 5.725399926681222,
+          "detached": [
+            [
+              10,
+              11
+            ]
+          ],
           "prescribed_dt": 500.0,
           "temperature": [
-            535.2636993123249,
-            528.5708841884249,
-            521.4971930221766,
-            513.9897870538827,
-            505.98417764323113,
-            497.39960339291156,
-            488.1328895200467,
-            478.0490450825421,
-            466.96623148258675,
-            454.63042405638635,
-            440.7042948445991,
-            424.5399101586745,
-            406.04567771292125,
-            384.6585204223237,
-            358.9579973400679,
-            326.1292580063407,
+            535.2621812120522,
+            528.569863704743,
+            521.4962229345954,
+            513.9888909799574,
+            505.98338212900984,
+            497.3989362329037,
+            488.1323764657193,
+            478.04870406357196,
+            466.9660634843398,
+            454.63039634827896,
+            440.7088135894643,
+            424.5408277406297,
+            406.0455066623671,
+            384.65852003476414,
+            358.9579973396736,
+            326.12925800634054,
             292.074865677648,
             272.03133376985585,
             265.3010276855582,
@@ -499,35 +512,40 @@
         "0.5": {
           "status": "max_steps",
           "reason": "reached t_final",
-          "steps_accepted": 80,
+          "steps_accepted": 8,
           "rejections": 0,
-          "simulated_time": 20000.0,
-          "wall_time_s": 0.5485055409371853,
-          "flux_flatness": 0.45847098975341094,
-          "tendency_norm": 0.46763221171730607,
-          "newton_iterations": 481,
-          "mlt_evals": 3532,
-          "line_search_backtracks": 4,
-          "primary_rcb_log10p": 5.721871178182087,
-          "detached": [],
+          "simulated_time": 2000.0,
+          "wall_time_s": 0.08864591689780354,
+          "flux_flatness": 0.12218459516062978,
+          "tendency_norm": 0.07819585190880617,
+          "newton_iterations": 49,
+          "mlt_evals": 360,
+          "line_search_backtracks": 0,
+          "primary_rcb_log10p": 5.725646912554154,
+          "detached": [
+            [
+              10,
+              11
+            ]
+          ],
           "prescribed_dt": 250.0,
           "temperature": [
-            535.2634811099817,
-            528.5709002464536,
-            521.4972097920614,
-            513.9898046390755,
-            505.98419618492835,
-            497.3996230741581,
-            488.13291058447305,
-            478.0490678649233,
-            466.96625646131145,
-            454.6304503725797,
-            440.7042427439197,
-            424.53995947546474,
-            406.045679277004,
-            384.6585204307494,
-            358.9579973400841,
-            326.1292580063407,
+            535.2621952542028,
+            528.5698762624604,
+            521.4962325148349,
+            513.9888961971033,
+            505.9833821380647,
+            497.39893123835213,
+            488.1323680734767,
+            478.04869498700873,
+            466.9660561258454,
+            454.6303912447986,
+            440.7086332157734,
+            424.5409967583778,
+            406.0455067873062,
+            384.65852003429956,
+            358.9579973396735,
+            326.12925800634054,
             292.074865677648,
             272.03133376985585,
             265.3010276855582,
@@ -543,35 +561,40 @@
         "0.25": {
           "status": "max_steps",
           "reason": "reached t_final",
-          "steps_accepted": 160,
+          "steps_accepted": 16,
           "rejections": 0,
-          "simulated_time": 20000.0,
-          "wall_time_s": 0.8821780411526561,
-          "flux_flatness": 0.20609603874864205,
-          "tendency_norm": 0.2159291382993765,
-          "newton_iterations": 804,
-          "mlt_evals": 5819,
-          "line_search_backtracks": 21,
-          "primary_rcb_log10p": 5.721877345922218,
-          "detached": [],
+          "simulated_time": 2000.0,
+          "wall_time_s": 0.13686579186469316,
+          "flux_flatness": 0.12109578694744035,
+          "tendency_norm": 0.05684705128042007,
+          "newton_iterations": 83,
+          "mlt_evals": 626,
+          "line_search_backtracks": 20,
+          "primary_rcb_log10p": 5.725818605592296,
+          "detached": [
+            [
+              10,
+              11
+            ]
+          ],
           "prescribed_dt": 125.0,
           "temperature": [
-            535.2633719904942,
-            528.57090825767,
-            521.497218160118,
-            513.9898134161361,
-            505.9842054420773,
-            497.3996329034236,
-            488.13292110814507,
-            478.0490792507172,
-            466.9662689483863,
-            454.6304635334079,
-            440.70421180286826,
-            424.53998872985363,
-            406.04568011711154,
-            384.6585204351834,
-            358.9579973400927,
-            326.1292580063406,
+            535.2622021101945,
+            528.5698824595536,
+            521.4962373724248,
+            513.9888990191188,
+            505.98338238758345,
+            497.39892881774995,
+            488.1323636557813,
+            478.0486901065431,
+            466.966052371485,
+            454.6303889024082,
+            440.70856932183585,
+            424.54105664495785,
+            406.04550688888156,
+            384.6585200342383,
+            358.9579973396735,
+            326.12925800634054,
             292.074865677648,
             272.03133376985585,
             265.3010276855582,
@@ -586,9 +609,9 @@
         },
         "refinement": {
           "valid": true,
-          "err_dt_vs_dt2": 4.0765416534536836e-07,
-          "err_dt2_vs_dt4": 2.038613012904655e-07,
-          "ratio": 1.9996642951107964
+          "err_dt_vs_dt2": 4.0928110653073646e-07,
+          "err_dt2_vs_dt4": 1.4498002074357847e-07,
+          "ratio": 2.82301729873952
         }
       }
     }
@@ -602,7 +625,7 @@
         "steps_accepted": 800,
         "rejections": 0,
         "simulated_time": 19234.10830534512,
-        "wall_time_s": 0.36043545813299716,
+        "wall_time_s": 0.3693265840411186,
         "flux_flatness": 0.05510824264227419,
         "tendency_norm": 0.045060563199092483,
         "newton_iterations": 0,
@@ -618,110 +641,182 @@
       "rad_then_implicit_conv": {
         "status": "converged",
         "reason": "converged for 5 consecutive accepted steps",
-        "steps_accepted": 243,
+        "steps_accepted": 248,
         "rejections": 5,
-        "simulated_time": 539424.9280000001,
-        "wall_time_s": 2.5355243750382215,
-        "flux_flatness": 0.0005533758119008781,
-        "tendency_norm": 0.0003333130422970498,
-        "newton_iterations": 1948,
-        "mlt_evals": 15040,
-        "line_search_backtracks": 384,
-        "primary_rcb_log10p": 5.610370653763097,
+        "simulated_time": 543807.2392653064,
+        "wall_time_s": 4.529685667017475,
+        "flux_flatness": 0.0004910893701511062,
+        "tendency_norm": 0.00030213513320556255,
+        "newton_iterations": 1979,
+        "mlt_evals": 15488,
+        "line_search_backtracks": 554,
+        "primary_rcb_log10p": 5.610364366464307,
         "detached": [],
         "reached_gate": true,
         "contract": "equilibrium_1e-3"
       },
       "implicit_conv_then_rad": {
-        "status": "max_steps",
-        "reason": "maximum step budget reached",
-        "steps_accepted": 800,
-        "rejections": 51,
-        "simulated_time": 853343.4461771925,
-        "wall_time_s": 9.146610124967992,
-        "flux_flatness": 2.5787858458509176,
-        "tendency_norm": 2.5787858458509176,
-        "newton_iterations": 5927,
-        "mlt_evals": 46691,
-        "line_search_backtracks": 2169,
-        "primary_rcb_log10p": 5.619341032695712,
+        "status": "converged",
+        "reason": "converged for 5 consecutive accepted steps",
+        "steps_accepted": 248,
+        "rejections": 5,
+        "simulated_time": 543807.2392653064,
+        "wall_time_s": 4.5214453330263495,
+        "flux_flatness": 0.0004910893701511062,
+        "tendency_norm": 0.00030213513320556255,
+        "newton_iterations": 1979,
+        "mlt_evals": 15488,
+        "line_search_backtracks": 554,
+        "primary_rcb_log10p": 5.610364366464307,
         "detached": [],
-        "reached_gate": false,
-        "contract": "equilibrium_1e-3",
-        "failed": true,
-        "failure_reason": "did not reach 1e-3 gate: status=max_steps flatness=2.5787858458509176"
+        "reached_gate": true,
+        "contract": "equilibrium_1e-3"
       },
       "strang_rad_implicit_conv": {
-        "status": "max_steps",
-        "reason": "maximum step budget reached",
-        "steps_accepted": 800,
-        "rejections": 52,
-        "simulated_time": 817220.8749289225,
-        "wall_time_s": 8.740918667055666,
-        "flux_flatness": 1.5692517087300746,
-        "tendency_norm": 1.5787476673220318,
-        "newton_iterations": 5554,
-        "mlt_evals": 42751,
-        "line_search_backtracks": 1277,
-        "primary_rcb_log10p": 5.612923389815567,
+        "status": "converged",
+        "reason": "converged for 5 consecutive accepted steps",
+        "steps_accepted": 248,
+        "rejections": 5,
+        "simulated_time": 543807.2392653064,
+        "wall_time_s": 4.517407541861758,
+        "flux_flatness": 0.0004910893701511062,
+        "tendency_norm": 0.00030213513320556255,
+        "newton_iterations": 1979,
+        "mlt_evals": 15488,
+        "line_search_backtracks": 554,
+        "primary_rcb_log10p": 5.610364366464307,
         "detached": [],
-        "reached_gate": false,
-        "contract": "equilibrium_1e-3",
-        "failed": true,
-        "failure_reason": "did not reach 1e-3 gate: status=max_steps flatness=1.5692517087300746"
+        "reached_gate": true,
+        "contract": "equilibrium_1e-3"
       }
     },
-    "n_gate_converged": 1,
-    "comparison_valid": false
+    "n_gate_converged": 3,
+    "comparison_valid": true,
+    "gate_rcb": {
+      "rad_then_implicit_conv": 5.610364366464307,
+      "implicit_conv_then_rad": 5.610364366464307,
+      "strang_rad_implicit_conv": 5.610364366464307
+    },
+    "gate_flatness": {
+      "rad_then_implicit_conv": 0.0004910893701511062,
+      "implicit_conv_then_rad": 0.0004910893701511062,
+      "strang_rad_implicit_conv": 0.0004910893701511062
+    }
   },
   "point39": {
     "radiation_only_explicit": {
       "stable_dt": {
-        "largest_stable_dt": 200000.0,
+        "largest_stable_dt": 447213.5954999579,
         "largest_stable_dt_is_lower_bound_only": false,
-        "failed_upper_dt": 1000000.0,
-        "note": "bracket: last success 200000.0, first failure above 1000000.0",
+        "failed_upper_dt": 668740.304976422,
+        "failed_upper_phrasing": "first failure at X",
+        "n_required_accepted": 20,
+        "note": "bracket: last success 447213.5954999579, first failure at 668740.304976422",
         "probe": {
-          "dt": 200000.0,
+          "dt": 447213.5954999579,
           "ok": true,
+          "t_probe": 8944271.909999158,
           "status": "max_steps",
           "reason": "reached t_final",
-          "steps_accepted": 1,
+          "steps_accepted": 20,
           "rejections": 0,
-          "wall_time_s": 0.0007137500215321779,
-          "flux_flatness": 0.22585868677266868
+          "simulated_time": 8944271.909999158,
+          "wall_time_s": 0.009146541822701693,
+          "flux_flatness": 0.13134359290495012,
+          "n_rejected_reasons": [],
+          "detached": []
         },
         "failed_upper": {
-          "dt": 1000000.0,
+          "dt": 668740.304976422,
           "ok": false,
+          "t_probe": 13374806.09952844,
           "status": "prescribed_dt_rejected",
           "reason": "prescribed_dt rejected: fractional-temperature bound exceeded",
           "steps_accepted": 0,
           "rejections": 1,
-          "wall_time_s": 0.000565582886338234,
-          "flux_flatness": 0.2384593676361146
+          "simulated_time": 0.0,
+          "wall_time_s": 0.0005508339963853359,
+          "flux_flatness": 0.2384593676361146,
+          "n_rejected_reasons": [
+            "fractional-temperature bound exceeded"
+          ],
+          "detached": [
+            [
+              10,
+              11
+            ]
+          ]
         },
-        "t_probe": 5000.0,
         "trials": [
           {
             "dt": 1000000.0,
             "ok": false,
+            "t_probe": 20000000.0,
             "status": "prescribed_dt_rejected",
             "reason": "prescribed_dt rejected: fractional-temperature bound exceeded",
             "steps_accepted": 0,
             "rejections": 1,
-            "wall_time_s": 0.000565582886338234,
-            "flux_flatness": 0.2384593676361146
+            "simulated_time": 0.0,
+            "wall_time_s": 0.0005559998098760843,
+            "flux_flatness": 0.2384593676361146,
+            "n_rejected_reasons": [
+              "fractional-temperature bound exceeded"
+            ],
+            "detached": [
+              [
+                10,
+                11
+              ]
+            ]
           },
           {
             "dt": 200000.0,
             "ok": true,
+            "t_probe": 4000000.0,
             "status": "max_steps",
             "reason": "reached t_final",
-            "steps_accepted": 1,
+            "steps_accepted": 20,
             "rejections": 0,
-            "wall_time_s": 0.0007137500215321779,
-            "flux_flatness": 0.22585868677266868
+            "simulated_time": 4000000.0,
+            "wall_time_s": 0.009561833925545216,
+            "flux_flatness": 0.16662755142118993,
+            "n_rejected_reasons": [],
+            "detached": []
+          },
+          {
+            "dt": 447213.5954999579,
+            "ok": true,
+            "t_probe": 8944271.909999158,
+            "status": "max_steps",
+            "reason": "reached t_final",
+            "steps_accepted": 20,
+            "rejections": 0,
+            "simulated_time": 8944271.909999158,
+            "wall_time_s": 0.009146541822701693,
+            "flux_flatness": 0.13134359290495012,
+            "n_rejected_reasons": [],
+            "detached": []
+          },
+          {
+            "dt": 668740.304976422,
+            "ok": false,
+            "t_probe": 13374806.09952844,
+            "status": "prescribed_dt_rejected",
+            "reason": "prescribed_dt rejected: fractional-temperature bound exceeded",
+            "steps_accepted": 0,
+            "rejections": 1,
+            "simulated_time": 0.0,
+            "wall_time_s": 0.0005508339963853359,
+            "flux_flatness": 0.2384593676361146,
+            "n_rejected_reasons": [
+              "fractional-temperature bound exceeded"
+            ],
+            "detached": [
+              [
+                10,
+                11
+              ]
+            ]
           }
         ]
       },
@@ -731,7 +826,7 @@
         "steps_accepted": 80,
         "rejections": 0,
         "simulated_time": 58210622.4948443,
-        "wall_time_s": 0.036013999953866005,
+        "wall_time_s": 0.04089249996468425,
         "flux_flatness": 0.045001784333874945,
         "tendency_norm": 0.04003597549729117,
         "newton_iterations": 0,
@@ -745,77 +840,141 @@
     },
     "convection_only_frozen_rad": {
       "stable_dt": {
-        "largest_stable_dt": 50000.0,
+        "largest_stable_dt": 10000.0,
         "largest_stable_dt_is_lower_bound_only": false,
-        "failed_upper_dt": 200000.0,
-        "note": "bracket: last success 50000.0, first failure above 200000.0",
+        "failed_upper_dt": 20000.0,
+        "failed_upper_phrasing": "first failure at X",
+        "n_required_accepted": 20,
+        "note": "bracket: last success 10000.0, first failure at 20000.0",
         "probe": {
-          "dt": 50000.0,
+          "dt": 10000.0,
           "ok": true,
+          "t_probe": 200000.0,
           "status": "max_steps",
           "reason": "reached t_final",
-          "steps_accepted": 1,
+          "steps_accepted": 20,
           "rejections": 0,
-          "wall_time_s": 0.011973707936704159,
-          "flux_flatness": 0.11921395882929631
+          "simulated_time": 200000.0,
+          "wall_time_s": 0.19851391692645848,
+          "flux_flatness": 0.00509487320052358,
+          "n_rejected_reasons": [],
+          "detached": []
         },
         "failed_upper": {
-          "dt": 200000.0,
+          "dt": 20000.0,
           "ok": false,
+          "t_probe": 400000.0,
           "status": "prescribed_dt_rejected",
           "reason": "prescribed_dt rejected: conservative_projection_failure: residual",
-          "steps_accepted": 0,
+          "steps_accepted": 6,
           "rejections": 1,
-          "wall_time_s": 0.03650920791551471,
-          "flux_flatness": Infinity
+          "simulated_time": 120000.0,
+          "wall_time_s": 0.1844577081501484,
+          "flux_flatness": 0.057957190115762384,
+          "n_rejected_reasons": [
+            "conservative_projection_failure: residual"
+          ],
+          "detached": []
         },
-        "t_probe": 5000.0,
         "trials": [
           {
             "dt": 1000000.0,
             "ok": false,
-            "status": "prescribed_dt_rejected",
-            "reason": "prescribed_dt rejected: fractional-temperature bound exceeded",
-            "steps_accepted": 0,
-            "rejections": 1,
-            "wall_time_s": 0.00025570904836058617,
-            "flux_flatness": Infinity
-          },
-          {
-            "dt": 200000.0,
-            "ok": false,
+            "t_probe": 20000000.0,
             "status": "prescribed_dt_rejected",
             "reason": "prescribed_dt rejected: conservative_projection_failure: residual",
             "steps_accepted": 0,
             "rejections": 1,
-            "wall_time_s": 0.03650920791551471,
-            "flux_flatness": Infinity
+            "simulated_time": 0.0,
+            "wall_time_s": 0.33949629217386246,
+            "flux_flatness": Infinity,
+            "n_rejected_reasons": [
+              "conservative_projection_failure: residual"
+            ],
+            "detached": []
+          },
+          {
+            "dt": 200000.0,
+            "ok": false,
+            "t_probe": 4000000.0,
+            "status": "prescribed_dt_rejected",
+            "reason": "prescribed_dt rejected: conservative_projection_failure: residual",
+            "steps_accepted": 0,
+            "rejections": 1,
+            "simulated_time": 0.0,
+            "wall_time_s": 0.03696583304554224,
+            "flux_flatness": Infinity,
+            "n_rejected_reasons": [
+              "conservative_projection_failure: residual"
+            ],
+            "detached": []
           },
           {
             "dt": 50000.0,
+            "ok": false,
+            "t_probe": 1000000.0,
+            "status": "prescribed_dt_rejected",
+            "reason": "prescribed_dt rejected: conservative_projection_failure: residual",
+            "steps_accepted": 1,
+            "rejections": 1,
+            "simulated_time": 50000.0,
+            "wall_time_s": 0.03750262502580881,
+            "flux_flatness": 0.11921395882929631,
+            "n_rejected_reasons": [
+              "conservative_projection_failure: residual"
+            ],
+            "detached": [
+              [
+                10,
+                11
+              ]
+            ]
+          },
+          {
+            "dt": 20000.0,
+            "ok": false,
+            "t_probe": 400000.0,
+            "status": "prescribed_dt_rejected",
+            "reason": "prescribed_dt rejected: conservative_projection_failure: residual",
+            "steps_accepted": 6,
+            "rejections": 1,
+            "simulated_time": 120000.0,
+            "wall_time_s": 0.1844577081501484,
+            "flux_flatness": 0.057957190115762384,
+            "n_rejected_reasons": [
+              "conservative_projection_failure: residual"
+            ],
+            "detached": []
+          },
+          {
+            "dt": 10000.0,
             "ok": true,
+            "t_probe": 200000.0,
             "status": "max_steps",
             "reason": "reached t_final",
-            "steps_accepted": 1,
+            "steps_accepted": 20,
             "rejections": 0,
-            "wall_time_s": 0.011973707936704159,
-            "flux_flatness": 0.11921395882929631
+            "simulated_time": 200000.0,
+            "wall_time_s": 0.19851391692645848,
+            "flux_flatness": 0.00509487320052358,
+            "n_rejected_reasons": [],
+            "detached": []
           }
         ]
       },
       "residual_drop": {
         "status": "converged",
         "reason": "converged for 3 consecutive accepted steps",
-        "steps_accepted": 56,
-        "rejections": 1,
-        "simulated_time": 133750.0,
-        "wall_time_s": 0.531139082973823,
-        "flux_flatness": 0.015193553012965518,
-        "tendency_norm": 0.005223676989053085,
-        "newton_iterations": 440,
-        "mlt_evals": 3386,
-        "line_search_backtracks": 72,
-        "primary_rcb_log10p": 5.67054474574339,
+        "steps_accepted": 58,
+        "rejections": 0,
+        "simulated_time": 137354.7112653064,
+        "wall_time_s": 0.5122650000266731,
+        "flux_flatness": 0.007528128822401072,
+        "tendency_norm": 0.005094694893096705,
+        "newton_iterations": 456,
+        "mlt_evals": 3541,
+        "line_search_backtracks": 101,
+        "primary_rcb_log10p": 5.670493420510563,
         "detached": [],
         "target_flatness": 0.05,
         "hit_target": true
@@ -825,129 +984,289 @@
       "stable_dt": {
         "largest_stable_dt": 50.0,
         "largest_stable_dt_is_lower_bound_only": false,
-        "failed_upper_dt": 200.0,
-        "note": "bracket: last success 50.0, first failure above 200.0",
+        "failed_upper_dt": 100.0,
+        "failed_upper_phrasing": "first failure at X",
+        "n_required_accepted": 20,
+        "note": "bracket: last success 50.0, first failure at 100.0",
         "probe": {
           "dt": 50.0,
           "ok": true,
+          "t_probe": 1000.0,
           "status": "max_steps",
           "reason": "reached t_final",
-          "steps_accepted": 100,
+          "steps_accepted": 20,
           "rejections": 0,
-          "wall_time_s": 0.04455958306789398,
-          "flux_flatness": 0.06181404847955283
+          "simulated_time": 1000.0,
+          "wall_time_s": 0.009347165934741497,
+          "flux_flatness": 0.15670840742799405,
+          "n_rejected_reasons": [],
+          "detached": []
         },
         "failed_upper": {
-          "dt": 200.0,
+          "dt": 100.0,
           "ok": false,
+          "t_probe": 2000.0,
           "status": "prescribed_dt_rejected",
           "reason": "prescribed_dt rejected: fractional-temperature bound exceeded",
-          "steps_accepted": 2,
+          "steps_accepted": 5,
           "rejections": 1,
-          "wall_time_s": 0.0015062079764902592,
-          "flux_flatness": 7080.473879487979
+          "simulated_time": 500.0,
+          "wall_time_s": 0.002785207936540246,
+          "flux_flatness": 3284.333156219583,
+          "n_rejected_reasons": [
+            "fractional-temperature bound exceeded"
+          ],
+          "detached": [
+            [
+              2,
+              6
+            ],
+            [
+              7,
+              8
+            ],
+            [
+              9,
+              10
+            ]
+          ]
         },
-        "t_probe": 5000.0,
         "trials": [
           {
             "dt": 1000000.0,
             "ok": false,
+            "t_probe": 20000000.0,
             "status": "prescribed_dt_rejected",
             "reason": "prescribed_dt rejected: nonfinite/nonpositive trial temperature",
             "steps_accepted": 0,
             "rejections": 1,
-            "wall_time_s": 0.000576582970097661,
-            "flux_flatness": 183.57168968871412
+            "simulated_time": 0.0,
+            "wall_time_s": 0.0006040830630809069,
+            "flux_flatness": 183.57168968871412,
+            "n_rejected_reasons": [
+              "nonfinite/nonpositive trial temperature"
+            ],
+            "detached": [
+              [
+                10,
+                11
+              ]
+            ]
           },
           {
             "dt": 200000.0,
             "ok": false,
+            "t_probe": 4000000.0,
             "status": "prescribed_dt_rejected",
             "reason": "prescribed_dt rejected: fractional-temperature bound exceeded",
             "steps_accepted": 0,
             "rejections": 1,
-            "wall_time_s": 0.0005491250194609165,
-            "flux_flatness": 183.57168968871412
+            "simulated_time": 0.0,
+            "wall_time_s": 0.000558291794732213,
+            "flux_flatness": 183.57168968871412,
+            "n_rejected_reasons": [
+              "fractional-temperature bound exceeded"
+            ],
+            "detached": [
+              [
+                10,
+                11
+              ]
+            ]
           },
           {
             "dt": 50000.0,
             "ok": false,
+            "t_probe": 1000000.0,
             "status": "prescribed_dt_rejected",
             "reason": "prescribed_dt rejected: fractional-temperature bound exceeded",
             "steps_accepted": 0,
             "rejections": 1,
-            "wall_time_s": 0.0005453750491142273,
-            "flux_flatness": 183.57168968871412
+            "simulated_time": 0.0,
+            "wall_time_s": 0.0005504169967025518,
+            "flux_flatness": 183.57168968871412,
+            "n_rejected_reasons": [
+              "fractional-temperature bound exceeded"
+            ],
+            "detached": [
+              [
+                10,
+                11
+              ]
+            ]
           },
           {
             "dt": 20000.0,
             "ok": false,
+            "t_probe": 400000.0,
             "status": "prescribed_dt_rejected",
             "reason": "prescribed_dt rejected: fractional-temperature bound exceeded",
             "steps_accepted": 0,
             "rejections": 1,
-            "wall_time_s": 0.0005439161323010921,
-            "flux_flatness": 183.57168968871412
+            "simulated_time": 0.0,
+            "wall_time_s": 0.0005480002146214247,
+            "flux_flatness": 183.57168968871412,
+            "n_rejected_reasons": [
+              "fractional-temperature bound exceeded"
+            ],
+            "detached": [
+              [
+                10,
+                11
+              ]
+            ]
           },
           {
             "dt": 10000.0,
             "ok": false,
+            "t_probe": 200000.0,
             "status": "prescribed_dt_rejected",
             "reason": "prescribed_dt rejected: fractional-temperature bound exceeded",
             "steps_accepted": 0,
             "rejections": 1,
-            "wall_time_s": 0.0005431249737739563,
-            "flux_flatness": 183.57168968871412
+            "simulated_time": 0.0,
+            "wall_time_s": 0.0005529578775167465,
+            "flux_flatness": 183.57168968871412,
+            "n_rejected_reasons": [
+              "fractional-temperature bound exceeded"
+            ],
+            "detached": [
+              [
+                10,
+                11
+              ]
+            ]
           },
           {
             "dt": 5000.0,
             "ok": false,
+            "t_probe": 100000.0,
             "status": "prescribed_dt_rejected",
             "reason": "prescribed_dt rejected: fractional-temperature bound exceeded",
             "steps_accepted": 0,
             "rejections": 1,
-            "wall_time_s": 0.0005572079680860043,
-            "flux_flatness": 183.57168968871412
+            "simulated_time": 0.0,
+            "wall_time_s": 0.0005490831099450588,
+            "flux_flatness": 183.57168968871412,
+            "n_rejected_reasons": [
+              "fractional-temperature bound exceeded"
+            ],
+            "detached": [
+              [
+                10,
+                11
+              ]
+            ]
           },
           {
             "dt": 2500.0,
             "ok": false,
+            "t_probe": 50000.0,
             "status": "prescribed_dt_rejected",
             "reason": "prescribed_dt rejected: fractional-temperature bound exceeded",
             "steps_accepted": 0,
             "rejections": 1,
-            "wall_time_s": 0.0005474579520523548,
-            "flux_flatness": 183.57168968871412
+            "simulated_time": 0.0,
+            "wall_time_s": 0.000545040937140584,
+            "flux_flatness": 183.57168968871412,
+            "n_rejected_reasons": [
+              "fractional-temperature bound exceeded"
+            ],
+            "detached": [
+              [
+                10,
+                11
+              ]
+            ]
           },
           {
             "dt": 1000.0,
             "ok": false,
+            "t_probe": 20000.0,
             "status": "prescribed_dt_rejected",
             "reason": "prescribed_dt rejected: fractional-temperature bound exceeded",
             "steps_accepted": 0,
             "rejections": 1,
-            "wall_time_s": 0.0006091250106692314,
-            "flux_flatness": 183.57168968871412
+            "simulated_time": 0.0,
+            "wall_time_s": 0.0005492090713232756,
+            "flux_flatness": 183.57168968871412,
+            "n_rejected_reasons": [
+              "fractional-temperature bound exceeded"
+            ],
+            "detached": [
+              [
+                10,
+                11
+              ]
+            ]
           },
           {
             "dt": 200.0,
             "ok": false,
+            "t_probe": 4000.0,
             "status": "prescribed_dt_rejected",
             "reason": "prescribed_dt rejected: fractional-temperature bound exceeded",
             "steps_accepted": 2,
             "rejections": 1,
-            "wall_time_s": 0.0015062079764902592,
-            "flux_flatness": 7080.473879487979
+            "simulated_time": 400.0,
+            "wall_time_s": 0.0016625409480184317,
+            "flux_flatness": 7080.473879487979,
+            "n_rejected_reasons": [
+              "fractional-temperature bound exceeded"
+            ],
+            "detached": [
+              [
+                1,
+                9
+              ],
+              [
+                10,
+                11
+              ]
+            ]
           },
           {
             "dt": 50.0,
             "ok": true,
+            "t_probe": 1000.0,
             "status": "max_steps",
             "reason": "reached t_final",
-            "steps_accepted": 100,
+            "steps_accepted": 20,
             "rejections": 0,
-            "wall_time_s": 0.04455958306789398,
-            "flux_flatness": 0.06181404847955283
+            "simulated_time": 1000.0,
+            "wall_time_s": 0.009347165934741497,
+            "flux_flatness": 0.15670840742799405,
+            "n_rejected_reasons": [],
+            "detached": []
+          },
+          {
+            "dt": 100.0,
+            "ok": false,
+            "t_probe": 2000.0,
+            "status": "prescribed_dt_rejected",
+            "reason": "prescribed_dt rejected: fractional-temperature bound exceeded",
+            "steps_accepted": 5,
+            "rejections": 1,
+            "simulated_time": 500.0,
+            "wall_time_s": 0.002785207936540246,
+            "flux_flatness": 3284.333156219583,
+            "n_rejected_reasons": [
+              "fractional-temperature bound exceeded"
+            ],
+            "detached": [
+              [
+                2,
+                6
+              ],
+              [
+                7,
+                8
+              ],
+              [
+                9,
+                10
+              ]
+            ]
           }
         ]
       },
@@ -957,7 +1276,7 @@
         "steps_accepted": 2000,
         "rejections": 0,
         "simulated_time": 47829.10109734591,
-        "wall_time_s": 0.8938811251427978,
+        "wall_time_s": 0.9069867499638349,
         "flux_flatness": 0.05460163794559321,
         "tendency_norm": 0.04421518326509992,
         "newton_iterations": 0,
@@ -971,77 +1290,161 @@
     },
     "coupled_semi_implicit": {
       "stable_dt": {
-        "largest_stable_dt": 50000.0,
+        "largest_stable_dt": 20000.0,
         "largest_stable_dt_is_lower_bound_only": false,
-        "failed_upper_dt": 200000.0,
-        "note": "bracket: last success 50000.0, first failure above 200000.0",
+        "failed_upper_dt": 31622.776601683792,
+        "failed_upper_phrasing": "first failure at X",
+        "n_required_accepted": 20,
+        "note": "bracket: last success 20000.0, first failure at 31622.776601683792",
         "probe": {
-          "dt": 50000.0,
+          "dt": 20000.0,
           "ok": true,
+          "t_probe": 400000.0,
           "status": "max_steps",
           "reason": "reached t_final",
-          "steps_accepted": 1,
+          "steps_accepted": 20,
           "rejections": 0,
-          "wall_time_s": 0.012569416081532836,
-          "flux_flatness": 0.11444151024390199
+          "simulated_time": 400000.0,
+          "wall_time_s": 0.6835398338735104,
+          "flux_flatness": 0.01049423206460915,
+          "n_rejected_reasons": [],
+          "detached": []
         },
         "failed_upper": {
-          "dt": 200000.0,
+          "dt": 31622.776601683792,
           "ok": false,
+          "t_probe": 632455.5320336758,
           "status": "prescribed_dt_rejected",
           "reason": "prescribed_dt rejected: conservative_projection_failure: residual",
-          "steps_accepted": 0,
+          "steps_accepted": 1,
           "rejections": 1,
-          "wall_time_s": 0.0368859157897532,
-          "flux_flatness": 183.57168968871412
+          "simulated_time": 31622.776601683792,
+          "wall_time_s": 0.09935045894235373,
+          "flux_flatness": 0.20711872301811998,
+          "n_rejected_reasons": [
+            "conservative_projection_failure: residual"
+          ],
+          "detached": [
+            [
+              10,
+              11
+            ]
+          ]
         },
-        "t_probe": 5000.0,
         "trials": [
           {
             "dt": 1000000.0,
             "ok": false,
-            "status": "prescribed_dt_rejected",
-            "reason": "prescribed_dt rejected: fractional-temperature bound exceeded",
-            "steps_accepted": 0,
-            "rejections": 1,
-            "wall_time_s": 0.0006248331628739834,
-            "flux_flatness": 183.57168968871412
-          },
-          {
-            "dt": 200000.0,
-            "ok": false,
+            "t_probe": 20000000.0,
             "status": "prescribed_dt_rejected",
             "reason": "prescribed_dt rejected: conservative_projection_failure: residual",
             "steps_accepted": 0,
             "rejections": 1,
-            "wall_time_s": 0.0368859157897532,
-            "flux_flatness": 183.57168968871412
+            "simulated_time": 0.0,
+            "wall_time_s": 0.24854012485593557,
+            "flux_flatness": 183.57168968871412,
+            "n_rejected_reasons": [
+              "conservative_projection_failure: residual"
+            ],
+            "detached": [
+              [
+                10,
+                11
+              ]
+            ]
+          },
+          {
+            "dt": 200000.0,
+            "ok": false,
+            "t_probe": 4000000.0,
+            "status": "prescribed_dt_rejected",
+            "reason": "prescribed_dt rejected: conservative_projection_failure: residual",
+            "steps_accepted": 0,
+            "rejections": 1,
+            "simulated_time": 0.0,
+            "wall_time_s": 0.037077416898682714,
+            "flux_flatness": 183.57168968871412,
+            "n_rejected_reasons": [
+              "conservative_projection_failure: residual"
+            ],
+            "detached": [
+              [
+                10,
+                11
+              ]
+            ]
           },
           {
             "dt": 50000.0,
+            "ok": false,
+            "t_probe": 1000000.0,
+            "status": "prescribed_dt_rejected",
+            "reason": "prescribed_dt rejected: conservative_projection_failure: residual",
+            "steps_accepted": 0,
+            "rejections": 1,
+            "simulated_time": 0.0,
+            "wall_time_s": 0.035661458037793636,
+            "flux_flatness": 183.57168968871412,
+            "n_rejected_reasons": [
+              "conservative_projection_failure: residual"
+            ],
+            "detached": [
+              [
+                10,
+                11
+              ]
+            ]
+          },
+          {
+            "dt": 20000.0,
             "ok": true,
+            "t_probe": 400000.0,
             "status": "max_steps",
             "reason": "reached t_final",
-            "steps_accepted": 1,
+            "steps_accepted": 20,
             "rejections": 0,
-            "wall_time_s": 0.012569416081532836,
-            "flux_flatness": 0.11444151024390199
+            "simulated_time": 400000.0,
+            "wall_time_s": 0.6835398338735104,
+            "flux_flatness": 0.01049423206460915,
+            "n_rejected_reasons": [],
+            "detached": []
+          },
+          {
+            "dt": 31622.776601683792,
+            "ok": false,
+            "t_probe": 632455.5320336758,
+            "status": "prescribed_dt_rejected",
+            "reason": "prescribed_dt rejected: conservative_projection_failure: residual",
+            "steps_accepted": 1,
+            "rejections": 1,
+            "simulated_time": 31622.776601683792,
+            "wall_time_s": 0.09935045894235373,
+            "flux_flatness": 0.20711872301811998,
+            "n_rejected_reasons": [
+              "conservative_projection_failure: residual"
+            ],
+            "detached": [
+              [
+                10,
+                11
+              ]
+            ]
           }
         ]
       },
       "residual_drop": {
         "status": "converged",
         "reason": "converged for 3 consecutive accepted steps",
-        "steps_accepted": 67,
+        "steps_accepted": 69,
         "rejections": 2,
-        "simulated_time": 156250.0,
-        "wall_time_s": 0.7024822500534356,
-        "flux_flatness": 0.024475565903956824,
-        "tendency_norm": 0.012998897726567975,
-        "newton_iterations": 529,
-        "mlt_evals": 4131,
-        "line_search_backtracks": 135,
-        "primary_rcb_log10p": 5.67081194983813,
+        "simulated_time": 155479.7112653064,
+        "wall_time_s": 1.3198737499769777,
+        "flux_flatness": 0.024981333274787403,
+        "tendency_norm": 0.013030018992112672,
+        "newton_iterations": 543,
+        "mlt_evals": 4206,
+        "line_search_backtracks": 112,
+        "primary_rcb_log10p": 5.670821844211417,
         "detached": [],
         "target_flatness": 0.05,
         "hit_target": true
@@ -1050,16 +1453,16 @@
     "thermal_relaxation_semi_implicit_to_1e-3": {
       "status": "converged",
       "reason": "converged for 5 consecutive accepted steps",
-      "steps_accepted": 243,
+      "steps_accepted": 248,
       "rejections": 5,
-      "simulated_time": 539424.9280000001,
-      "wall_time_s": 2.4544166659470648,
-      "flux_flatness": 0.0005533758119008781,
-      "tendency_norm": 0.0003333130422970498,
-      "newton_iterations": 1948,
-      "mlt_evals": 15040,
-      "line_search_backtracks": 384,
-      "primary_rcb_log10p": 5.610370653763097,
+      "simulated_time": 543807.2392653064,
+      "wall_time_s": 4.538097874959931,
+      "flux_flatness": 0.0004910893701511062,
+      "tendency_norm": 0.00030213513320556255,
+      "newton_iterations": 1979,
+      "mlt_evals": 15488,
+      "line_search_backtracks": 554,
+      "primary_rcb_log10p": 5.610364366464307,
       "detached": []
     }
   }

@@ -188,6 +188,7 @@ def test_single_step_explicit_implicit_differ_at_second_order():
         cfg = RCEConfig(
             max_steps=1, n_consec=99, stall_window=10, prescribed_dt=dt,
             implicit_convection=rce_cfg.implicit_convection,
+            coupled_picard=False,
         )
         unsplit = solve_adaptive_rce(
             grid, t, physics, solver, thermo, opacity, grid.pressure_centres, top, bot,
@@ -237,6 +238,7 @@ def test_fixed_time_explicit_implicit_differ_at_first_order():
         cfg = RCEConfig(
             max_steps=n_steps, n_consec=10**9, stall_window=10**9,
             prescribed_dt=dt, t_final=t_final,
+            coupled_picard=False,
             implicit_convection=ImplicitConvectionConfig(
                 residual_tolerance=1e-11, step_tolerance=1e-11
             ),
