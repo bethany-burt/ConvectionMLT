@@ -1,51 +1,74 @@
 Stage 4 status report
 Fixed-composition H2 radiative-convective equilibrium (handbook points 35-40)
 
-Current claim (2026-08-21, Picard coupling + nested τ-grids)
------------------------------------------------------------
+Current claim (2026-08-21, N=192 continuation + audit-row enforcement)
+--------------------------------------------------------------------
 core_single_resolution_status: PASS
 spatial_and_operator_convergence_status: NOT_PASSED
-helios_parity_status: NOT_RUN_OR_PILOT_ONLY
+algebraic_identity_status: PASS
+helios_parity_status: NOT_RUN_OR_PILOT_ONLY   (derived from the HELIOS row)
 full_stage4_claim: false
 
 Statuses are computed from current rows in stage4/results/exit_gate_audit.json.
-The pre-implicit 1e-8 / 0.885 audit is archived as
-stage4/results/exit_gate_audit_preimplicit_2026-08-19.json.
+The 0.05-dex RCB spatial gate, timestep-refinement, and implicit equilibrium
+operator rows now participate in spatial_and_operator_convergence_status.
+Algebraic 1e-12 construction identities (bottom BC, telescoping, F_rad+F_conv)
+are independent pass/fail rows. The pre-implicit 1e-8 / 0.885 audit is archived
+as stage4/results/exit_gate_audit_preimplicit_2026-08-19.json.
 
 Gates
   algebraic identities: 1e-12
-  physical RCE: 1e-3
+  physical RCE: 1e-3 (unchanged; not relaxed)
   spatial: max rel T 0.02 and 0.05 dex RCB (not met)
   HELIOS: not run
 
-Physical RCE (ConstantH2Thermo, independent N=48 n_phot=16 / N=96 n_phot=24)
-  N=48: converged, 196 accepted, flatness 3.48e-4, RCB log10P 5.419
-  N=96: converged, 1472 accepted, flatness 9.99e-4, RCB log10P 5.142
-  N=192 nested (master 384/64): 12000 accepted, 1022 rejected, median dt ≈ 97 s,
-        flatness 3.65e-3, NOT at the 1e-3 gate. Complete profiles, residual
-        history and checksum are in stage4/results/n192_implicit_rce.json
-        sha256 b71ab7480837fcf9147b7f1ed1fde59c991caf8ebfe28e4c3b07846741647528
-  N=384 was not run.
+Physical RCE (ConstantH2Thermo)
+  Independent-grid regression (not Richardson):
+    N=48 n_phot=16: converged, 196 accepted, flatness 3.48e-4, RCB log10P 5.419
+    N=96 n_phot=24: converged, 1472 accepted, flatness 9.99e-4, RCB log10P 5.142
+  Nested family from master N=384 n_phot=64:
+    N=48 n_phot=8:  converged, 1253 accepted, flatness 9.95e-4, RCB log10P 5.359
+    N=96 n_phot=16: converged, 5804 accepted, flatness 9.997e-4, RCB log10P 5.117
+    N=192 n_phot=32: 62000 accepted, 1022 rejected (all from the original 12k),
+        t_sim 6.231e6 s. After 50000 extra accepted steps at Δt=100 s:
+        flatness 2.019e-3, tendency 3.37e-4, RCB log10P 5.0283, CZ (0,155),
+        no detached zones, coupled defect 4.3e-11, bottom flux exactly 300.
+        NOT at the 1e-3 flux-flatness gate. Record:
+        stage4/results/n192_implicit_rce.json
+  N=384 was not run. Do not run it until the N=192 gate is crossed with a
+  conservation-constrained Newton (the post-Newton projection residual floor
+  is the bottleneck).
+
+N=192 continuation tail
+  Tendency crossed 1e-3 after ~2500 extra steps and kept falling.
+  Flatness improved monotonically 3.65e-3 → 2.02e-3 with zero new rejections.
+  Geometric chunk drops imply an asymptote ≈ 1.57e-3. A 1/t fit on the last
+  20k accepted steps gives floor ≈ 1.34e-3. Best exponential residual fit is
+  floor 1.60e-3. More time at Δt=100 s is not going to reach 1e-3.
+
+Nested spatial (gate-converged 48/96; 192 not gated)
+  96 vs 48: max rel T 8.27%, ΔRCB 0.242 dex, enthalpy 16.3%
+  192 vs 96: max rel T 3.15%, ΔRCB 0.089 dex, enthalpy 6.4%
+  Ratio ~2.6 is a plausible first-order trend but is not Richardson evidence
+  until N=192 is independently at the 1e-3 gate.
 
 Picard / coupled defect
-  Production implicit macrostep iterates F_rad(T^k) → h* → backward-Euler
-  convection until the coupled enthalpy defect is ≤ 1e-10. Reverse and Strang
-  use the same coupled step when coupled_picard is on, so those orders match
-  radiation→convection at equilibrium (N=24 flatness 4.91e-4 all three).
-  Fine-grid dt is still limited by Picard rejection (~100 s at N=192), not by
-  radiation-only CFL. Cancellation stiffness remains the cost driver.
+  Production integrator is coupled_picard_backward_euler. Reverse and Strang
+  with coupled_picard=True are route-alias parity of that macrostep, not
+  operator-order evidence. The explicit unsplit fixed-time ratio 2.20 is the
+  genuine order evidence (observed order ≈ 1.14).
 
 Nested optical-depth family
   Master N=384, n_phot=64, τ=1 is an edge. N=192/96/48 are every 2nd/4th/8th
-  master edge. N=48 with n_phot=16 remains the low-cost regression grid.
+  master edge. Independent N=48 n_phot=16 remains the low-cost regression grid.
 
 Timestep at N=96 (800 vs 400 s, both at 1e-3): max rel T 6.5e-9 PASS.
-N=192 timestep control was not repeated because N=192 is not gate-converged.
+N=192 continuation used Δt=100 s (largest probed step that still projects).
 
 Operator-order fixed time
-  Explicit unsplit redone at Δt=25, 12.5, 6.25 s (below the 50 s success
-  bracket); all three reach the same t_final; fitted ratio ≈ 2.20.
-  Implicit Picard routes also complete t_final and are identical to each other.
+  Explicit unsplit at Δt=25, 12.5, 6.25 s; all three reach the same t_final;
+  fitted ratio ≈ 2.20. Implicit Picard routes complete t_final and agree
+  exactly because they dispatch to the same coupled macrostep.
 
 Point 39 (20 consecutive accepted steps, t_probe=20 Δt, bisection, first failure at X)
   radiation-only explicit: last success 4.47e5 s, first failure at 6.69e5 s
@@ -53,8 +76,9 @@ Point 39 (20 consecutive accepted steps, t_probe=20 Δt, bisection, first failur
   coupled explicit: last success 50 s, first failure at 100 s
   coupled semi-implicit: last success 2e4 s, first failure at 3.16e4 s
 
-EOS / gravity / attractor naming unchanged. HELIOS still waits on nested
-gate-converged N=96/192/384 with matched opacity, EOS, g, and F_int.
+EOS / gravity / attractor naming unchanged. HELIOS still waits until nested
+N=192 crosses the 1e-3 gate with a conservation-constrained Newton, then
+matched radiation-only and coupled RCE comparisons (opacity, EOS, g, F_int).
 
 
 Archive: 2026-08-19 HELIOS-pilot snapshot

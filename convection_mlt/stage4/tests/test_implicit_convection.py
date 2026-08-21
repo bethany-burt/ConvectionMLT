@@ -316,3 +316,53 @@ def test_implicit_dt_hold_does_not_double_immediately_after_reject():
         625.0, 1e9, cfg, implicit=False, dt_ceiling=None, hold_remaining=0
     )
     assert explicit_nxt == pytest.approx(1250.0)
+
+
+def test_restart_seeds_dt_hold_and_simulated_time():
+    import pytest
+
+    grid, thermo, physics, solver, t = _column(n_layers=8)
+    grav = ConstantGravity(G)
+    opacity = ConstantGreyOpacity(2.0e-4)
+    top = TopIrradiation(120.0)
+    bot = LowerNetInternalFlux(F0)
+    cfg1 = RCEConfig(
+        max_steps=2,
+        n_consec=10**9,
+        stall_window=10**9,
+        coupled_picard=True,
+        dt_accuracy=5.0,
+        implicit_convection=ImplicitConvectionConfig(
+            residual_tolerance=1e-10, step_tolerance=1e-10
+        ),
+    )
+    res1 = solve_adaptive_rce(
+        grid, t, physics, solver, thermo, opacity, grid.pressure_centres, top, bot,
+        gravity=grav, route=RCERoute.SPLIT_RAD_THEN_IMPLICIT_CONV, config=cfg1,
+    )
+    accepted = [d for d in res1.diagnostics if d.accepted]
+    assert accepted
+    last = accepted[-1]
+    cfg2 = RCEConfig(
+        max_steps=1,
+        n_consec=10**9,
+        stall_window=10**9,
+        coupled_picard=True,
+        dt_accuracy=1.0e9,
+        dt_hold_init=last.dt,
+        simulated_time_init=res1.simulated_time,
+        previous_rcb_init=res1.primary_rcb_log10p,
+        implicit_convection=ImplicitConvectionConfig(
+            residual_tolerance=1e-10, step_tolerance=1e-10
+        ),
+    )
+    res2 = solve_adaptive_rce(
+        grid, res1.final_state.temperature, physics, solver, thermo, opacity,
+        grid.pressure_centres, top, bot, gravity=grav,
+        route=RCERoute.SPLIT_RAD_THEN_IMPLICIT_CONV, config=cfg2,
+    )
+    accepted2 = [d for d in res2.diagnostics if d.accepted]
+    assert accepted2
+    assert accepted2[0].dt <= last.dt + 1e-12
+    assert res2.simulated_time == pytest.approx(res1.simulated_time + accepted2[0].dt)
+

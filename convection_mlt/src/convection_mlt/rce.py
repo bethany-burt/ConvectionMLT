@@ -155,6 +155,10 @@ class RCEConfig:
     picard_tolerance: float = 1.0e-10
     picard_relax: float = 1.0
     use_coupled_tendency_dt: bool = True
+    # Restart / continuation: seed the hold and optional prior RCB.
+    dt_hold_init: float | None = None
+    simulated_time_init: float = 0.0
+    previous_rcb_init: float | None = None
 
 
 def _uses_implicit_convection(route: RCERoute) -> bool:
@@ -1216,16 +1220,16 @@ def solve_adaptive_rce(
     f_int = _internal_flux_reference(lower_bc, manufactured)
 
     accepted_consec = 0
-    prev_rcb: float | None = None
+    prev_rcb: float | None = cfg.previous_rcb_init
     diagnostics: list[RCEStepDiagnostics] = []
-    simulated_time = 0.0
+    simulated_time = float(cfg.simulated_time_init)
     rejections = 0
     best_resid = np.inf
     stall_counter = 0
     steps_accepted = 0
-    dt_hold: float | None = None
-    dt_ceiling: float | None = None
-    hold_remaining = 0
+    dt_hold: float | None = cfg.dt_hold_init
+    dt_ceiling: float | None = cfg.dt_hold_init
+    hold_remaining = int(cfg.n_hold_after_reject) if cfg.dt_hold_init is not None else 0
     last_temp_change = float("inf")
 
     final_closure = _evaluate_closure(grid, state, physics, thermo)

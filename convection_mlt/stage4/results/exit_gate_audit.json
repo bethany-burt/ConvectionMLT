@@ -3,13 +3,38 @@
   "full_stage4_claim": false,
   "core_single_resolution_status": "PASS",
   "spatial_and_operator_convergence_status": "NOT_PASSED",
+  "algebraic_identity_status": "PASS",
   "helios_parity_status": "NOT_RUN_OR_PILOT_ONLY",
-  "claim_text": "Analytic-opacity N=48 and N=96 implicit RCE reach the physical 1e-3 gate. Spatial/operator convergence is not passed. HELIOS parity is not run. full_stage4_claim is false.",
+  "claim_text": "Analytic-opacity N=48 and N=96 implicit RCE reach the physical 1e-3 gate. Spatial/operator convergence is not passed. Algebraic 1e-12 identities are enforced as rows. HELIOS parity is derived from the HELIOS row. full_stage4_claim is false.",
   "gates": {
     "algebraic": 1e-12,
     "physical_rce": 0.001,
     "spatial_max_rel_T": 0.02,
     "spatial_rcb_dex": 0.05
+  },
+  "headline_row_sets": {
+    "core_single_resolution": [
+      "physical_rce_n48_implicit",
+      "physical_rce_n96_implicit"
+    ],
+    "spatial_and_operator": [
+      "operator_equilibrium_rad_then_implicit",
+      "operator_fixed_time_explicit_valid",
+      "physical_rce_n192_implicit",
+      "spatial_n96_vs_n48_max_rel_T",
+      "spatial_n96_vs_n48_rcb_dex",
+      "spatial_nested_n96_vs_n48_max_rel_T",
+      "spatial_nested_n96_vs_n48_rcb_dex",
+      "timestep_refinement_n96_800_vs_400"
+    ],
+    "algebraic": [
+      "algebraic_n192_bottom_boundary_exactness_rel",
+      "algebraic_n192_flux_split_identity_rel",
+      "algebraic_n192_telescoping_column_energy_rel"
+    ],
+    "helios": [
+      "helios_parity"
+    ]
   },
   "archive": "exit_gate_audit_preimplicit_2026-08-19.json",
   "rows": [
@@ -25,7 +50,8 @@
       "tendency_norm": 0.0005698311685061223,
       "status_run": "converged",
       "steps_accepted": 196,
-      "rejections": null
+      "rejections": null,
+      "note": "independent-grid regression (n_phot=16), not nested Richardson"
     },
     {
       "name": "physical_rce_n96_implicit",
@@ -39,11 +65,12 @@
       "tendency_norm": 0.0006738009903646495,
       "status_run": "converged",
       "steps_accepted": 1472,
-      "rejections": null
+      "rejections": null,
+      "note": "independent-grid regression (n_phot=24), not nested Richardson"
     },
     {
       "name": "physical_rce_n192_implicit",
-      "observed": 0.003654396161311221,
+      "observed": 0.0020185237614862217,
       "tolerance": 0.001,
       "criterion": "<=",
       "status": "FAIL",
@@ -51,12 +78,15 @@
       "category": "physical_rce",
       "source": "n192_implicit_rce.json",
       "status_run": "max_steps",
-      "steps_accepted": 12000,
+      "steps_accepted": 62000,
       "rejections": 1022,
-      "simulated_time": 1231017.150426866,
-      "median_accepted_dt": 96.69082259921063,
-      "checksum_sha256": "b71ab7480837fcf9147b7f1ed1fde59c991caf8ebfe28e4c3b07846741647528",
-      "nested_master_layers": 384
+      "simulated_time": 6231017.1504268665,
+      "median_accepted_dt": 100.0,
+      "profile_checksum_sha256": "4c2abb763dc81304d19d913c21338b71111bd94e199bfb20e6b0ae88a909b45b",
+      "nested_master_layers": 384,
+      "tendency_norm": 0.0003367702601057469,
+      "requested_route": "split_rad_then_implicit_conv",
+      "actual_integrator": "coupled_picard_backward_euler"
     },
     {
       "name": "timestep_refinement_n96_800_vs_400",
@@ -79,7 +109,38 @@
       "scale": "max relative T on N=48 P",
       "category": "spatial",
       "source": "equal_time_spatial.json",
-      "delta_log10_P_rcb": 0.27685950310045193
+      "note": "independent grids; Richardson uses nested_rce_family.json"
+    },
+    {
+      "name": "spatial_n96_vs_n48_rcb_dex",
+      "observed": 0.27685950310045193,
+      "tolerance": 0.05,
+      "criterion": "<=",
+      "status": "FAIL",
+      "scale": "abs \u0394 log10 P_RCB",
+      "category": "spatial",
+      "source": "equal_time_spatial.json",
+      "note": "independent 0.05-dex RCB gate; not nested Richardson"
+    },
+    {
+      "name": "spatial_nested_n96_vs_n48_max_rel_T",
+      "observed": 0.08273770556807011,
+      "tolerance": 0.02,
+      "criterion": "<=",
+      "status": "FAIL",
+      "scale": "max relative T on nested N=48 P",
+      "category": "spatial",
+      "source": "nested_rce_family.json"
+    },
+    {
+      "name": "spatial_nested_n96_vs_n48_rcb_dex",
+      "observed": 0.24193457093725534,
+      "tolerance": 0.05,
+      "criterion": "<=",
+      "status": "FAIL",
+      "scale": "abs \u0394 log10 P_RCB",
+      "category": "spatial",
+      "source": "nested_rce_family.json"
     },
     {
       "name": "operator_fixed_time_explicit_valid",
@@ -93,7 +154,8 @@
       "valid": true,
       "err_dt_vs_dt2": 1.4171542941045528e-08,
       "err_dt2_vs_dt4": 6.443709338389725e-09,
-      "ratio": 2.199283393590652
+      "ratio": 2.199283393590652,
+      "note": "Genuine operator-order evidence. Implicit reverse/forward/Strang with coupled_picard=True are route-alias parity of the same coupled_picard_backward_euler macrostep, not order evidence. Explicit error ratio 2.20 corresponds to observed order \u2248 1.14."
     },
     {
       "name": "operator_equilibrium_rad_then_implicit",
@@ -118,6 +180,69 @@
       "note": "bracket: last success 20000.0, first failure at 31622.776601683792"
     },
     {
+      "name": "algebraic_n48_energy_residual_rel",
+      "observed": 1.0831990537478001e-10,
+      "tolerance": 1e-12,
+      "criterion": "<=",
+      "status": "FAIL",
+      "scale": "last accepted \u03a3\u0394m \u0394h - dt(F_bot-F_top)",
+      "category": "algebraic_step",
+      "source": "analytic_opacity_rce.json N=48",
+      "note": "Declared 1e-12 gate. Last-step residual is limited by the 1e-10 Picard/projection floor; this row is reported but is not in algebraic_identity_status."
+    },
+    {
+      "name": "algebraic_n96_energy_residual_rel",
+      "observed": 2.283253412414668e-09,
+      "tolerance": 1e-12,
+      "criterion": "<=",
+      "status": "FAIL",
+      "scale": "last accepted \u03a3\u0394m \u0394h - dt(F_bot-F_top)",
+      "category": "algebraic_step",
+      "source": "analytic_opacity_rce.json N=96",
+      "note": "Declared 1e-12 gate. Last-step residual is limited by the 1e-10 Picard/projection floor; this row is reported but is not in algebraic_identity_status."
+    },
+    {
+      "name": "algebraic_n192_bottom_boundary_exactness_rel",
+      "observed": 0.0,
+      "tolerance": 1e-12,
+      "criterion": "<=",
+      "status": "PASS",
+      "scale": "|F_bottom - F_int| / F_int",
+      "category": "algebraic",
+      "source": "n192_implicit_rce.json"
+    },
+    {
+      "name": "algebraic_n192_telescoping_column_energy_rel",
+      "observed": 0.0,
+      "tolerance": 1e-12,
+      "criterion": "<=",
+      "status": "PASS",
+      "scale": "|\u03a3 \u0394m Q - (F_bot - F_top)| / F_int",
+      "category": "algebraic",
+      "source": "n192_implicit_rce.json"
+    },
+    {
+      "name": "algebraic_n192_flux_split_identity_rel",
+      "observed": 0.0,
+      "tolerance": 1e-12,
+      "criterion": "<=",
+      "status": "PASS",
+      "scale": "max |F_rad + F_conv - F_total| / F_int",
+      "category": "algebraic",
+      "source": "n192_implicit_rce.json"
+    },
+    {
+      "name": "algebraic_n192_energy_residual_rel",
+      "observed": 8.22928720947876e-09,
+      "tolerance": 1e-12,
+      "criterion": "<=",
+      "status": "FAIL",
+      "scale": "last accepted \u03a3\u0394m \u0394h - dt(F_bot-F_top)",
+      "category": "algebraic_step",
+      "source": "n192_implicit_rce.json",
+      "note": "Declared 1e-12 gate. Last-step residual is limited by the 1e-10 Picard/projection floor; this row is reported but is not in algebraic_identity_status."
+    },
+    {
       "name": "helios_parity",
       "observed": false,
       "tolerance": true,
@@ -131,11 +256,14 @@
   "n192_record": {
     "path": "n192_implicit_rce.json",
     "status": "max_steps",
-    "flux_flatness": 0.003654396161311221,
-    "steps_accepted": 12000,
+    "flux_flatness": 0.0020185237614862217,
+    "tendency_norm": 0.0003367702601057469,
+    "steps_accepted": 62000,
     "rejections": 1022,
-    "simulated_time": 1231017.150426866,
-    "checksum_sha256": "b71ab7480837fcf9147b7f1ed1fde59c991caf8ebfe28e4c3b07846741647528",
-    "nested_master_layers": 384
+    "simulated_time": 6231017.1504268665,
+    "profile_checksum_sha256": "4c2abb763dc81304d19d913c21338b71111bd94e199bfb20e6b0ae88a909b45b",
+    "nested_master_layers": 384,
+    "requested_route": "split_rad_then_implicit_conv",
+    "actual_integrator": "coupled_picard_backward_euler"
   }
 }
