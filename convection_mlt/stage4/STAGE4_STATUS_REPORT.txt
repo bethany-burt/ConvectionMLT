@@ -1,5 +1,64 @@
 Stage 4 status report
 Fixed-composition H2 radiative-convective equilibrium (handbook points 35-40)
+
+Current claim (2026-08-21, implicit convection)
+------------------------------------------------
+core_single_resolution_status: PASS
+  Analytic-opacity implicit RCE (radiation then backward-Euler convection)
+  with ConstantH2Thermo reaches the physical 1e-3 flux-flatness / tendency gate
+  at N=48 (flatness ≈ 3.69e-4, 200 accepted steps) and N=96 (flatness ≈ 9.99e-4,
+  1456 accepted steps, rejection/acceptance ≈ 0.086 after the controller fix).
+  The 0.1 explicit unsplit run remains a structural/RCB regression only.
+
+spatial_and_operator_convergence_status: NOT_PASSED
+  Gate-converged N=96 vs N=48: max rel T = 11.1%, RCB shift = 0.277 dex,
+  column enthalpy = 27.1%. That is a resolution-sensitivity regression, not
+  grid independence. N=192 at 12000 accepted steps is still at flatness ≈ 3.65e-3
+  and is not a gate-converged comparison. N=384 was not run.
+
+  Timestep refinement at fixed N=96 (accuracy Δt = 800 s vs 400 s, both at 1e-3):
+  max rel T ≈ 6.5e-9, so the N=48/N=96 profile difference is spatial, not mixed
+  with that particular temporal error.
+
+  Operator-order, identical t_final: explicit unsplit trajectories that miss
+  t_final are marked failed and excluded from fitted orders. Implicit routes
+  that complete t_final show ~first-order temperature ratios. Equilibrium
+  contract at N=24: only rad→implicit convection reached 1e-3; reverse and
+  Strang did not (flatness 2.58 and 1.57) and are failed, not compared.
+
+helios_parity_status: NOT_RUN_OR_PILOT_ONLY
+full_stage4_claim: false
+
+Controller (2026-08-21)
+  Implicit dt grows by f_grow=1.2 after an accept, holds a post-reject ceiling
+  for n_hold_after_reject=8 accepted steps, Newton 1e-12 / projection 1e-10,
+  projection residual continues Newton instead of immediately rejecting.
+  N=96 rejection ratio fell from ~1.0 (625/1250 chatter) to ~0.086.
+
+Point 39 stability (N=24 prescribed-dt probe, genuine failed upper)
+  radiation-only explicit: last success 2e5 s, first failure 1e6 s
+  convection-only frozen rad: last success 5e4 s, first failure 2e5 s
+  coupled explicit: last success 50 s, first failure 200 s
+  coupled semi-implicit: last success 5e4 s, first failure 2e5 s
+
+EOS
+  The 1e-3 analytic-opacity benchmark is ConstantH2Thermo (fixed ∇_ad = 2/7).
+  NASA H2 has a coupled implicit smoke (accepted steps, finite T) but is not a
+  gate-passing parity run. Do not mix EOS closures when comparing to HELIOS.
+
+Scope
+  Implicit Jacobian requires ConstantGravity; InverseSquareGravity is rejected
+  at runtime. In-basin isoenthalpic CZ redistributions show local path
+  independence, not a global hot/cold attractor.
+
+No embedded stage4.zip is present in the tree.
+
+The remainder of this file is the 2026-08-19 pre-implicit HELIOS-pilot report
+and is retained as archive of that snapshot. It does not describe the current
+implicit solver.
+
+
+Archive: 2026-08-19 HELIOS-pilot snapshot
 Date: 2026-08-19
 Repo commit: 1bc1f24371cf1fbbee4dd64634dc9f1f9646538c
 GitHub: https://github.com/bethany-burt/ConvectionMLT/commit/1bc1f24371cf1fbbee4dd64634dc9f1f9646538c

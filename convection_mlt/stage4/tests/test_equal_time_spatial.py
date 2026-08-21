@@ -46,6 +46,8 @@ def _cfg(max_steps: int, gate: float, t_final: float | None = None) -> RCEConfig
         implicit_convection=ImplicitConvectionConfig(
             residual_tolerance=1e-10,
             step_tolerance=1e-10,
+            newton_residual_tolerance=1e-12,
+            newton_step_tolerance=1e-12,
         ),
     )
 
@@ -100,15 +102,16 @@ def test_equal_time_n48_n96_share_physical_time_axis():
     assert r48.steps_accepted > 0 and r96.steps_accepted > 0
 
 
-def test_spatial_refinement_at_1e_3_gate_n48_n96():
-    """After each resolution hits 1e-3, compare T(P) and RCB (documented tolerances).
+def test_resolution_sensitivity_regression_n48_n96():
+    """Regression guard for resolution sensitivity — not a grid-independence claim.
 
-    N=48 and N=96 both reach the exit gate with a bottom-connected CZ. The RCB
-    still moves by O(0.3) dex between these grids; tolerances below lock the
-    present spatial-convergence status rather than a falsely tight claim.
+    N=48 and N=96 both reach the 1e-3 gate with a bottom-connected CZ. Profile
+    differences remain O(10%) in T and O(0.3) dex in RCB; those bounds lock the
+    present state. A genuine convergence test requires timestep-controlled,
+    independently gate-converged solutions.
     """
     cases = {}
-    for n, steps in ((48, 400), (96, 1200)):
+    for n, steps in ((48, 400), (96, 2500)):
         _, grid, res = _run(n, max_steps=steps, gate=STAGE4_EXIT_FLUX_GATE)
         assert res.status == RCETerminalStatus.CONVERGED, (n, res.reason, res.convergence.flux_flatness)
         assert res.convergence.flux_flatness <= STAGE4_EXIT_FLUX_GATE

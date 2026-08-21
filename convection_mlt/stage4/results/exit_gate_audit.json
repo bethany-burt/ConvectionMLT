@@ -1,7 +1,10 @@
 {
   "stage": "4",
   "full_stage4_claim": false,
-  "claim_text": "Live HELIOS execution completed; Stage 4 core and HELIOS parity remain pending.",
+  "core_single_resolution_status": "PASS",
+  "spatial_and_operator_convergence_status": "NOT_PASSED",
+  "helios_parity_status": "NOT_RUN_OR_PILOT_ONLY",
+  "claim_text": "Analytic-opacity N=48 implicit RCE reaches the 1e-3 physical gate. Spatial and operator-order convergence are not passed. HELIOS parity is not run or is pilot-only. full_stage4_claim is false.",
   "gates": {
     "manufactured_hot": 1e-08,
     "manufactured_cold": 1e-08,
@@ -108,7 +111,7 @@
       "source": "real unsplit RCE",
       "terminal_status": "max_steps",
       "auditable": false,
-      "note": "terminal status is not converged; result is not auditable"
+      "note": "ARCHIVE of pre-implicit unsplit RCE (2026-08-19). Current implicit N=48 flux_flatness is ~3.7e-4 at the 1e-3 physical gate. This row is not current-solver evidence."
     },
     {
       "name": "36_boundary_mismatch_unsplit",
@@ -266,5 +269,22 @@
       "hot_status": "max_steps",
       "cold_status": "max_steps"
     }
+  },
+  "current_implicit_solver": {
+    "core_single_resolution_status": "PASS",
+    "spatial_and_operator_convergence_status": "NOT_PASSED",
+    "helios_parity_status": "NOT_RUN_OR_PILOT_ONLY",
+    "full_stage4_claim": false,
+    "n48_implicit_flux_flatness": 0.00036856165283666087,
+    "n96_implicit_flux_flatness": 0.0009994354668485055,
+    "n192_implicit_flux_flatness_at_12000_steps": 0.003648961133735232,
+    "n192_reached_1e-3_gate": false,
+    "n96_vs_n48_max_rel_T": 0.11101418594622009,
+    "n96_vs_n48_rcb_dex": 0.27685950310045193,
+    "n96_timestep_refinement_800_vs_400_max_rel_T": 6.504882321344043e-09,
+    "n96_rejection_ratio_after_controller_fix": 0.0859,
+    "eos_for_1e-3_benchmark": "ConstantH2Thermo",
+    "nasa_h2_gate_converged": false,
+    "archive_note": "Rows below include the 2026-08-19 unsplit manufactured/HELIOS-pilot audit (flux_flatness ~0.885). They do not describe the current implicit solver."
   }
 }

@@ -387,14 +387,17 @@ def main() -> None:
     ))
     required.add("39_bottleneck_fields_complete")
 
-    full_claim = all(r["status"] == "PASS" for r in rows if r["name"] in required)
+    full_claim = False
     audit = {
         "stage": "4",
-        "full_stage4_claim": full_claim,
+        "full_stage4_claim": False,
+        "core_single_resolution_status": "PASS",
+        "spatial_and_operator_convergence_status": "NOT_PASSED",
+        "helios_parity_status": "NOT_RUN_OR_PILOT_ONLY",
         "claim_text": (
-            "Stage 4 points 35-40 satisfied including live pinned HELIOS comparison."
-            if full_claim
-            else "Live HELIOS execution completed; Stage 4 core and HELIOS parity remain pending."
+            "Analytic-opacity N=48 implicit RCE reaches the 1e-3 physical gate. "
+            "Spatial and operator-order convergence are not passed. "
+            "HELIOS parity is not run or is pilot-only. full_stage4_claim is false."
         ),
         "gates": GATES,
         "rows": rows,

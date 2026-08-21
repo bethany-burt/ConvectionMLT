@@ -75,6 +75,7 @@ from .implicit_convection import (
     assemble_dense_jacobian,
     assemble_tridiagonal_jacobian,
     provisional_support,
+    require_constant_gravity,
     solve_implicit_convection,
 )
 from .adapters.helios import (
@@ -162,6 +163,7 @@ __all__ = [
     "assemble_dense_jacobian",
     "assemble_tridiagonal_jacobian",
     "provisional_support",
+    "require_constant_gravity",
     "solve_radiation",
     "SolveRoute",
     "STEFAN_BOLTZMANN",

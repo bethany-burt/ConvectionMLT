@@ -17,6 +17,7 @@ from .hydrostatics import HydrostaticDomainError
 from .implicit_convection import (
     ImplicitConvectionConfig,
     ImplicitConvectionDiagnostics,
+    require_constant_gravity,
     solve_implicit_convection,
 )
 from .opacity import AnalyticGreyOpacity, PrescribedOpacity
@@ -129,6 +130,9 @@ class RCEConfig:
     max_steps: int = 200000
     max_rejections: int = 50
     f_back: float = 0.5
+    # Implicit-route growth after an accepted step. Explicit routes still use 1/f_back.
+    f_grow: float = 1.2
+    n_hold_after_reject: int = 8
     stall_window: int = 2000
     stall_rel_improvement: float = 1e-6
     diffusivity_factor: float = DEFAULT_DIFFUSIVITY
@@ -150,6 +154,38 @@ def _uses_implicit_convection(route: RCERoute) -> bool:
         RCERoute.SPLIT_IMPLICIT_CONV_THEN_RAD,
         RCERoute.SPLIT_STRANG_RAD_IMPLICIT_CONV,
     )
+
+
+def dt_after_reject(dt: float, cfg: RCEConfig) -> tuple[float, float, int]:
+    """Halve dt and install a ceiling held for n_hold_after_reject accepts."""
+    reduced = float(dt) * cfg.f_back
+    return reduced, reduced, int(cfg.n_hold_after_reject)
+
+
+def dt_after_accept(
+    dt: float,
+    dt_est: float,
+    cfg: RCEConfig,
+    *,
+    implicit: bool,
+    dt_ceiling: float | None,
+    hold_remaining: int,
+) -> tuple[float, float | None, int]:
+    """Next attempted dt. Implicit routes grow by f_grow, not 1/f_back."""
+    if not implicit:
+        grown = dt / cfg.f_back if cfg.f_back > 0.0 else dt
+        nxt = min(grown, dt_est) if np.isfinite(dt_est) else grown
+        return float(nxt), None, 0
+    grown = dt * cfg.f_grow
+    nxt = grown
+    if np.isfinite(dt_est):
+        nxt = min(nxt, dt_est)
+    if dt_ceiling is not None and hold_remaining > 0:
+        nxt = min(nxt, dt_ceiling)
+        hold_remaining -= 1
+        if hold_remaining <= 0:
+            dt_ceiling = None
+    return float(nxt), dt_ceiling, hold_remaining
 
 
 @dataclass(frozen=True)
@@ -944,6 +980,8 @@ def solve_adaptive_rce(
 ) -> RCEResult:
     cfg = config or RCEConfig()
     grav = gravity or ConstantGravity(physics.gravity)
+    if _uses_implicit_convection(route):
+        require_constant_gravity(grav)
     state = build_column_state(grid, np.asarray(initial_temperature, dtype=np.float64), thermo, grav)
     f_int = _internal_flux_reference(lower_bc, manufactured)
 
@@ -956,6 +994,8 @@ def solve_adaptive_rce(
     stall_counter = 0
     steps_accepted = 0
     dt_hold: float | None = None
+    dt_ceiling: float | None = None
+    hold_remaining = 0
     last_temp_change = float("inf")
 
     final_closure = _evaluate_closure(grid, state, physics, thermo)
@@ -1110,7 +1150,7 @@ def solve_adaptive_rce(
                     diagnostics.append(_rejected_diag(dt, route, dt_mlt, dt_rad, dt_temp, rejection_reason))
                     if prescribed:
                         break
-                    dt *= cfg.f_back
+                    dt, dt_ceiling, hold_remaining = dt_after_reject(dt, cfg)
                     dt_hold = dt
                     if dt < cfg.dt_min:
                         break
@@ -1122,7 +1162,7 @@ def solve_adaptive_rce(
                     diagnostics.append(_rejected_diag(dt, route, dt_mlt, dt_rad, dt_temp, rejection_reason))
                     if prescribed:
                         break
-                    dt *= cfg.f_back
+                    dt, dt_ceiling, hold_remaining = dt_after_reject(dt, cfg)
                     dt_hold = dt
                     if dt < cfg.dt_min:
                         break
@@ -1143,7 +1183,7 @@ def solve_adaptive_rce(
                     diagnostics.append(_rejected_diag(dt, route, dt_mlt, dt_rad, dt_temp, rejection_reason))
                     if prescribed:
                         break
-                    dt *= cfg.f_back
+                    dt, dt_ceiling, hold_remaining = dt_after_reject(dt, cfg)
                     dt_hold = dt
                     if dt < cfg.dt_min:
                         break
@@ -1177,10 +1217,14 @@ def solve_adaptive_rce(
             accepted = True
             last_temp_change = conv.temp_change
             if not prescribed:
-                if np.isfinite(dt_est):
-                    dt_hold = min(dt / cfg.f_back, dt_est)
-                else:
-                    dt_hold = dt / cfg.f_back
+                dt_hold, dt_ceiling, hold_remaining = dt_after_accept(
+                    dt,
+                    dt_est,
+                    cfg,
+                    implicit=_uses_implicit_convection(route),
+                    dt_ceiling=dt_ceiling,
+                    hold_remaining=hold_remaining,
+                )
 
             diagnostics.append(
                 RCEStepDiagnostics(
@@ -1330,6 +1374,7 @@ def solve_adaptive_rce_with_prescribed_external_flux(
     if physics.alpha <= 0.0:
         raise ValueError("prescribed-external convection helper requires alpha > 0")
     grav = gravity or ConstantGravity(physics.gravity)
+    require_constant_gravity(grav)
     # Opaque dummy: radiation is never evaluated when prescribed_f_ext is set,
     # but solve_adaptive_rce still needs an opacity object for the final audit.
     from .opacity import ConstantGreyOpacity
@@ -1365,6 +1410,8 @@ def solve_adaptive_rce_with_prescribed_external_flux(
     stall_counter = 0
     steps_accepted = 0
     dt_hold: float | None = None
+    dt_ceiling: float | None = None
+    hold_remaining = 0
     last_temp_change = float("inf")
     final_closure = _evaluate_closure(grid, state, physics, thermo)
     final_rad = None
@@ -1436,7 +1483,7 @@ def solve_adaptive_rce_with_prescribed_external_flux(
                     status = RCETerminalStatus.PRESCRIBED_DT_REJECTED
                     reason = f"prescribed_dt rejected: {attempt.reason}"
                     break
-                dt *= cfg_local.f_back
+                dt, dt_ceiling, hold_remaining = dt_after_reject(dt, cfg_local)
                 dt_hold = dt
                 if dt < cfg_local.dt_min:
                     break
@@ -1475,7 +1522,14 @@ def solve_adaptive_rce_with_prescribed_external_flux(
             accepted = True
             last_temp_change = conv.temp_change
             if not prescribed:
-                dt_hold = min(dt / cfg_local.f_back, dt_est) if np.isfinite(dt_est) else dt / cfg_local.f_back
+                dt_hold, dt_ceiling, hold_remaining = dt_after_accept(
+                    dt,
+                    dt_est,
+                    cfg_local,
+                    implicit=True,
+                    dt_ceiling=dt_ceiling,
+                    hold_remaining=hold_remaining,
+                )
 
             diagnostics.append(
                 RCEStepDiagnostics(

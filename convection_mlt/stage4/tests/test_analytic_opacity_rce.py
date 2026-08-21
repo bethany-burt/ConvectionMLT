@@ -57,6 +57,8 @@ def _implicit_cfg(max_steps: int, gate: float) -> RCEConfig:
         implicit_convection=ImplicitConvectionConfig(
             residual_tolerance=1e-10,
             step_tolerance=1e-10,
+            newton_residual_tolerance=1e-12,
+            newton_step_tolerance=1e-12,
         ),
     )
 
@@ -262,12 +264,13 @@ def _isoenthalpic_cz_redistribution(
     return thermo.invert_enthalpy(h)
 
 
-def test_hot_cold_attraction_from_true_1e_3_equilibrium():
-    """Path independence from the true 1e-3 state (handbook point 40 spirit).
+def test_in_basin_isoenthalpic_path_independence():
+    """Local path independence inside the existing convective basin.
 
     Two distinct in-basin isoenthalpic CZ redistributions must reconverge to the
-    same bottom-connected RCE. Mid-column ± multiply and cool-deep kicks are
-    excluded: they spawn detached zones on this benchmark.
+    same bottom-connected RCE. This is not a global hot/cold attractor test:
+    mid-column ± multiply and cool-deep kicks spawn detached zones on this
+    benchmark and are excluded by construction.
     """
     spec = _spec()
     grid = spec.grid()
@@ -321,3 +324,29 @@ def test_hot_cold_attraction_from_true_1e_3_equilibrium():
     for res in finals:
         rel_star = float(np.max(np.abs(res.final_state.temperature - t_star) / scale))
         assert rel_star < 5e-3
+
+
+def test_nasa_h2_coupled_smoke_accepts_implicit_steps():
+    """NASA H₂ is not the ConstantH2 parity EOS; this is a coupled-domain smoke.
+
+    HELIOS comparison must use a matched ∇_ad / EOS. ConstantH2Thermo remains
+    the analytic-opacity 1e-3 benchmark until that choice is locked.
+    """
+    spec = _spec(n_layers=16, n_photosphere=6)
+    grid = spec.grid()
+    thermo = NASAThermo.from_json()
+    opacity = spec.opacity()
+    t0 = radiative_convective_initial_temperature(
+        grid, opacity, thermo, spec.f_int, spec.f_irr
+    )
+    res = solve_adaptive_rce(
+        grid, t0, spec.physics(), _solver(), thermo, opacity, grid.pressure_centres,
+        TopIrradiation(spec.f_irr), LowerNetInternalFlux(spec.f_int),
+        gravity=ConstantGravity(spec.gravity),
+        route=RCERoute.SPLIT_RAD_THEN_IMPLICIT_CONV,
+        config=_implicit_cfg(max_steps=40, gate=STAGE4_EXIT_FLUX_GATE),
+    )
+    assert res.steps_accepted > 0, res.reason
+    assert np.all(np.isfinite(res.final_state.temperature))
+    assert float(res.final_state.temperature.min()) > 0.0
+    assert res.status != RCETerminalStatus.DT_MIN_FAILURE

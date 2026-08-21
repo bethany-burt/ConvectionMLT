@@ -15,6 +15,7 @@ from convection_mlt import (
     AnalyticOpacityRCESpec,
     ConstantGravity,
     ConstantH2Thermo,
+    ImplicitConvectionConfig,
     LowerNetInternalFlux,
     RCEConfig,
     RCERoute,
@@ -46,17 +47,24 @@ def _run(spec: AnalyticOpacityRCESpec, max_steps: int):
     solver = SolverConfig(epsilon_temperature=2.0e-3, c_diff=0.2, dt_min=1.0e-14)
     cfg = RCEConfig(
         max_steps=max_steps,
-        n_consec=10**9,
+        n_consec=5,
         stall_window=10**9,
-        flux_flatness_tolerance=1e-12,
-        tendency_tolerance=1e-12,
-        temp_change_tolerance=1e-12,
+        flux_flatness_tolerance=1e-3,
+        tendency_tolerance=1e-3,
+        temp_change_tolerance=1e-3,
+        dt_accuracy=2500.0,
+        implicit_convection=ImplicitConvectionConfig(
+            residual_tolerance=1e-10,
+            step_tolerance=1e-10,
+            newton_residual_tolerance=1e-12,
+            newton_step_tolerance=1e-12,
+        ),
     )
     res = solve_adaptive_rce(
         grid, t, spec.physics(), solver, thermo, opacity, grid.pressure_centres,
         TopIrradiation(spec.f_irr), LowerNetInternalFlux(spec.f_int),
         gravity=ConstantGravity(spec.gravity),
-        route=RCERoute.UNSPLIT,
+        route=RCERoute.SPLIT_RAD_THEN_IMPLICIT_CONV,
         config=cfg,
     )
     dtau = grey_layer_optical_thickness(grid, opacity, res.final_state.temperature)
@@ -147,7 +155,7 @@ def _plot(cases: dict[int, dict]) -> None:
     axes[1, 1].semilogy(c48["residual_steps"], color="C0", lw=1.3, label="N=48 flatness")
     axes[1, 1].semilogy(c48["tendency_steps"], color="C0", lw=1.0, ls="--", label="N=48 tendency")
     axes[1, 1].semilogy(c96["residual_steps"], color="C1", lw=1.1, label="N=96 flatness")
-    axes[1, 1].axhline(0.1, color="0.4", ls=":", lw=1.0, label="declared gate 0.1")
+    axes[1, 1].axhline(1e-3, color="0.4", ls=":", lw=1.0, label="physical gate 1e-3")
     axes[1, 1].set_xlabel("accepted step")
     axes[1, 1].set_ylabel("residual")
     axes[1, 1].set_title("Residual vs step")
@@ -177,8 +185,8 @@ def _plot(cases: dict[int, dict]) -> None:
 
 def main() -> None:
     cases = {
-        48: _run(_spec(48), max_steps=8000),
-        96: _run(_spec(96), max_steps=8000),
+        48: _run(_spec(48), max_steps=400),
+        96: _run(_spec(96), max_steps=2500),
     }
     DATA_DIR.mkdir(parents=True, exist_ok=True)
     summary = {

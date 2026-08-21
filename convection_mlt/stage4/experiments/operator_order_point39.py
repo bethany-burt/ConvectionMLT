@@ -54,6 +54,8 @@ def _base_cfg(**kwargs) -> RCEConfig:
         implicit_convection=ImplicitConvectionConfig(
             residual_tolerance=1e-10,
             step_tolerance=1e-10,
+            newton_residual_tolerance=1e-12,
+            newton_step_tolerance=1e-12,
         ),
     )
     cfg.update(kwargs)
@@ -137,18 +139,45 @@ def operator_order_refinement(
             summary = _summarize(res, wall)
             summary["prescribed_dt"] = dt
             summary["temperature"] = res.final_state.temperature.tolist()
+            reached = (
+                res.steps_accepted > 0
+                and res.simulated_time >= 0.99 * t_final
+                and res.status != RCETerminalStatus.PRESCRIBED_DT_REJECTED
+                and res.status != RCETerminalStatus.DT_MIN_FAILURE
+            )
+            summary["reached_t_final"] = reached
+            summary["contract"] = "fixed_physical_time"
+            if not reached:
+                summary["failed"] = True
+                summary["failure_reason"] = (
+                    f"truncated/failed trajectory: status={res.status.value} "
+                    f"t={res.simulated_time} < t_final={t_final}"
+                )
             out["routes"][name][str(factor)] = summary
-        t1 = np.asarray(out["routes"][name]["1.0"]["temperature"])
-        t2 = np.asarray(out["routes"][name]["0.5"]["temperature"])
-        t4 = np.asarray(out["routes"][name]["0.25"]["temperature"])
-        scale = np.maximum(np.abs(t4), 1.0)
-        e_coarse = float(np.max(np.abs(t1 - t2) / scale))
-        e_fine = float(np.max(np.abs(t2 - t4) / scale))
-        out["routes"][name]["refinement"] = {
-            "err_dt_vs_dt2": e_coarse,
-            "err_dt2_vs_dt4": e_fine,
-            "ratio": e_coarse / max(e_fine, 1e-30),
-        }
+        completed = [
+            out["routes"][name][k]
+            for k in ("1.0", "0.5", "0.25")
+            if out["routes"][name][k].get("reached_t_final")
+        ]
+        if len(completed) < 3:
+            out["routes"][name]["refinement"] = {
+                "valid": False,
+                "reason": "truncated or failed trajectories excluded from fitted orders",
+                "n_completed": len(completed),
+            }
+        else:
+            t1 = np.asarray(out["routes"][name]["1.0"]["temperature"])
+            t2 = np.asarray(out["routes"][name]["0.5"]["temperature"])
+            t4 = np.asarray(out["routes"][name]["0.25"]["temperature"])
+            scale = np.maximum(np.abs(t4), 1.0)
+            e_coarse = float(np.max(np.abs(t1 - t2) / scale))
+            e_fine = float(np.max(np.abs(t2 - t4) / scale))
+            out["routes"][name]["refinement"] = {
+                "valid": True,
+                "err_dt_vs_dt2": e_coarse,
+                "err_dt2_vs_dt4": e_fine,
+                "ratio": e_coarse / max(e_fine, 1e-30),
+            }
     return out
 
 
@@ -166,8 +195,12 @@ def _largest_stable_dt(
     dt_candidates: list[float] | None = None,
 ) -> dict:
     if dt_candidates is None:
-        dt_candidates = [5000.0, 2500.0, 1000.0, 500.0, 200.0, 100.0, 50.0, 20.0, 10.0, 5.0, 1.0]
-    best = None
+        dt_candidates = [
+            1.0e6, 2.0e5, 5.0e4, 2.0e4, 1.0e4, 5.0e3, 2.5e3, 1.0e3, 200.0, 50.0, 10.0, 1.0
+        ]
+    trials = []
+    largest_success = None
+    smallest_fail_above = None
     for dt in dt_candidates:
         cfg = _base_cfg(
             max_steps=int(t_probe / dt) + 20,
@@ -229,13 +262,36 @@ def _largest_stable_dt(
             "wall_time_s": wall,
             "flux_flatness": res.convergence.flux_flatness,
         }
+        trials.append(entry)
         if ok:
-            best = entry
+            largest_success = entry
             break
+        smallest_fail_above = entry
+    if largest_success is None:
+        note = "no successful prescribed_dt in the tested set"
+        dt_stable_report = None
+    elif smallest_fail_above is None:
+        note = (
+            f"dt_stable >= {largest_success['dt']}: largest timestep tested succeeded; "
+            "not a measured upper threshold"
+        )
+        dt_stable_report = largest_success["dt"]
+    else:
+        note = (
+            f"bracket: last success {largest_success['dt']}, "
+            f"first failure above {smallest_fail_above['dt']}"
+        )
+        dt_stable_report = largest_success["dt"]
     return {
-        "largest_stable_dt": None if best is None else best["dt"],
-        "probe": best,
+        "largest_stable_dt": dt_stable_report,
+        "largest_stable_dt_is_lower_bound_only": smallest_fail_above is None
+        and largest_success is not None,
+        "failed_upper_dt": None if smallest_fail_above is None else smallest_fail_above["dt"],
+        "note": note,
+        "probe": largest_success,
+        "failed_upper": smallest_fail_above,
         "t_probe": t_probe,
+        "trials": trials,
     }
 
 
@@ -296,6 +352,71 @@ def _residual_drop_timing(
         and res.convergence.flux_flatness <= target_flatness
     )
     return summary
+
+
+def operator_order_equilibrium(*, n_layers: int = 24, max_steps: int = 800) -> dict:
+    """Compare operator orders only after each independently hits the 1e-3 gate."""
+    spec = _spec(n_layers)
+    grid, thermo, opacity, t0 = _initial(spec)
+    routes = {
+        "unsplit_explicit": RCERoute.UNSPLIT,
+        "rad_then_implicit_conv": RCERoute.SPLIT_RAD_THEN_IMPLICIT_CONV,
+        "implicit_conv_then_rad": RCERoute.SPLIT_IMPLICIT_CONV_THEN_RAD,
+        "strang_rad_implicit_conv": RCERoute.SPLIT_STRANG_RAD_IMPLICIT_CONV,
+    }
+    out: dict = {"gate": GATE, "routes": {}}
+    for name, route in routes.items():
+        cfg = _base_cfg(max_steps=max_steps, prescribed_dt=None, t_final=None)
+        if route == RCERoute.UNSPLIT:
+            cfg = _base_cfg(
+                max_steps=max_steps,
+                prescribed_dt=None,
+                t_final=None,
+                dt_accuracy=None,
+            )
+        wall0 = time.perf_counter()
+        res = solve_adaptive_rce(
+            grid,
+            t0,
+            spec.physics(),
+            _solver(),
+            thermo,
+            opacity,
+            grid.pressure_centres,
+            TopIrradiation(spec.f_irr),
+            LowerNetInternalFlux(spec.f_int),
+            gravity=ConstantGravity(spec.gravity),
+            route=route,
+            config=cfg,
+        )
+        wall = time.perf_counter() - wall0
+        summary = _summarize(res, wall)
+        hit = (
+            res.status == RCETerminalStatus.CONVERGED
+            and res.convergence.flux_flatness <= GATE
+            and res.convergence.tendency_norm <= GATE
+        )
+        summary["reached_gate"] = hit
+        summary["contract"] = "equilibrium_1e-3"
+        if not hit:
+            summary["failed"] = True
+            summary["failure_reason"] = (
+                f"did not reach 1e-3 gate: status={res.status.value} "
+                f"flatness={res.convergence.flux_flatness}"
+            )
+        out["routes"][name] = summary
+    completed = [k for k, v in out["routes"].items() if v.get("reached_gate")]
+    out["n_gate_converged"] = len(completed)
+    out["comparison_valid"] = len(completed) >= 2
+    if out["comparison_valid"]:
+        names = completed
+        out["gate_rcb"] = {
+            name: out["routes"][name]["primary_rcb_log10p"] for name in names
+        }
+        out["gate_flatness"] = {
+            name: out["routes"][name]["flux_flatness"] for name in names
+        }
+    return out
 
 
 def point39_bracket(*, n_layers: int = 24) -> dict:
@@ -443,18 +564,32 @@ def point39_bracket(*, n_layers: int = 24) -> dict:
 def main() -> dict:
     DATA_DIR.mkdir(parents=True, exist_ok=True)
     payload = {
-        "operator_order": operator_order_refinement(),
+        "operator_order_fixed_time": operator_order_refinement(),
+        "operator_order_equilibrium": operator_order_equilibrium(),
         "point39": point39_bracket(),
     }
     path = DATA_DIR / "operator_order_point39.json"
     path.write_text(json.dumps(payload, indent=2, allow_nan=True))
     oo = {
-        name: payload["operator_order"]["routes"][name]["refinement"]
-        for name in payload["operator_order"]["routes"]
+        name: payload["operator_order_fixed_time"]["routes"][name]["refinement"]
+        for name in payload["operator_order_fixed_time"]["routes"]
+    }
+    eq = {
+        name: {
+            "reached_gate": payload["operator_order_equilibrium"]["routes"][name]["reached_gate"],
+            "flux_flatness": payload["operator_order_equilibrium"]["routes"][name]["flux_flatness"],
+            "status": payload["operator_order_equilibrium"]["routes"][name]["status"],
+        }
+        for name in payload["operator_order_equilibrium"]["routes"]
     }
     p39 = {
         name: {
             "largest_stable_dt": payload["point39"][name]["stable_dt"]["largest_stable_dt"],
+            "largest_stable_dt_is_lower_bound_only": payload["point39"][name]["stable_dt"][
+                "largest_stable_dt_is_lower_bound_only"
+            ],
+            "failed_upper_dt": payload["point39"][name]["stable_dt"]["failed_upper_dt"],
+            "note": payload["point39"][name]["stable_dt"]["note"],
             "drop_time": payload["point39"][name]["residual_drop"]["simulated_time"],
             "drop_wall": payload["point39"][name]["residual_drop"]["wall_time_s"],
             "hit": payload["point39"][name]["residual_drop"]["hit_target"],
@@ -466,7 +601,12 @@ def main() -> dict:
             "coupled_semi_implicit",
         )
     }
-    print(json.dumps({"operator_refinement": oo, "point39": p39, "data": str(path)}, indent=2))
+    print(json.dumps({
+        "operator_refinement": oo,
+        "operator_equilibrium": eq,
+        "point39": p39,
+        "data": str(path),
+    }, indent=2))
     return payload
 
 

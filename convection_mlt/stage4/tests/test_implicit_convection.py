@@ -265,3 +265,52 @@ def test_fixed_time_explicit_implicit_differ_at_first_order():
     assert ratios
     # Fixed-time FE vs BE: first-order difference O(dt).
     assert 0.6 < float(np.mean(ratios)) < 1.6
+
+
+def test_implicit_convection_rejects_inverse_square_gravity():
+    import pytest
+
+    from convection_mlt import InverseSquareGravity
+
+    grid, thermo, physics, solver, t = _column(n_layers=8)
+    grav = InverseSquareGravity(g0=G, planet_radius=1.0e8)
+    state = build_column_state(grid, t, thermo, grav)
+    with pytest.raises(ValueError, match="ConstantGravity"):
+        solve_implicit_convection(
+            grid, state, state.enthalpy.copy(), physics, thermo, grav,
+            state.mass_path, 1.0, solver,
+        )
+    with pytest.raises(ValueError, match="ConstantGravity"):
+        solve_adaptive_rce(
+            grid, t, physics, solver, thermo, ConstantGreyOpacity(2e-4),
+            grid.pressure_centres, TopIrradiation(120.0), LowerNetInternalFlux(F0),
+            gravity=grav, route=RCERoute.SPLIT_RAD_THEN_IMPLICIT_CONV,
+            config=RCEConfig(max_steps=1),
+        )
+
+
+def test_implicit_dt_hold_does_not_double_immediately_after_reject():
+    import pytest
+
+    from convection_mlt.rce import dt_after_accept, dt_after_reject
+
+    cfg = RCEConfig(f_back=0.5, f_grow=1.2, n_hold_after_reject=4)
+    dt, ceil, hold = dt_after_reject(1250.0, cfg)
+    assert dt == 625.0
+    nxt, ceil, hold = dt_after_accept(
+        dt, 1e9, cfg, implicit=True, dt_ceiling=ceil, hold_remaining=hold
+    )
+    assert nxt <= 625.0 + 1e-12
+    for _ in range(3):
+        nxt, ceil, hold = dt_after_accept(
+            nxt, 1e9, cfg, implicit=True, dt_ceiling=ceil, hold_remaining=hold
+        )
+    assert nxt <= 625.0 + 1e-12
+    nxt, ceil, hold = dt_after_accept(
+        nxt, 1e9, cfg, implicit=True, dt_ceiling=ceil, hold_remaining=hold
+    )
+    assert nxt == pytest.approx(625.0 * 1.2)
+    explicit_nxt, _, _ = dt_after_accept(
+        625.0, 1e9, cfg, implicit=False, dt_ceiling=None, hold_remaining=0
+    )
+    assert explicit_nxt == pytest.approx(1250.0)

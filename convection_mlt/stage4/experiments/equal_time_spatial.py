@@ -67,6 +67,8 @@ def _implicit_cfg(
         implicit_convection=ImplicitConvectionConfig(
             residual_tolerance=1e-10,
             step_tolerance=1e-10,
+            newton_residual_tolerance=1e-12,
+            newton_step_tolerance=1e-12,
         ),
     )
 
@@ -155,7 +157,12 @@ def _run_equal_time(n_layers: int, t_final: float, max_steps: int = 2000) -> dic
     }
 
 
-def _run_to_gate(n_layers: int, gate: float = STAGE4_EXIT_FLUX_GATE, max_steps: int = 800) -> dict:
+def _run_to_gate(
+    n_layers: int,
+    gate: float = STAGE4_EXIT_FLUX_GATE,
+    max_steps: int = 800,
+    dt_accuracy: float = 2500.0,
+) -> dict:
     spec = _spec(n_layers)
     grid = spec.grid()
     thermo = ConstantH2Thermo()
@@ -176,7 +183,7 @@ def _run_to_gate(n_layers: int, gate: float = STAGE4_EXIT_FLUX_GATE, max_steps: 
         LowerNetInternalFlux(spec.f_int),
         gravity=ConstantGravity(spec.gravity),
         route=RCERoute.SPLIT_RAD_THEN_IMPLICIT_CONV,
-        config=_implicit_cfg(max_steps=max_steps, gate=gate),
+        config=_implicit_cfg(max_steps=max_steps, gate=gate, dt_accuracy=dt_accuracy),
     )
     wall = time.perf_counter() - wall0
     return {
@@ -203,7 +210,44 @@ def _run_to_gate(n_layers: int, gate: float = STAGE4_EXIT_FLUX_GATE, max_steps: 
         ),
         "f_int": spec.f_int,
         "cz_extent_log10p": _cz_extent_log10p(grid.pressure_centres, res.convective_regions),
+        "dt_accuracy": dt_accuracy,
+        "mean_accepted_dt": (
+            float(res.simulated_time / res.steps_accepted) if res.steps_accepted else float("nan")
+        ),
     }
+
+
+def timestep_refinement_fixed_n(
+    n_layers: int,
+    dt_values: tuple[float, float] = (800.0, 400.0),
+    max_steps: int = 4000,
+) -> dict:
+    """Gate-converged profiles at one N under two accuracy-dt ceilings."""
+    cases = {}
+    for dt_acc in dt_values:
+        cases[str(dt_acc)] = _run_to_gate(
+            n_layers, max_steps=max_steps, dt_accuracy=dt_acc
+        )
+    a, b = (cases[str(dt_values[0])], cases[str(dt_values[1])])
+    valid = a["status"] == "converged" and b["status"] == "converged"
+    t_a = np.asarray(a["temperature"])
+    t_b = np.asarray(b["temperature"])
+    scale = np.maximum(np.abs(t_b), 1.0)
+    out = {
+        "n_layers": n_layers,
+        "dt_values": list(dt_values),
+        "valid": valid,
+        "cases": cases,
+    }
+    if valid:
+        out["max_rel_T"] = float(np.max(np.abs(t_a - t_b) / scale))
+        out["dlog_rcb"] = abs(float(a["primary_rcb_log10p"]) - float(b["primary_rcb_log10p"]))
+        out["dH_rel"] = abs(a["column_enthalpy"] - b["column_enthalpy"]) / max(
+            abs(b["column_enthalpy"]), 1e-30
+        )
+    else:
+        out["reason"] = "both resolutions must independently reach the 1e-3 gate"
+    return out
 
 
 def _cz_extent_log10p(pressure_centres, regions) -> float | None:
@@ -334,7 +378,7 @@ def main(include_n192: bool = True, t_final: float = 2.0e5) -> dict:
 
     steady: dict[int, dict] = {
         48: _run_to_gate(48, max_steps=400),
-        96: _run_to_gate(96, max_steps=1200),
+        96: _run_to_gate(96, max_steps=2500),
     }
     if include_n192:
         try:
@@ -345,11 +389,21 @@ def main(include_n192: bool = True, t_final: float = 2.0e5) -> dict:
     comparison = spatial_comparison({k: v for k, v in steady.items() if isinstance(k, int)})
     _plot_spatial({k: v for k, v in steady.items() if isinstance(k, int)}, PLOT_DIR / "spatial_1e-3.png")
 
+    dt_refine = {
+        48: timestep_refinement_fixed_n(48, dt_values=(800.0, 400.0), max_steps=800),
+        96: timestep_refinement_fixed_n(96, dt_values=(800.0, 400.0), max_steps=4000),
+    }
     payload = {
         "t_final_equal_time": t_final,
         "equal_time": equal,
         "steady_1e-3": {str(k): v for k, v in steady.items()},
         "spatial_comparison": comparison,
+        "timestep_refinement_fixed_n": dt_refine,
+        "n192_gate_status": "NOT_PASSED",
+        "n192_note": (
+            "N=192 implicit run at 12000 accepted steps reached flux_flatness≈3.65e-3, "
+            "not the 1e-3 gate. Do not treat N=192 vs N=96 as a converged-profile comparison."
+        ),
     }
     out = DATA_DIR / "equal_time_spatial.json"
     out.write_text(json.dumps(payload, indent=2, allow_nan=True))

@@ -43,6 +43,8 @@ def _cfg(**kwargs) -> RCEConfig:
         implicit_convection=ImplicitConvectionConfig(
             residual_tolerance=1e-10,
             step_tolerance=1e-10,
+            newton_residual_tolerance=1e-12,
+            newton_step_tolerance=1e-12,
         ),
     )
     base.update(kwargs)
@@ -129,6 +131,44 @@ def test_operator_order_refinement_errors_shrink_with_dt():
     e_coarse = float(np.max(np.abs(temps[1.0] - temps[0.5]) / scale))
     e_fine = float(np.max(np.abs(temps[0.5] - temps[0.25]) / scale))
     assert e_fine <= 1.5 * e_coarse + 1e-12
+
+
+def test_timestep_refinement_at_fixed_n16_implicit():
+    """Fixed-N profiles should not jump when the accuracy dt is halved."""
+    spec = _spec(n_layers=16)
+    grid = spec.grid()
+    thermo = ConstantH2Thermo()
+    opacity = spec.opacity()
+    t0 = radiative_convective_initial_temperature(
+        grid, opacity, thermo, spec.f_int, spec.f_irr
+    )
+    t_final = 2.0e3
+    temps = []
+    for dt_acc in (200.0, 100.0):
+        res = solve_adaptive_rce(
+            grid,
+            t0,
+            spec.physics(),
+            _solver(),
+            thermo,
+            opacity,
+            grid.pressure_centres,
+            TopIrradiation(spec.f_irr),
+            LowerNetInternalFlux(spec.f_int),
+            gravity=ConstantGravity(spec.gravity),
+            route=RCERoute.SPLIT_RAD_THEN_IMPLICIT_CONV,
+            config=_cfg(
+                prescribed_dt=None,
+                t_final=t_final,
+                max_steps=int(t_final / (0.5 * dt_acc)) + 80,
+                dt_accuracy=dt_acc,
+            ),
+        )
+        assert res.simulated_time >= 0.99 * t_final, res.reason
+        temps.append(res.final_state.temperature.copy())
+    scale = np.maximum(np.abs(temps[1]), 1.0)
+    rel = float(np.max(np.abs(temps[0] - temps[1]) / scale))
+    assert rel < 0.05
 
 
 def test_point39_rad_only_and_coupled_semi_implicit_brackets():
