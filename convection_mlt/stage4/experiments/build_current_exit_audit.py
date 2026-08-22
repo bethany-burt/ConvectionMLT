@@ -254,12 +254,11 @@ def main() -> dict:
             rows.append(_row(
                 f"algebraic_{prefix}_energy_residual_rel",
                 energy_rel, ALGEBRAIC, "<=",
-                "last accepted ΣΔm Δh - dt(F_bot-F_top)", "algebraic_step", source,
+                "last accepted ΣΔm Δh - dt(F_bot-F_top)", "algebraic", source,
                 extra={
                     "note": (
-                        "Declared 1e-12 gate. Last-step residual is limited by "
-                        "the 1e-10 Picard/projection floor; this row is reported "
-                        "but is not in algebraic_identity_status."
+                        "Committed-step energy closure is part of the algebraic "
+                        "1e-12 exit gate. Bordered Newton is expected to restore it."
                     ),
                 },
             ))
@@ -308,8 +307,8 @@ def main() -> dict:
         "claim_text": (
             "Analytic-opacity N=48 and N=96 implicit RCE reach the physical 1e-3 gate. "
             "Spatial/operator convergence is not passed. Algebraic 1e-12 identities "
-            "are enforced as rows. HELIOS parity is derived from the HELIOS row. "
-            "full_stage4_claim is false."
+            "include committed-step energy closure. HELIOS parity is derived from "
+            "the HELIOS row. full_stage4_claim is false."
         ),
         "gates": {
             "algebraic": ALGEBRAIC,

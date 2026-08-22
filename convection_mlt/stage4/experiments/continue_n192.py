@@ -1,9 +1,8 @@
-"""Restart the stored nested N=192 state and continue toward the 1e-3 gate.
+"""Restart the stored nested N=192 state toward the 1e-3 gate.
 
-Timestep policy for continuation is dt_accuracy = 100 s: a direct restart
-probe from the stored state passed at 100 s (residual 3.7e-11) and failed at
-180 s. Gates are unchanged (flatness, tendency, temperature change, RCB
-stability, five consecutive accepted steps).
+Bordered-Newton phase: seed Δt from the stored 100 s step and let the
+controller grow. Gates are unchanged (flatness, tendency, temperature
+change, RCB stability, five consecutive accepted steps).
 """
 
 from __future__ import annotations
@@ -42,8 +41,9 @@ OUT = ROOT / "results" / "n192_implicit_rce.json"
 CHECKPOINT = ROOT / "results" / "n192_implicit_rce.checkpoint.json"
 CHUNK_ACCEPTED = 2500
 MAX_EXTRA_ACCEPTED = 50000
-# Largest probed Δt that still meets the projection residual from the stored state.
-CONTINUATION_DT_ACCURACY = 100.0
+# Allow the implicit controller to grow from the stored 100 s step.
+CONTINUATION_DT_ACCURACY = 2500.0
+CONTINUATION_PHASE = "bordered_newton"
 
 
 def _load() -> dict:
@@ -58,7 +58,7 @@ def _run_chunk(temperature, *, max_steps: int, dt_hold: float, rcb) -> tuple[dic
     cfg = production_rce_config(
         max_steps=max_steps,
         dt_accuracy=CONTINUATION_DT_ACCURACY,
-        dt_hold_init=min(float(dt_hold), CONTINUATION_DT_ACCURACY),
+        dt_hold_init=float(dt_hold),
         previous_rcb_init=rcb,
         gate=PHYSICAL_GATE,
     )
@@ -98,15 +98,17 @@ def _run_chunk(temperature, *, max_steps: int, dt_hold: float, rcb) -> tuple[dic
 def main(max_extra: int = MAX_EXTRA_ACCEPTED, chunk: int = CHUNK_ACCEPTED) -> dict:
     record = enrich_stored_record(_load())
     OUT.write_text(dumps(record))
-    extra_done = int((record.get("continuation") or {}).get("extra_accepted") or 0)
+    prev = dict(record.get("continuation") or {})
+    extra_done = int(prev.get("bordered_extra_accepted") or 0)
     remaining = max(0, max_extra - extra_done)
     print(
         "continue_n192 start",
+        "phase", CONTINUATION_PHASE,
         "status", record.get("status"),
         "flat", record.get("flux_flatness"),
         "tend", record.get("tendency_norm"),
         "acc", record.get("steps_accepted"),
-        "extra_done", extra_done,
+        "bordered_extra", extra_done,
         "remaining", remaining,
         flush=True,
     )
@@ -134,17 +136,27 @@ def main(max_extra: int = MAX_EXTRA_ACCEPTED, chunk: int = CHUNK_ACCEPTED) -> di
         record = merge_continuation(record, payload)
         extra_done += int(payload["steps_accepted"])
         remaining = max(0, max_extra - extra_done)
+        versions = list((record.get("continuation") or {}).get("code_versions") or [])
+        if versions:
+            versions[-1]["extra_accepted_from"] = extra_done - int(payload["steps_accepted"])
+            versions[-1]["extra_accepted_to"] = extra_done
+            versions[-1]["phase"] = CONTINUATION_PHASE
         record["continuation"] = {
-            "extra_accepted": extra_done,
+            **prev,
+            "extra_accepted": int(prev.get("extra_accepted") or 0) + int(payload["steps_accepted"]),
+            "bordered_extra_accepted": extra_done,
             "max_extra_accepted": max_extra,
             "chunk_accepted": chunk,
             "continuation_dt_accuracy": CONTINUATION_DT_ACCURACY,
+            "phase": CONTINUATION_PHASE,
+            "code_versions": versions,
             "note": (
-                "Restart from stored N=192 state. Δt held at 100 s because a "
-                "direct probe passed at 100 s and failed at 180 s. Original "
-                "1e-3 gates and n_consec=5 are unchanged."
+                "Bordered-Newton restart from the 62k state. Δt is seeded from "
+                "the stored step and the controller may grow. Original 1e-3 "
+                "gates and n_consec=5 are unchanged."
             ),
         }
+        prev = dict(record["continuation"])
         record["record_checksum_sha256"] = _record_checksum(record)
         OUT.parent.mkdir(parents=True, exist_ok=True)
         text = dumps(record)

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import pytest
 import numpy as np
 
 from convection_mlt import (
@@ -316,6 +317,157 @@ def test_implicit_dt_hold_does_not_double_immediately_after_reject():
         625.0, 1e9, cfg, implicit=False, dt_ceiling=None, hold_remaining=0
     )
     assert explicit_nxt == pytest.approx(1250.0)
+
+
+def test_bordered_two_thomas_matches_dense_augmented():
+    from convection_mlt import (
+        conservation_residual,
+        conservation_weight,
+        solve_bordered_correction,
+        solve_bordered_dense,
+    )
+
+    for n in (6, 8, 12):
+        grid, thermo, physics, solver, t = _column(n_layers=n)
+        grav = ConstantGravity(G)
+        state = build_column_state(grid, t, thermo, grav)
+        h_star = state.enthalpy * 0.999
+        mass = state.mass_path.copy()
+        dt = 1.0
+        closure = evaluate_mlt(grid, state, physics, thermo)
+        support = provisional_support(closure)
+        f = flux_with_provisional_support(closure, support)
+        residual = _residual(state.enthalpy, h_star, f, mass, dt)
+        cfg = ImplicitConvectionConfig()
+        lower, diag, upper, _ = assemble_tridiagonal_jacobian(
+            grid, state, h_star, support, physics, thermo, grav, mass, dt, cfg, residual
+        )
+        dense = assemble_dense_jacobian(
+            grid, state, h_star, support, physics, thermo, grav, mass, dt, cfg, residual
+        )
+        w = conservation_weight(mass)
+        c = conservation_residual(state.enthalpy, h_star, mass)
+        lam = 0.25
+        dh_t, dlam_t, schur = solve_bordered_correction(
+            lower, diag, upper, residual, w, c, lam,
+            pivot_floor=cfg.pivot_floor, schur_floor=cfg.schur_floor,
+        )
+        dh_d, dlam_d = solve_bordered_dense(dense, residual, w, c, lam)
+        assert np.isfinite(schur)
+        assert np.allclose(dh_t, dh_d, rtol=1e-8, atol=1e-8)
+        assert dlam_t == pytest.approx(dlam_d, rel=1e-8, abs=1e-8)
+
+
+def test_bordered_newton_reaches_residual_conservation_and_lambda():
+    grid, thermo, physics, solver, t = _column(n_layers=16)
+    grav = ConstantGravity(G)
+    state = build_column_state(grid, t, thermo, grav)
+    h_star = state.enthalpy.copy()
+    h_star[:4] *= 1.01
+    res = solve_implicit_convection(
+        grid, state, h_star, physics, thermo, grav, state.mass_path,
+        dt=2.0, solver=solver,
+        cfg=ImplicitConvectionConfig(),
+    )
+    assert res.ok, res.diagnostics.rejection_reason
+    assert res.diagnostics.residual_norm <= 1e-10
+    c_scale = max(float(np.max(np.abs(h_star))), 1e-30)
+    assert abs(res.diagnostics.conservation_residual) / c_scale <= 1e-12
+    assert abs(res.diagnostics.multiplier) <= 1e-8 or np.isfinite(res.diagnostics.multiplier)
+
+
+def test_bordered_active_set_one_interface_rcb():
+    grid, thermo, physics, solver, t = _column(n_layers=16)
+    grav = ConstantGravity(G)
+    # Deep convective, radiative lid: one RCB interface.
+    t = t.copy()
+    t[:8] *= 1.12
+    t[8:] *= 0.96
+    state = build_column_state(grid, t, thermo, grav)
+    support0 = provisional_support(evaluate_mlt(grid, state, physics, thermo))
+    crossings = np.where(support0[1:-1] != support0[2:])[0]
+    assert crossings.size >= 1
+    h_star = state.enthalpy.copy()
+    # Heat just below the RCB so the active set may move one interface.
+    rcb_layer = int(crossings[0])
+    h_star[rcb_layer] *= 1.015
+    res = solve_implicit_convection(
+        grid, state, h_star, physics, thermo, grav, state.mass_path,
+        dt=1.0, solver=solver,
+        cfg=ImplicitConvectionConfig(),
+    )
+    assert res.ok, res.diagnostics.rejection_reason
+    support1 = provisional_support(res.closure)
+    crossings1 = np.where(support1[1:-1] != support1[2:])[0]
+    assert crossings1.size >= 1
+    assert res.diagnostics.mask_outer_iterations >= 1
+
+
+def test_newton_starts_from_valid_state_if_h_star_does_not_invert():
+    from convection_mlt.implicit_convection import _newton_start
+
+    grid, thermo, physics, solver, t = _column(n_layers=8)
+    grav = ConstantGravity(G)
+    state = build_column_state(grid, t, thermo, grav)
+    h_bad = np.full_like(state.enthalpy, np.nan)
+    started, h0 = _newton_start(grid, state, h_bad, thermo, grav)
+    assert np.allclose(started.enthalpy, state.enthalpy)
+    assert np.allclose(h0, state.enthalpy)
+    res = solve_implicit_convection(
+        grid, state, h_bad, physics, thermo, grav, state.mass_path,
+        dt=0.5, solver=solver,
+    )
+    assert res.diagnostics.newton_iterations >= 1
+    assert res.diagnostics.rejection_reason != "coupled_picard_failure: h* invert"
+
+
+def test_bordered_reproduces_n192_100s_and_probes_larger_dt():
+    import json
+    from pathlib import Path
+
+    rec_path = Path(__file__).resolve().parents[1] / "results" / "n192_implicit_rce.json"
+    if not rec_path.exists():
+        import pytest
+        pytest.skip("n192_implicit_rce.json not stored")
+    record = json.loads(rec_path.read_text())
+    spec = __import__("convection_mlt", fromlist=["nested_analytic_opacity_spec"]).nested_analytic_opacity_spec(192)
+    grid = spec.grid()
+    thermo = ConstantH2Thermo()
+    solver = SolverConfig(epsilon_temperature=2e-3, c_diff=0.2, dt_min=1e-14)
+    t = np.asarray(record["temperature"], dtype=np.float64)
+    probes = {}
+    for dt in (100.0, 180.0, 300.0, 500.0, 1000.0):
+        cfg = RCEConfig(
+            max_steps=1,
+            n_consec=99,
+            stall_window=10**9,
+            prescribed_dt=dt,
+            coupled_picard=True,
+            implicit_convection=ImplicitConvectionConfig(),
+        )
+        res = solve_adaptive_rce(
+            grid, t, spec.physics(), solver, thermo, spec.opacity(),
+            grid.pressure_centres, TopIrradiation(spec.f_irr),
+            LowerNetInternalFlux(spec.f_int),
+            gravity=ConstantGravity(spec.gravity),
+            route=RCERoute.SPLIT_RAD_THEN_IMPLICIT_CONV,
+            config=cfg,
+        )
+        accepted = [d for d in res.diagnostics if d.accepted]
+        probes[dt] = {
+            "accepted": bool(accepted),
+            "reason": res.reason if not accepted else None,
+            "residual": None if not accepted else accepted[0].nonlinear_residual,
+            "defect": None if not accepted else accepted[0].coupled_defect,
+        }
+    assert probes[100.0]["accepted"], probes[100.0]
+    assert probes[100.0]["residual"] <= 1e-10
+    # Record larger-dt outcomes without relaxing tolerances.
+    record_path = Path(__file__).resolve().parents[1] / "results" / "n192_bordered_dt_probes.json"
+    record_path.write_text(json.dumps({k: probes[k] for k in probes}, indent=2))
+    for dt in (180.0, 300.0, 500.0, 1000.0):
+        if probes[dt]["accepted"]:
+            assert probes[dt]["residual"] <= 1e-10
 
 
 def test_restart_seeds_dt_hold_and_simulated_time():

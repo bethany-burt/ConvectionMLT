@@ -217,12 +217,7 @@ def serialize_rce_result(
             rce_config.implicit_convection if rce_config is not None else production_implicit_config()
         ),
         "physics_config": _jsonable(spec.physics()),
-        "environment": {
-            "git_commit": git_commit(REPO),
-            "git_dirty": git_dirty(REPO),
-            "python": __import__("platform").python_version(),
-            "numpy": np.__version__,
-        },
+        "environment": code_snapshot(),
         "profile_checksum_sha256": profile_checksum,
         "checksum_sha256": profile_checksum,
     }
@@ -235,6 +230,15 @@ def serialize_rce_result(
 
 def dumps(payload: dict[str, Any]) -> str:
     return json.dumps(payload, indent=2, allow_nan=True)
+
+
+def code_snapshot() -> dict[str, Any]:
+    return {
+        "git_commit": git_commit(REPO),
+        "git_dirty": git_dirty(REPO),
+        "python": __import__("platform").python_version(),
+        "numpy": np.__version__,
+    }
 
 
 def enrich_stored_record(record: dict[str, Any]) -> dict[str, Any]:
@@ -266,12 +270,22 @@ def enrich_stored_record(record: dict[str, Any]) -> dict[str, Any]:
     if record.get("implicit_convection_config") is None:
         record["implicit_convection_config"] = _jsonable(production_implicit_config())
     if record.get("environment") is None:
-        record["environment"] = {
-            "git_commit": git_commit(REPO),
-            "git_dirty": git_dirty(REPO),
-            "python": __import__("platform").python_version(),
-            "numpy": np.__version__,
-        }
+        record["environment"] = code_snapshot()
+    cont = record.setdefault("continuation", {})
+    versions = list(cont.get("code_versions") or [])
+    if not versions and int(record.get("steps_accepted") or 0) >= 62000:
+        versions.append({
+            "extra_accepted_from": 0,
+            "extra_accepted_to": int((cont.get("extra_accepted") or 50000)),
+            "git_commit": "0bd78d10792cfe8f8be284930bd2c3299d8319a2",
+            "git_dirty": True,
+            "note": (
+                "50k Δt=100 s continuation ran on a dirty 0bd78d1 tree; "
+                "the archived snapshot of that record is 709113f."
+            ),
+        })
+        cont["code_versions"] = versions
+        record["continuation"] = cont
     if all(k in record for k in ("flux_total", "flux_rad", "flux_conv", "mass_path", "f_int")):
         record.update(algebraic_identities(record))
     record["record_checksum_sha256"] = _record_checksum(record)
@@ -345,5 +359,20 @@ def merge_continuation(base: dict[str, Any], chunk: dict[str, Any]) -> dict[str,
         if key in chunk:
             merged[key] = chunk[key]
     merged.update({k: chunk[k] for k in algebraic_identities(chunk)})
+    cont = dict(merged.get("continuation") or {})
+    versions = list(cont.get("code_versions") or [])
+    env = chunk.get("environment") or {}
+    extra_to = int(merged.get("continuation", {}).get("extra_accepted") or merged.get("steps_accepted") or 0)
+    extra_from = extra_to - int(chunk.get("steps_accepted") or 0)
+    versions.append({
+        "extra_accepted_from": extra_from,
+        "extra_accepted_to": extra_to,
+        "git_commit": env.get("git_commit"),
+        "git_dirty": env.get("git_dirty"),
+        "python": env.get("python"),
+        "numpy": env.get("numpy"),
+    })
+    cont["code_versions"] = versions
+    merged["continuation"] = cont
     merged["record_checksum_sha256"] = _record_checksum(merged)
     return merged

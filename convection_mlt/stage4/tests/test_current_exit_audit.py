@@ -44,6 +44,10 @@ def test_current_audit_enforces_rcb_timestep_operator_and_algebraic_rows():
     algebraic = [r for r in audit["rows"] if r["category"] == "algebraic"]
     assert algebraic
     assert all(r["tolerance"] == ALGEBRAIC for r in algebraic)
+    energy = next(r for r in algebraic if r["name"] == "algebraic_n192_energy_residual_rel")
+    assert energy["status"] == "FAIL"
+    assert "algebraic_n192_energy_residual_rel" in audit["headline_row_sets"]["algebraic"]
+    assert audit["algebraic_identity_status"] == "NOT_PASSED"
     assert audit["core_single_resolution_status"] == "PASS"
     assert audit["spatial_and_operator_convergence_status"] == "NOT_PASSED"
     assert audit["full_stage4_claim"] is False

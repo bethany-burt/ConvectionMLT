@@ -877,14 +877,8 @@ def _run_coupled_picard_macrostep(
         )
         q_rad = enthalpy_tendency(grid, f_rad_k, mass)
         h_star = h_n + dt * q_rad
-        state_star = _invert_enthalpy_state(grid, h_star, thermo, gravity)
-        if state_star is None:
-            return _SplitAttempt(
-                False, "coupled_picard_failure: h* invert", state_n, nan_f, nan_f,
-                float("nan"), float("nan"), last_diag, k, last_defect,
-            )
         result = solve_implicit_convection(
-            grid, state_star, h_star, physics, thermo, gravity, mass, dt, solver,
+            grid, state_n, h_star, physics, thermo, gravity, mass, dt, solver,
             cfg=cfg.implicit_convection,
         )
         last_diag = result.diagnostics

@@ -3,9 +3,9 @@
   "full_stage4_claim": false,
   "core_single_resolution_status": "PASS",
   "spatial_and_operator_convergence_status": "NOT_PASSED",
-  "algebraic_identity_status": "PASS",
+  "algebraic_identity_status": "NOT_PASSED",
   "helios_parity_status": "NOT_RUN_OR_PILOT_ONLY",
-  "claim_text": "Analytic-opacity N=48 and N=96 implicit RCE reach the physical 1e-3 gate. Spatial/operator convergence is not passed. Algebraic 1e-12 identities are enforced as rows. HELIOS parity is derived from the HELIOS row. full_stage4_claim is false.",
+  "claim_text": "Analytic-opacity N=48 and N=96 implicit RCE reach the physical 1e-3 gate. Spatial/operator convergence is not passed. Algebraic 1e-12 identities include committed-step energy closure. HELIOS parity is derived from the HELIOS row. full_stage4_claim is false.",
   "gates": {
     "algebraic": 1e-12,
     "physical_rce": 0.001,
@@ -29,8 +29,11 @@
     ],
     "algebraic": [
       "algebraic_n192_bottom_boundary_exactness_rel",
+      "algebraic_n192_energy_residual_rel",
       "algebraic_n192_flux_split_identity_rel",
-      "algebraic_n192_telescoping_column_energy_rel"
+      "algebraic_n192_telescoping_column_energy_rel",
+      "algebraic_n48_energy_residual_rel",
+      "algebraic_n96_energy_residual_rel"
     ],
     "helios": [
       "helios_parity"
@@ -186,9 +189,9 @@
       "criterion": "<=",
       "status": "FAIL",
       "scale": "last accepted \u03a3\u0394m \u0394h - dt(F_bot-F_top)",
-      "category": "algebraic_step",
+      "category": "algebraic",
       "source": "analytic_opacity_rce.json N=48",
-      "note": "Declared 1e-12 gate. Last-step residual is limited by the 1e-10 Picard/projection floor; this row is reported but is not in algebraic_identity_status."
+      "note": "Committed-step energy closure is part of the algebraic 1e-12 exit gate. Bordered Newton is expected to restore it."
     },
     {
       "name": "algebraic_n96_energy_residual_rel",
@@ -197,9 +200,9 @@
       "criterion": "<=",
       "status": "FAIL",
       "scale": "last accepted \u03a3\u0394m \u0394h - dt(F_bot-F_top)",
-      "category": "algebraic_step",
+      "category": "algebraic",
       "source": "analytic_opacity_rce.json N=96",
-      "note": "Declared 1e-12 gate. Last-step residual is limited by the 1e-10 Picard/projection floor; this row is reported but is not in algebraic_identity_status."
+      "note": "Committed-step energy closure is part of the algebraic 1e-12 exit gate. Bordered Newton is expected to restore it."
     },
     {
       "name": "algebraic_n192_bottom_boundary_exactness_rel",
@@ -238,9 +241,9 @@
       "criterion": "<=",
       "status": "FAIL",
       "scale": "last accepted \u03a3\u0394m \u0394h - dt(F_bot-F_top)",
-      "category": "algebraic_step",
+      "category": "algebraic",
       "source": "n192_implicit_rce.json",
-      "note": "Declared 1e-12 gate. Last-step residual is limited by the 1e-10 Picard/projection floor; this row is reported but is not in algebraic_identity_status."
+      "note": "Committed-step energy closure is part of the algebraic 1e-12 exit gate. Bordered Newton is expected to restore it."
     },
     {
       "name": "helios_parity",

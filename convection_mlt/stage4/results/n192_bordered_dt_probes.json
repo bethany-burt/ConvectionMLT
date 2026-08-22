@@ -1,0 +1,32 @@
+{
+  "100.0": {
+    "accepted": true,
+    "reason": null,
+    "residual": 7.435661080239503e-14,
+    "defect": 7.439309581281868e-14
+  },
+  "180.0": {
+    "accepted": true,
+    "reason": null,
+    "residual": 2.4451280329397187e-13,
+    "defect": 2.447223531342867e-13
+  },
+  "300.0": {
+    "accepted": true,
+    "reason": null,
+    "residual": 3.166991734816787e-13,
+    "defect": 4.509190607584026e-13
+  },
+  "500.0": {
+    "accepted": true,
+    "reason": null,
+    "residual": 3.961197931934945e-13,
+    "defect": 1.1436251556688027e-12
+  },
+  "1000.0": {
+    "accepted": true,
+    "reason": null,
+    "residual": 8.115379958560432e-13,
+    "defect": 5.011175137103582e-12
+  }
+}
