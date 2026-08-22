@@ -200,6 +200,9 @@ def serialize_rce_result(
             "coupled_defect": [float(d.coupled_defect) for d in accepted],
             "newton_iterations": [int(d.newton_iterations) for d in accepted],
             "energy_residual_rel": [float(d.energy_residual_rel) for d in accepted],
+            "energy_committed_residual_rel": [
+                float(d.energy_committed_residual_rel) for d in accepted
+            ],
             "boundary_mismatch": [float(d.boundary_mismatch) for d in accepted],
         },
         "rejection_reasons": [d.rejection_reason for d in rejected],
@@ -306,6 +309,7 @@ def merge_continuation(base: dict[str, Any], chunk: dict[str, Any]) -> dict[str,
         "coupled_defect",
         "newton_iterations",
         "energy_residual_rel",
+        "energy_committed_residual_rel",
         "boundary_mismatch",
     ):
         old = list(hist.get(key) or [])

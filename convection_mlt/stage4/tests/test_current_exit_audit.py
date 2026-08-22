@@ -2,16 +2,19 @@
 
 from __future__ import annotations
 
+import json
 import sys
 from pathlib import Path
 
 EXPERIMENTS = Path(__file__).resolve().parents[1] / "experiments"
+RESULTS = Path(__file__).resolve().parents[1] / "results"
 sys.path.insert(0, str(EXPERIMENTS))
 
 from build_current_exit_audit import (  # noqa: E402
     ALGEBRAIC,
     SPATIAL_RCB_DEX,
     _helios_status_from_row,
+    assert_n192_audit_sync,
     main,
 )
 
@@ -45,9 +48,14 @@ def test_current_audit_enforces_rcb_timestep_operator_and_algebraic_rows():
     assert algebraic
     assert all(r["tolerance"] == ALGEBRAIC for r in algebraic)
     energy = next(r for r in algebraic if r["name"] == "algebraic_n192_energy_residual_rel")
-    assert energy["status"] == "FAIL"
+    assert energy["tolerance"] == ALGEBRAIC
     assert "algebraic_n192_energy_residual_rel" in audit["headline_row_sets"]["algebraic"]
-    assert audit["algebraic_identity_status"] == "NOT_PASSED"
+    if energy["status"] == "FAIL":
+        assert audit["algebraic_identity_status"] == "NOT_PASSED"
+    n192_path = RESULTS / "n192_implicit_rce.json"
+    if n192_path.exists():
+        n192 = json.loads(n192_path.read_text())
+        assert_n192_audit_sync(audit, n192)
     assert audit["core_single_resolution_status"] == "PASS"
     assert audit["spatial_and_operator_convergence_status"] == "NOT_PASSED"
     assert audit["full_stage4_claim"] is False

@@ -7,6 +7,7 @@ from convection_mlt import (
     ConstantGreyOpacity,
     ConstantH2Thermo,
     HeliosAdapter,
+    ImplicitConvectionConfig,
     LowerNetInternalFlux,
     PhysicsConfig,
     PrescribedBandOpacity,
@@ -20,7 +21,11 @@ from convection_mlt import (
     manufactured_operator_identity,
     solve_adaptive_rce,
 )
-from convection_mlt.rce import ManufacturedRadiativeTarget
+from convection_mlt.rce import (
+    ManufacturedRadiativeTarget,
+    committed_energy_ok,
+    committed_energy_residual,
+)
 
 
 def _case(n_layers: int = 24):
@@ -188,3 +193,47 @@ def test_helios_adapter_roundtrip_orientation_exact():
     ifaces = np.array([1.0, 2.0, 3.0, 4.0, 5.0], dtype=np.float64)
     assert np.array_equal(adapter.roundtrip_layers(layers), layers)
     assert np.array_equal(adapter.roundtrip_interfaces(ifaces), ifaces)
+
+
+def test_committed_energy_helpers_match_column_identity():
+    mass = np.array([1.0, 2.0, 3.0])
+    h_n = np.array([10.0, 20.0, 30.0])
+    h_new = np.array([11.0, 21.0, 32.0])
+    dt = 2.0
+    f_total = np.array([4.0, 3.0, 2.0, 1.0])
+    resid = committed_energy_residual(mass, h_new, h_n, dt, f_total)
+    assert resid == (1.0 * 1.0 + 2.0 * 1.0 + 3.0 * 2.0) - 2.0 * (4.0 - 1.0)
+    cfg = RCEConfig()
+    assert committed_energy_ok(1e-20, 1.0, 1e-16, cfg)
+    assert not committed_energy_ok(1e-8, 1.0, 1e-16, cfg)
+
+
+def test_implicit_picard_step_meets_committed_energy():
+    grid, thermo, physics, solver, p, t_target, top, bot = _case(n_layers=16)
+    opacity = ConstantGreyOpacity(2.0e-4)
+    initial = t_target.copy()
+    initial[grid.n_layers // 3 : 2 * grid.n_layers // 3] *= 1.02
+    cfg = RCEConfig(
+        max_steps=1,
+        n_consec=99,
+        stall_window=10,
+        prescribed_dt=50.0,
+        coupled_picard=True,
+        implicit_convection=ImplicitConvectionConfig(
+            residual_tolerance=1e-10,
+            step_tolerance=1e-10,
+            newton_residual_tolerance=1e-12,
+            newton_step_tolerance=1e-12,
+        ),
+    )
+    res = solve_adaptive_rce(
+        grid, initial, physics, solver, thermo, opacity, p, top, bot,
+        gravity=ConstantGravity(physics.gravity),
+        route=RCERoute.SPLIT_RAD_THEN_IMPLICIT_CONV,
+        config=cfg,
+    )
+    accepted = [d for d in res.diagnostics if d.accepted]
+    assert accepted, res.reason
+    d = accepted[0]
+    scale = max(abs(d.energy_committed), abs(d.flux_boundary_work), 1e-30)
+    assert abs(d.energy_committed_residual) <= max(16.0 * d.energy_ulp_floor, 1e-12 * scale)

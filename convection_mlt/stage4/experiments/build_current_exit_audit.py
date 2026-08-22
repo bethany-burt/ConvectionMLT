@@ -257,15 +257,23 @@ def main() -> dict:
                 "last accepted ΣΔm Δh - dt(F_bot-F_top)", "algebraic", source,
                 extra={
                     "note": (
-                        "Committed-step energy closure is part of the algebraic "
-                        "1e-12 exit gate. Bordered Newton is expected to restore it."
+                        "Committed-step energy |ΣΔm Δh - Δt(F_bot-F_top)| / E_scale. "
+                        "Picard acceptance now requires this 1e-12 (or ULP-floor) gate."
                     ),
                 },
             ))
 
-    _add_algebraic("n48", n48, "analytic_opacity_rce.json N=48", n48.get("energy_residual_rel"))
-    _add_algebraic("n96", n96, "analytic_opacity_rce.json N=96", n96.get("energy_residual_rel"))
-    _add_algebraic("n192", n192, "n192_implicit_rce.json", (n192 or {}).get("energy_residual_rel"))
+    def _energy_rel(rec):
+        if rec is None:
+            return None
+        committed = rec.get("energy_committed_residual_rel")
+        if committed is not None:
+            return committed
+        return rec.get("energy_residual_rel")
+
+    _add_algebraic("n48", n48, "analytic_opacity_rce.json N=48", _energy_rel(n48))
+    _add_algebraic("n96", n96, "analytic_opacity_rce.json N=96", _energy_rel(n96))
+    _add_algebraic("n192", n192, "n192_implicit_rce.json", _energy_rel(n192))
 
     rows.append(_row(
         "helios_parity", False, True, "pending",
@@ -345,9 +353,28 @@ def main() -> dict:
         "algebraic_identity_status": audit["algebraic_identity_status"],
         "helios_parity_status": audit["helios_parity_status"],
         "full_stage4_claim": audit["full_stage4_claim"],
+        "n192_steps": None if n192 is None else n192.get("steps_accepted"),
+        "n192_flatness": None if n192 is None else n192.get("flux_flatness"),
+        "n192_checksum": None if n192 is None else (
+            n192.get("profile_checksum_sha256") or n192.get("checksum_sha256")
+        ),
         "out": str(OUT),
     }, indent=2))
     return audit
+
+
+def assert_n192_audit_sync(audit: dict, record: dict) -> None:
+    """Fail if the audit's N=192 profile is not the record just written."""
+    rec_hash = record.get("profile_checksum_sha256") or record.get("checksum_sha256")
+    audit_hash = (audit.get("n192_record") or {}).get("profile_checksum_sha256")
+    rec_steps = record.get("steps_accepted")
+    audit_steps = (audit.get("n192_record") or {}).get("steps_accepted")
+    if rec_hash != audit_hash or rec_steps != audit_steps:
+        raise RuntimeError(
+            "stale exit-gate audit: "
+            f"record checksum={rec_hash} steps={rec_steps}; "
+            f"audit checksum={audit_hash} steps={audit_steps}"
+        )
 
 
 if __name__ == "__main__":

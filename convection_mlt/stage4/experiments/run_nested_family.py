@@ -136,7 +136,7 @@ def richardson_order(e_coarse_vs_mid: float, e_mid_vs_fine: float) -> float | No
     return float(np.log2(e_coarse_vs_mid / e_mid_vs_fine))
 
 
-def main(layers=(48, 96)) -> dict:
+def main(layers=(48, 96), force: bool = True) -> dict:
     import numpy as np
 
     cases = {}
@@ -146,7 +146,7 @@ def main(layers=(48, 96)) -> dict:
     for n in layers:
         key = str(n)
         existing = cases.get(key)
-        if existing and existing.get("status") == "converged":
+        if existing and existing.get("status") == "converged" and not force:
             print(f"N={n} already converged; skipping", flush=True)
             continue
         cases[key] = _run_one(n)
@@ -176,8 +176,9 @@ def main(layers=(48, 96)) -> dict:
         "comparisons": comparisons,
         "richardson_order_from_max_rel_T": order,
         "note": (
-            "Nested τ-family from master N=384, n_phot=64. Independent-grid "
-            "N=48/96 are not used here."
+            "Nested τ-family from master N=384, n_phot=64, regenerated with "
+            "the bordered production solver and energy-closed Picard. "
+            "Independent-grid N=48/96 are not used here."
         ),
     }
     OUT.write_text(dumps(payload))

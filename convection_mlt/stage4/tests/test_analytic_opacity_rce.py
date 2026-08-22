@@ -403,3 +403,8 @@ def test_coupled_picard_reduces_defect_on_short_n16_run():
     assert finite_def
     assert min(finite_def) <= 1e-8
     assert np.all(np.isfinite(res.final_state.temperature))
+    for d in accepted:
+        scale = max(abs(d.energy_committed), abs(d.flux_boundary_work), 1e-30)
+        assert abs(d.energy_committed_residual) <= max(
+            16.0 * d.energy_ulp_floor, 1e-12 * scale
+        )

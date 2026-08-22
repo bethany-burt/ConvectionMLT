@@ -151,8 +151,11 @@ class RCEConfig:
     implicit_convection: ImplicitConvectionConfig | None = None
     # Outer radiation–implicit-convection defect iteration (production implicit route).
     coupled_picard: bool = True
-    max_picard: int = 12
+    max_picard: int = 24
     picard_tolerance: float = 1.0e-10
+    picard_energy_tolerance: float = 1.0e-12
+    energy_ulp_factor: float = 16.0
+    max_energy_corrections: int = 4
     picard_relax: float = 1.0
     use_coupled_tendency_dt: bool = True
     # Restart / continuation: seed the hold and optional prior RCB.
@@ -844,6 +847,87 @@ def _coupled_defect(
     return scaled_residual_norm(residual, h_n, temperature, cp, 1.0e-30)
 
 
+def committed_energy_residual(
+    mass_path: NDArray[np.float64],
+    h_new: NDArray[np.float64],
+    h_n: NDArray[np.float64],
+    dt: float,
+    f_total: NDArray[np.float64],
+) -> float:
+    """Σ Δm (h^{n+1}-h^n) - Δt (F_bot - F_top)."""
+    return float(
+        np.sum(mass_path * (h_new - h_n)) - dt * float(f_total[0] - f_total[-1])
+    )
+
+
+def committed_energy_ok(
+    residual: float,
+    e_scale: float,
+    ulp_floor: float,
+    cfg: RCEConfig,
+) -> bool:
+    return abs(residual) <= max(
+        cfg.picard_energy_tolerance * e_scale,
+        cfg.energy_ulp_factor * ulp_floor,
+    )
+
+
+def _trial_coupled_metrics(
+    grid: PressureGrid,
+    state_trial: ColumnState,
+    h_trial: NDArray[np.float64],
+    h_n: NDArray[np.float64],
+    mass: NDArray[np.float64],
+    dt: float,
+    physics: PhysicsConfig,
+    thermo: ThermoProvider,
+    gravity: GravityLaw,
+    opacity: PrescribedOpacity,
+    pressure: NDArray[np.float64],
+    top_bc: TopIrradiation,
+    lower_bc: LowerBoundary,
+    cfg: RCEConfig,
+    manufactured: ManufacturedRadiativeTarget | None,
+    *,
+    prescribed_f_ext: NDArray[np.float64] | None = None,
+) -> tuple[NDArray[np.float64], NDArray[np.float64], float, float, float, float, bool]:
+    """Layer defect and committed energy at a Picard trial state."""
+    f_rad = _external_flux_at_state(
+        grid, state_trial, physics, thermo, opacity, pressure, top_bc, lower_bc,
+        cfg, manufactured, gravity, prescribed_f_ext=prescribed_f_ext,
+    )
+    closure = _evaluate_closure(grid, state_trial, physics, thermo)
+    f_conv = np.asarray(closure.flux, dtype=np.float64).copy()
+    f_conv[0] = 0.0
+    f_conv[-1] = 0.0
+    f_total = f_rad + f_conv
+    q_tot = enthalpy_tendency(grid, f_total, mass)
+    defect = _coupled_defect(h_trial, h_n, q_tot, dt, state_trial.temperature, thermo)
+    work = dt * float(f_total[0] - f_total[-1])
+    lhs = float(np.sum(mass * (h_trial - h_n)))
+    resid = lhs - work
+    f_ref = _internal_flux_reference(lower_bc, manufactured)
+    f_scale = max(
+        cfg.flux_scale_floor,
+        abs(f_ref) if f_ref is not None else max(abs(float(f_total[0])), abs(float(f_total[-1])), 1.0),
+    )
+    e_scale = _energy_scale(work, f_scale, dt, cfg)
+    ulp = _ulp_energy_floor(mass, h_trial)
+    return f_rad, f_conv, defect, work, lhs, resid, committed_energy_ok(resid, e_scale, ulp, cfg)
+
+
+def _scalar_energy_correction(
+    h_trial: NDArray[np.float64],
+    mass: NDArray[np.float64],
+    energy_resid: float,
+) -> NDArray[np.float64]:
+    """Uniform enthalpy shift that zeros the column energy residual at frozen F."""
+    total_m = float(np.sum(mass))
+    if total_m <= 0.0 or not np.isfinite(energy_resid):
+        return h_trial
+    return np.asarray(h_trial, dtype=np.float64) - energy_resid / total_m
+
+
 def _run_coupled_picard_macrostep(
     grid: PressureGrid,
     state_n: ColumnState,
@@ -869,6 +953,20 @@ def _run_coupled_picard_macrostep(
     omega = float(cfg.picard_relax)
     last_diag: ImplicitConvectionDiagnostics | None = None
     last_defect = float("inf")
+    last_energy = float("inf")
+
+    def _accept(
+        state_trial: ColumnState,
+        f_conv: NDArray[np.float64],
+        f_rad: NDArray[np.float64],
+        work: float,
+        lhs: float,
+        k: int,
+        defect: float,
+    ) -> _SplitAttempt:
+        return _SplitAttempt(
+            True, None, state_trial, f_conv, f_rad, work, lhs, last_diag, k, defect
+        )
 
     for k in range(1, cfg.max_picard + 1):
         f_rad_k = _external_flux_at_state(
@@ -896,33 +994,50 @@ def _run_coupled_picard_macrostep(
                 False, "coupled_picard_failure: trial invert", state_n, nan_f, nan_f,
                 float("nan"), float("nan"), last_diag, k, last_defect,
             )
-        f_rad = _external_flux_at_state(
-            grid, state_trial, physics, thermo, opacity, pressure, top_bc, lower_bc,
-            cfg, manufactured, gravity, prescribed_f_ext=prescribed_f_ext,
-        )
-        closure = _evaluate_closure(grid, state_trial, physics, thermo)
-        f_conv = np.asarray(closure.flux, dtype=np.float64).copy()
-        f_conv[0] = 0.0
-        f_conv[-1] = 0.0
-        q_tot = enthalpy_tendency(grid, f_rad + f_conv, mass)
-        defect = _coupled_defect(
-            h_trial, h_n, q_tot, dt, state_trial.temperature, thermo
+        f_rad, f_conv, defect, work, lhs, energy_resid, energy_is_ok = _trial_coupled_metrics(
+            grid, state_trial, h_trial, h_n, mass, dt, physics, thermo, gravity,
+            opacity, pressure, top_bc, lower_bc, cfg, manufactured,
+            prescribed_f_ext=prescribed_f_ext,
         )
         if defect > last_defect and omega > 0.3:
             omega = max(0.5 * omega, 0.3)
         last_defect = defect
+        last_energy = energy_resid
         state_k = state_trial
-        if defect <= cfg.picard_tolerance:
-            work = dt * float((f_rad[0] + f_conv[0]) - (f_rad[-1] + f_conv[-1]))
-            lhs = float(np.sum(mass * (h_trial - h_n)))
-            return _SplitAttempt(
-                True, None, state_trial, f_conv, f_rad, work, lhs, last_diag, k, defect
-            )
+        if defect <= cfg.picard_tolerance and energy_is_ok:
+            return _accept(state_trial, f_conv, f_rad, work, lhs, k, defect)
 
+        if defect <= cfg.picard_tolerance and not energy_is_ok:
+            for _ in range(cfg.max_energy_corrections):
+                h_corr = _scalar_energy_correction(h_trial, mass, energy_resid)
+                state_corr = _invert_enthalpy_state(grid, h_corr, thermo, gravity)
+                if state_corr is None:
+                    break
+                h_trial = h_corr
+                state_trial = state_corr
+                f_rad, f_conv, defect, work, lhs, energy_resid, energy_is_ok = (
+                    _trial_coupled_metrics(
+                        grid, state_trial, h_trial, h_n, mass, dt, physics, thermo,
+                        gravity, opacity, pressure, top_bc, lower_bc, cfg, manufactured,
+                        prescribed_f_ext=prescribed_f_ext,
+                    )
+                )
+                last_defect = defect
+                last_energy = energy_resid
+                state_k = state_trial
+                if defect <= cfg.picard_tolerance and energy_is_ok:
+                    return _accept(state_trial, f_conv, f_rad, work, lhs, k, defect)
+                if not energy_is_ok:
+                    continue
+                break
+
+    if last_defect <= cfg.picard_tolerance:
+        reason = f"coupled_picard_failure: committed energy {last_energy}"
+    else:
+        reason = f"coupled_picard_failure: defect {last_defect}"
     return _SplitAttempt(
-        False,
-        f"coupled_picard_failure: defect {last_defect}",
-        state_n, nan_f, nan_f, float("nan"), float("nan"), last_diag, cfg.max_picard, last_defect,
+        False, reason, state_n, nan_f, nan_f, float("nan"), float("nan"),
+        last_diag, cfg.max_picard, last_defect,
     )
 
 
@@ -1432,9 +1547,7 @@ def solve_adaptive_rce(
                 trial_state = attempt.state
                 f_conv = attempt.f_conv
                 f_rad = attempt.f_rad
-                boundary_work = attempt.boundary_work
                 energy_lhs = attempt.energy_lhs
-                energy_resid = energy_lhs - boundary_work
                 energy_committed = float(np.sum(old_state.mass_path * (trial_state.enthalpy - old_state.enthalpy)))
                 # Recompute coupled metrics from F(T^{n+1}), not cached substep fluxes.
                 closure, rad, f_conv, f_rad, f_total = _run_unsplit(
@@ -1442,6 +1555,8 @@ def solve_adaptive_rce(
                     cfg, manufactured, grav,
                 )
                 dhdt = enthalpy_tendency(grid, f_total, trial_state.mass_path)
+                boundary_work = dt * float(f_total[0] - f_total[-1])
+                energy_resid = energy_committed - boundary_work
                 implicit_diag = attempt.implicit
                 picard_iters = attempt.picard_iterations
                 coupled_def = attempt.coupled_defect
@@ -1453,6 +1568,21 @@ def solve_adaptive_rce(
             )
             e_scale = _energy_scale(boundary_work, f_scale, dt, cfg)
             e_committed_scale = max(e_scale, ulp_floor)
+            if (
+                _uses_implicit_convection(route)
+                and cfg.coupled_picard
+                and not committed_energy_ok(energy_committed_resid, e_scale, ulp_floor, cfg)
+            ):
+                rejection_reason = "coupled_picard_failure: committed energy"
+                rejections += 1
+                diagnostics.append(_rejected_diag(dt, route, dt_mlt, dt_rad, dt_temp, rejection_reason))
+                if prescribed:
+                    break
+                dt, dt_ceiling, hold_remaining = dt_after_reject(dt, cfg)
+                dt_hold = dt
+                if dt < cfg.dt_min:
+                    break
+                continue
 
             state = trial_state
             simulated_time += dt

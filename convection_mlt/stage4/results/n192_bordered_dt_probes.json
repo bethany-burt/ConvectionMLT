@@ -2,31 +2,31 @@
   "100.0": {
     "accepted": true,
     "reason": null,
-    "residual": 7.435661080239503e-14,
-    "defect": 7.439309581281868e-14
+    "residual": 1.1769822461395213e-13,
+    "defect": 1.1802792575380346e-13
   },
   "180.0": {
     "accepted": true,
     "reason": null,
-    "residual": 2.4451280329397187e-13,
-    "defect": 2.447223531342867e-13
+    "residual": 1.5535362999609493e-13,
+    "defect": 1.5534337420713393e-13
   },
   "300.0": {
     "accepted": true,
     "reason": null,
-    "residual": 3.166991734816787e-13,
-    "defect": 4.509190607584026e-13
+    "residual": 3.0400217598808356e-13,
+    "defect": 3.0401298813520836e-13
   },
   "500.0": {
     "accepted": true,
     "reason": null,
-    "residual": 3.961197931934945e-13,
-    "defect": 1.1436251556688027e-12
+    "residual": 4.0151559758952605e-13,
+    "defect": 4.010644639064965e-13
   },
   "1000.0": {
     "accepted": true,
     "reason": null,
-    "residual": 8.115379958560432e-13,
-    "defect": 5.011175137103582e-12
+    "residual": 7.765433595304208e-13,
+    "defect": 7.768382631369578e-13
   }
 }

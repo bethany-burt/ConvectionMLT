@@ -73,21 +73,21 @@
     },
     {
       "name": "physical_rce_n192_implicit",
-      "observed": 0.0020185237614862217,
+      "observed": 0.0009994027090874625,
       "tolerance": 0.001,
       "criterion": "<=",
-      "status": "FAIL",
+      "status": "PASS",
       "scale": "max |F-F_int|/F_scale",
       "category": "physical_rce",
       "source": "n192_implicit_rce.json",
-      "status_run": "max_steps",
-      "steps_accepted": 62000,
+      "status_run": "converged",
+      "steps_accepted": 81343,
       "rejections": 1022,
-      "simulated_time": 6231017.1504268665,
-      "median_accepted_dt": 100.0,
-      "profile_checksum_sha256": "4c2abb763dc81304d19d913c21338b71111bd94e199bfb20e6b0ae88a909b45b",
+      "simulated_time": 381590668.0449543,
+      "median_accepted_dt": 500.0,
+      "profile_checksum_sha256": "f2b209af40da8e3719023cddd79acbbfac714f7852b89ab8ac9a7ec8c4126a79",
       "nested_master_layers": 384,
-      "tendency_norm": 0.0003367702601057469,
+      "tendency_norm": 9.232790841906535e-06,
       "requested_route": "split_rad_then_implicit_conv",
       "actual_integrator": "coupled_picard_backward_euler"
     },
@@ -127,7 +127,7 @@
     },
     {
       "name": "spatial_nested_n96_vs_n48_max_rel_T",
-      "observed": 0.08273770556807011,
+      "observed": 0.08273767620797264,
       "tolerance": 0.02,
       "criterion": "<=",
       "status": "FAIL",
@@ -137,7 +137,7 @@
     },
     {
       "name": "spatial_nested_n96_vs_n48_rcb_dex",
-      "observed": 0.24193457093725534,
+      "observed": 0.2419346894409875,
       "tolerance": 0.05,
       "criterion": "<=",
       "status": "FAIL",
@@ -169,7 +169,7 @@
       "scale": "1e-3 gate",
       "category": "operator",
       "source": "operator_order_point39.json",
-      "flux_flatness": 0.0004910893701511062
+      "flux_flatness": 0.00018158272216851402
     },
     {
       "name": "point39_semi_implicit_has_failed_upper",
@@ -180,7 +180,7 @@
       "scale": "multi-step bracket with first failure at X",
       "category": "39",
       "source": "operator_order_point39.json",
-      "note": "bracket: last success 20000.0, first failure at 31622.776601683792"
+      "note": "bracket: last success 668740.304976422, first failure at 1000000.0"
     },
     {
       "name": "algebraic_n48_energy_residual_rel",
@@ -191,7 +191,7 @@
       "scale": "last accepted \u03a3\u0394m \u0394h - dt(F_bot-F_top)",
       "category": "algebraic",
       "source": "analytic_opacity_rce.json N=48",
-      "note": "Committed-step energy closure is part of the algebraic 1e-12 exit gate. Bordered Newton is expected to restore it."
+      "note": "Committed-step energy |\u03a3\u0394m \u0394h - \u0394t(F_bot-F_top)| / E_scale. Picard acceptance now requires this 1e-12 (or ULP-floor) gate."
     },
     {
       "name": "algebraic_n96_energy_residual_rel",
@@ -202,7 +202,7 @@
       "scale": "last accepted \u03a3\u0394m \u0394h - dt(F_bot-F_top)",
       "category": "algebraic",
       "source": "analytic_opacity_rce.json N=96",
-      "note": "Committed-step energy closure is part of the algebraic 1e-12 exit gate. Bordered Newton is expected to restore it."
+      "note": "Committed-step energy |\u03a3\u0394m \u0394h - \u0394t(F_bot-F_top)| / E_scale. Picard acceptance now requires this 1e-12 (or ULP-floor) gate."
     },
     {
       "name": "algebraic_n192_bottom_boundary_exactness_rel",
@@ -236,14 +236,14 @@
     },
     {
       "name": "algebraic_n192_energy_residual_rel",
-      "observed": 8.22928720947876e-09,
+      "observed": 1.3027771241998682e-09,
       "tolerance": 1e-12,
       "criterion": "<=",
       "status": "FAIL",
       "scale": "last accepted \u03a3\u0394m \u0394h - dt(F_bot-F_top)",
       "category": "algebraic",
       "source": "n192_implicit_rce.json",
-      "note": "Committed-step energy closure is part of the algebraic 1e-12 exit gate. Bordered Newton is expected to restore it."
+      "note": "Committed-step energy |\u03a3\u0394m \u0394h - \u0394t(F_bot-F_top)| / E_scale. Picard acceptance now requires this 1e-12 (or ULP-floor) gate."
     },
     {
       "name": "helios_parity",
@@ -258,13 +258,13 @@
   ],
   "n192_record": {
     "path": "n192_implicit_rce.json",
-    "status": "max_steps",
-    "flux_flatness": 0.0020185237614862217,
-    "tendency_norm": 0.0003367702601057469,
-    "steps_accepted": 62000,
+    "status": "converged",
+    "flux_flatness": 0.0009994027090874625,
+    "tendency_norm": 9.232790841906535e-06,
+    "steps_accepted": 81343,
     "rejections": 1022,
-    "simulated_time": 6231017.1504268665,
-    "profile_checksum_sha256": "4c2abb763dc81304d19d913c21338b71111bd94e199bfb20e6b0ae88a909b45b",
+    "simulated_time": 381590668.0449543,
+    "profile_checksum_sha256": "f2b209af40da8e3719023cddd79acbbfac714f7852b89ab8ac9a7ec8c4126a79",
     "nested_master_layers": 384,
     "requested_route": "split_rad_then_implicit_conv",
     "actual_integrator": "coupled_picard_backward_euler"
