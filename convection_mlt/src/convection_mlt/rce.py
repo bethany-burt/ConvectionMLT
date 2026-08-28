@@ -90,6 +90,9 @@ class RCEStepDiagnostics:
     energy_committed_residual: float = float("nan")
     energy_committed_residual_rel: float = float("nan")
     energy_ulp_floor: float = float("nan")
+    energy_scale: float = float("nan")
+    energy_allowed: float = float("nan")
+    energy_gate_ratio: float = float("nan")
     rejection_reason: str | None = None
     nonlinear_residual: float = float("nan")
     newton_iterations: int = 0
@@ -860,16 +863,30 @@ def committed_energy_residual(
     )
 
 
+def committed_energy_budget(
+    residual: float,
+    e_scale: float,
+    ulp_floor: float,
+    cfg: RCEConfig,
+) -> tuple[float, float]:
+    """Allowed |R_E| and |R_E|/allowed. PASS when the ratio is ≤ 1."""
+    allowed = max(
+        cfg.picard_energy_tolerance * e_scale,
+        cfg.energy_ulp_factor * ulp_floor,
+    )
+    if allowed <= 0.0 or not np.isfinite(allowed):
+        return float(allowed), float("inf")
+    return float(allowed), float(abs(residual) / allowed)
+
+
 def committed_energy_ok(
     residual: float,
     e_scale: float,
     ulp_floor: float,
     cfg: RCEConfig,
 ) -> bool:
-    return abs(residual) <= max(
-        cfg.picard_energy_tolerance * e_scale,
-        cfg.energy_ulp_factor * ulp_floor,
-    )
+    _allowed, ratio = committed_energy_budget(residual, e_scale, ulp_floor, cfg)
+    return ratio <= 1.0
 
 
 def _trial_coupled_metrics(
@@ -1568,10 +1585,13 @@ def solve_adaptive_rce(
             )
             e_scale = _energy_scale(boundary_work, f_scale, dt, cfg)
             e_committed_scale = max(e_scale, ulp_floor)
+            energy_allowed, energy_ratio = committed_energy_budget(
+                energy_committed_resid, e_scale, ulp_floor, cfg
+            )
             if (
                 _uses_implicit_convection(route)
                 and cfg.coupled_picard
-                and not committed_energy_ok(energy_committed_resid, e_scale, ulp_floor, cfg)
+                and energy_ratio > 1.0
             ):
                 rejection_reason = "coupled_picard_failure: committed energy"
                 rejections += 1
@@ -1621,6 +1641,9 @@ def solve_adaptive_rce(
                     energy_committed_residual=energy_committed_resid,
                     energy_committed_residual_rel=abs(energy_committed_resid) / e_committed_scale,
                     energy_ulp_floor=ulp_floor,
+                    energy_scale=e_scale,
+                    energy_allowed=energy_allowed,
+                    energy_gate_ratio=energy_ratio,
                     nonlinear_residual=(
                         float("nan") if implicit_diag is None else implicit_diag.residual_norm
                     ),
@@ -1901,6 +1924,9 @@ def solve_adaptive_rce_with_prescribed_external_flux(
             )
             e_scale = _energy_scale(boundary_work, f_scale, dt, cfg_local)
             e_committed_scale = max(e_scale, ulp_floor)
+            energy_allowed, energy_ratio = committed_energy_budget(
+                energy_committed_resid, e_scale, ulp_floor, cfg_local
+            )
             idiag = attempt.implicit
 
             state = trial_state
@@ -1940,6 +1966,9 @@ def solve_adaptive_rce_with_prescribed_external_flux(
                     energy_committed_residual=energy_committed_resid,
                     energy_committed_residual_rel=abs(energy_committed_resid) / e_committed_scale,
                     energy_ulp_floor=ulp_floor,
+                    energy_scale=e_scale,
+                    energy_allowed=energy_allowed,
+                    energy_gate_ratio=energy_ratio,
                     nonlinear_residual=float("nan") if idiag is None else idiag.residual_norm,
                     newton_iterations=0 if idiag is None else idiag.newton_iterations,
                     line_search_backtracks=0 if idiag is None else idiag.line_search_backtracks,

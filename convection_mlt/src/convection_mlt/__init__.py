@@ -69,6 +69,14 @@ from .rce import (
     solve_adaptive_rce,
     solve_adaptive_rce_with_prescribed_external_flux,
 )
+from .production_rce import (
+    PHYSICAL_GATE,
+    ProductionControls,
+    ProductionRCERun,
+    evaluate_physical_gates,
+    run_production_rce,
+    validation_envelope,
+)
 from .implicit_convection import (
     BorderedSchurError,
     ImplicitConvectionConfig,
@@ -150,9 +158,15 @@ __all__ = [
     "load_tp_profile",
     "ManufacturedRadiativeTarget",
     "numerical_isentrope",
+    "PHYSICAL_GATE",
+    "ProductionControls",
+    "ProductionRCERun",
     "PrescribedBandOpacity",
     "piecewise_enthalpy_reference",
+    "evaluate_physical_gates",
     "radiation_core",
+    "run_production_rce",
+    "validation_envelope",
     "RadiationResult",
     "reconstruct_hydrostatic",
     "reference_enthalpy_residuals",

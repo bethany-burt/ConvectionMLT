@@ -22,49 +22,16 @@ from convection_mlt import (
 from convection_mlt.energy import column_enthalpy_per_area
 from convection_mlt.metadata import git_commit, git_dirty, json_safe
 
+from convection_mlt.production_rce import (
+    PHYSICAL_GATE,
+    production_implicit_config,
+    production_rce_config,
+    production_solver_config,
+)
+
 REPO = Path(__file__).resolve().parents[3]
 REQUESTED_ROUTE = RCERoute.SPLIT_RAD_THEN_IMPLICIT_CONV
 ACTUAL_INTEGRATOR_PICARD = "coupled_picard_backward_euler"
-PHYSICAL_GATE = 1.0e-3
-
-
-def production_solver_config() -> SolverConfig:
-    return SolverConfig(epsilon_temperature=2e-3, c_diff=0.2, dt_min=1e-14)
-
-
-def production_implicit_config() -> ImplicitConvectionConfig:
-    return ImplicitConvectionConfig(
-        residual_tolerance=1e-10,
-        step_tolerance=1e-10,
-        newton_residual_tolerance=1e-12,
-        newton_step_tolerance=1e-12,
-    )
-
-
-def production_rce_config(
-    *,
-    max_steps: int,
-    dt_accuracy: float = 2500.0,
-    dt_hold_init: float | None = None,
-    previous_rcb_init: float | None = None,
-    simulated_time_init: float = 0.0,
-    gate: float = PHYSICAL_GATE,
-) -> RCEConfig:
-    return RCEConfig(
-        max_steps=max_steps,
-        n_consec=5,
-        stall_window=10**9,
-        flux_flatness_tolerance=gate,
-        tendency_tolerance=gate,
-        temp_change_tolerance=gate,
-        dt_accuracy=dt_accuracy,
-        coupled_picard=True,
-        use_coupled_tendency_dt=True,
-        dt_hold_init=dt_hold_init,
-        previous_rcb_init=previous_rcb_init,
-        simulated_time_init=simulated_time_init,
-        implicit_convection=production_implicit_config(),
-    )
 
 
 def _jsonable(value: Any) -> Any:
@@ -85,6 +52,83 @@ def _sha256_arrays(*arrays: np.ndarray) -> str:
         a = np.asarray(arr, dtype=np.float64)
         h.update(np.ascontiguousarray(a).tobytes())
     return h.hexdigest()
+
+
+def finalize_record(payload: dict[str, Any]) -> dict[str, Any]:
+    """Set record_checksum_sha256 last, after every metadata mutation."""
+    payload["record_checksum_sha256"] = _record_checksum(payload)
+    return payload
+
+
+def history_simulated_time(record: dict[str, Any]) -> float:
+    dts = (record.get("history") or {}).get("dt") or []
+    return float(sum(float(dt) for dt in dts if dt is not None))
+
+
+def history_is_complete_clock(record: dict[str, Any]) -> bool:
+    """True when history.dt is the full integrated clock, not a polish segment.
+
+    Continuation and five-check polish records inherit simulated_time from a
+    longer solve while storing only the latest accepted steps.
+    """
+    scope = record.get("history_scope")
+    if scope in {"five_check_polish_segment", "continuation_chunk", "polish_segment"}:
+        return False
+    dts = (record.get("history") or {}).get("dt") or []
+    if not dts:
+        return False
+    sim = float(record.get("simulated_time") or 0.0)
+    hist = history_simulated_time(record)
+    integrator = str(record.get("actual_integrator") or "")
+    if "five_check" in integrator or "polish" in integrator.lower():
+        return False
+    source_steps = record.get("source_steps_accepted")
+    if (
+        source_steps is not None
+        and int(record.get("steps_accepted") or 0) == len(dts)
+        and sim > hist + 1.0
+    ):
+        return False
+    return True
+
+
+def repair_simulated_time(record: dict[str, Any]) -> dict[str, Any]:
+    """Recover simulated_time as Σ history.dt after a double-counting merge."""
+    recovered = history_simulated_time(record)
+    stored = float(record.get("simulated_time") or 0.0)
+    if abs(stored - recovered) > 1.0e-6 * max(abs(recovered), 1.0):
+        record["simulated_time_recovered_from_history_dt"] = True
+        record["simulated_time_before_repair"] = stored
+        record["simulated_time"] = recovered
+    return finalize_record(record)
+
+
+def verify_record_checksums(record: dict[str, Any]) -> None:
+    stored = record.get("record_checksum_sha256")
+    recomputed = _record_checksum(record)
+    if stored != recomputed:
+        raise AssertionError(
+            f"record checksum stale: stored={stored} recomputed={recomputed}"
+        )
+    profile = record.get("profile_checksum_sha256") or record.get("checksum_sha256")
+    if profile is None:
+        return
+    arrays = [
+        np.asarray(record["temperature"], dtype=np.float64),
+        np.asarray(record["pressure_centres"], dtype=np.float64),
+        np.asarray(record["flux_total"], dtype=np.float64),
+        np.asarray(record["flux_rad"], dtype=np.float64),
+        np.asarray(record["flux_conv"], dtype=np.float64),
+        np.asarray(record["enthalpy"], dtype=np.float64),
+        np.asarray(record["mass_path"], dtype=np.float64),
+    ]
+    if record.get("pressure_edges") is not None:
+        arrays.append(np.asarray(record["pressure_edges"], dtype=np.float64))
+    expected = _sha256_arrays(*arrays)
+    if profile != expected:
+        raise AssertionError(
+            f"profile checksum mismatch: stored={profile} recomputed={expected}"
+        )
 
 
 def _record_checksum(payload: dict[str, Any]) -> str:
@@ -203,15 +247,23 @@ def serialize_rce_result(
             "energy_committed_residual_rel": [
                 float(d.energy_committed_residual_rel) for d in accepted
             ],
+            "energy_gate_ratio": [float(d.energy_gate_ratio) for d in accepted],
             "boundary_mismatch": [float(d.boundary_mismatch) for d in accepted],
         },
         "rejection_reasons": [d.rejection_reason for d in rejected],
         "median_accepted_dt": float(np.median(dts)) if dts else float("nan"),
         "last_accepted_dt": dts[-1] if dts else None,
         "energy_residual_rel": None if last is None else float(last.energy_residual_rel),
+        "energy_committed_residual": (
+            None if last is None else float(last.energy_committed_residual)
+        ),
         "energy_committed_residual_rel": (
             None if last is None else float(last.energy_committed_residual_rel)
         ),
+        "energy_scale": None if last is None else float(last.energy_scale),
+        "energy_ulp_floor": None if last is None else float(last.energy_ulp_floor),
+        "energy_allowed": None if last is None else float(last.energy_allowed),
+        "energy_gate_ratio": None if last is None else float(last.energy_gate_ratio),
         "boundary_mismatch": None if last is None else float(last.boundary_mismatch),
         "coupled_defect": None if last is None else float(last.coupled_defect),
         "rce_config": None if rce_config is None else _jsonable(rce_config),
@@ -227,8 +279,7 @@ def serialize_rce_result(
     payload.update(algebraic_identities(payload))
     if extra:
         payload.update(extra)
-    payload["record_checksum_sha256"] = _record_checksum(payload)
-    return payload
+    return finalize_record(payload)
 
 
 def dumps(payload: dict[str, Any]) -> str:
@@ -291,8 +342,7 @@ def enrich_stored_record(record: dict[str, Any]) -> dict[str, Any]:
         record["continuation"] = cont
     if all(k in record for k in ("flux_total", "flux_rad", "flux_conv", "mass_path", "f_int")):
         record.update(algebraic_identities(record))
-    record["record_checksum_sha256"] = _record_checksum(record)
-    return record
+    return finalize_record(record)
 
 
 def merge_continuation(base: dict[str, Any], chunk: dict[str, Any]) -> dict[str, Any]:
@@ -310,6 +360,7 @@ def merge_continuation(base: dict[str, Any], chunk: dict[str, Any]) -> dict[str,
         "newton_iterations",
         "energy_residual_rel",
         "energy_committed_residual_rel",
+        "energy_gate_ratio",
         "boundary_mismatch",
     ):
         old = list(hist.get(key) or [])
@@ -322,9 +373,8 @@ def merge_continuation(base: dict[str, Any], chunk: dict[str, Any]) -> dict[str,
     )
     merged["steps_accepted"] = int(base.get("steps_accepted") or 0) + int(chunk.get("steps_accepted") or 0)
     merged["rejections"] = int(base.get("rejections") or 0) + int(chunk.get("rejections") or 0)
-    merged["simulated_time"] = float(base.get("simulated_time") or 0.0) + float(
-        chunk.get("simulated_time") or 0.0
-    )
+    # The chunk solve already returns absolute time when seeded with simulated_time_init.
+    merged["simulated_time"] = float(chunk.get("simulated_time") or 0.0)
     merged["wall_time_s"] = float(base.get("wall_time_s") or 0.0) + float(chunk.get("wall_time_s") or 0.0)
     for key in (
         "status",
@@ -346,7 +396,12 @@ def merge_continuation(base: dict[str, Any], chunk: dict[str, Any]) -> dict[str,
         "median_accepted_dt",
         "last_accepted_dt",
         "energy_residual_rel",
+        "energy_committed_residual",
         "energy_committed_residual_rel",
+        "energy_scale",
+        "energy_ulp_floor",
+        "energy_allowed",
+        "energy_gate_ratio",
         "boundary_mismatch",
         "coupled_defect",
         "profile_checksum_sha256",
@@ -362,7 +417,7 @@ def merge_continuation(base: dict[str, Any], chunk: dict[str, Any]) -> dict[str,
     ):
         if key in chunk:
             merged[key] = chunk[key]
-    merged.update({k: chunk[k] for k in algebraic_identities(chunk)})
+    merged.update(algebraic_identities(chunk))
     cont = dict(merged.get("continuation") or {})
     versions = list(cont.get("code_versions") or [])
     env = chunk.get("environment") or {}
@@ -378,5 +433,4 @@ def merge_continuation(base: dict[str, Any], chunk: dict[str, Any]) -> dict[str,
     })
     cont["code_versions"] = versions
     merged["continuation"] = cont
-    merged["record_checksum_sha256"] = _record_checksum(merged)
-    return merged
+    return finalize_record(merged)
