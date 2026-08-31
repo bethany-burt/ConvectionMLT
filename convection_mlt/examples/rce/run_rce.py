@@ -2,8 +2,8 @@
 """User-facing nested-τ radiative–convective equilibrium runner.
 
 Usage:
-  cd convection_mlt && PYTHONPATH=src python examples/rce/run_rce.py --config examples/rce/example_config.json
-  cd convection_mlt && PYTHONPATH=src python examples/rce/run_rce.py --write-example-config examples/rce/example_config.json
+  cd convection_mlt && PYTHONPATH=src python examples/rce/run_rce.py --config examples/rce/cfg_demo.py
+  cd convection_mlt && PYTHONPATH=src python examples/rce/run_rce.py --write-example-config my_case.py
 
 Exit codes:
   0 CONVERGED
@@ -26,7 +26,7 @@ sys.path.insert(0, str(_PKG / "src"))
 sys.path.insert(0, str(_PKG / "stage4" / "experiments"))
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-from config import ConfigError, load_and_validate, write_example_config
+from load_cfg import ConfigError, copy_config_to_run_dir, load_and_validate, write_example_config
 from outputs import OutputDirError, RunLog, prepare_output_dir, write_run_artifacts
 
 from convection_mlt.production_rce import run_production_rce
@@ -44,9 +44,24 @@ def _utc_now() -> str:
 
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__)
-    ap.add_argument("--config", type=Path, default=None)
-    ap.add_argument("--write-example-config", type=Path, default=None)
-    ap.add_argument("--output-dir", type=Path, default=None)
+    ap.add_argument(
+        "--config",
+        type=Path,
+        default=None,
+        help="Python case file (.py) with user inputs",
+    )
+    ap.add_argument(
+        "--write-example-config",
+        type=Path,
+        default=None,
+        help="write the demo case file template to PATH",
+    )
+    ap.add_argument(
+        "--output-dir",
+        type=Path,
+        default=None,
+        help="override output_dir/out_name from the case file",
+    )
     ap.add_argument(
         "--force",
         action="store_true",
@@ -67,8 +82,9 @@ def main(argv: list[str] | None = None) -> int:
         print("INVALID INPUT: --config is required (or use --write-example-config)")
         return EXIT_INVALID
 
+    cfg_path = args.config.resolve()
     try:
-        cfg = load_and_validate(args.config)
+        cfg = load_and_validate(cfg_path)
     except ConfigError as exc:
         print(f"INVALID INPUT: {exc}")
         return EXIT_INVALID
@@ -76,9 +92,14 @@ def main(argv: list[str] | None = None) -> int:
         traceback.print_exc()
         return EXIT_ERROR
 
-    out_dir = Path(args.output_dir) if args.output_dir is not None else Path(cfg.output_dir)
+    out_dir = (
+        Path(args.output_dir)
+        if args.output_dir is not None
+        else Path(cfg.resolved_output_dir)
+    )
+    force = bool(args.force or cfg.overwrite)
     try:
-        out_dir = prepare_output_dir(out_dir, force=bool(args.force))
+        out_dir = prepare_output_dir(out_dir, force=force)
     except OutputDirError as exc:
         print(f"INVALID INPUT: {exc}")
         return EXIT_INVALID
@@ -91,9 +112,12 @@ def main(argv: list[str] | None = None) -> int:
     wall0 = time.perf_counter()
     try:
         log.write(f"start_utc={started}")
-        log.write(f"config={args.config.resolve()}")
+        log.write(f"config={cfg_path}")
         log.write(f"config_checksum={cfg.config_checksum_sha256}")
-        log.write(f"procedure={cfg.procedure} seed={cfg.seed} N={cfg.n_layers} alpha={cfg.alpha}")
+        log.write(
+            f"procedure={cfg.procedure} seed={cfg.seed} "
+            f"N={cfg.n_layers} alpha={cfg.alpha} x_he={cfg.x_he}"
+        )
         log.write(f"validation_envelope={cfg.envelope_status}")
         for w in cfg.envelope_warnings:
             log.write(f"ENVELOPE WARNING: {w}")
@@ -102,14 +126,17 @@ def main(argv: list[str] | None = None) -> int:
             "profile fluxes positive upward."
         )
 
+        copy_config_to_run_dir(cfg_path, out_dir)
+
         run = run_production_rce(
             n_layers=cfg.n_layers,
             alpha=cfg.alpha,
-            f_int=cfg.f_int_W_m2,
-            f_irr=cfg.f_irr_W_m2,
-            gravity=cfg.gravity_m_s2,
-            p_bottom=cfg.p_bottom_Pa,
-            p_top=cfg.p_top_Pa,
+            f_int=cfg.f_int,
+            f_irr=cfg.f_irr,
+            gravity=cfg.gravity,
+            p_bottom=cfg.p_bottom,
+            p_top=cfg.p_top,
+            x_he=cfg.x_he,
             seed=cfg.seed,
             procedure=cfg.procedure,
             controls=cfg.controls(),

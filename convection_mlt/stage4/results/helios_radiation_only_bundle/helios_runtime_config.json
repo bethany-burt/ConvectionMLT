@@ -1,0 +1,20 @@
+{
+  "helios_commit": "b0800f9ea4366263241c13bb926e8ca68f266cc5",
+  "n_layers": 192,
+  "diffusivity_factor": 2.0,
+  "precision": "double",
+  "scattering": "no",
+  "convective_adjustment": "no",
+  "direct_irradiation": "no",
+  "planet_type": "rocky",
+  "internal_flux_temperature_k": 269.698,
+  "p_boa_microbar": 10000000.0,
+  "p_toa_microbar": 10.3663,
+  "run_type": "post-processing",
+  "stellar_model": "blackbody",
+  "patch_file": "helios_write_integrated_flux_b0800f9.patch",
+  "sha256": "fe5323668e80b0698d7d55e10ec7c9126a270e981dede64570b47840763ab9c2",
+  "applies_to": "source/write.py write_integrated_flux",
+  "format": "unified_diff",
+  "purpose": "space-delimited {:.17e} integrated-flux writer after git checkout of the pinned commit"
+}

@@ -1,0 +1,43 @@
+{
+  "job_id": "16015061",
+  "date": "2026-08-25",
+  "case": "stage4_coupled_n96",
+  "classification": {
+    "manifest": "PASS",
+    "helios_launch_gpu_infrastructure": "PASS",
+    "seed_loading_contract": "FAIL",
+    "helios_convergence": "ABORTED_BEFORE_VALID_BENCHMARK",
+    "coupled_n96_physical_benchmark": "NOT_RUN",
+    "full_stage4_claim": false
+  },
+  "summary": {
+    "what_happened": "HELIOS ignored the exported MLT TP seed and started isothermal 500 K; hit maximum iterations=1000 with 0/97 layers converged; wrote ABORT only (no final TP or integrated_flux). Scorer then crashed on missing nested_rce_family.json.",
+    "not_implicated": [
+      "analytic opacity table",
+      "matched F_irr=0 forcing",
+      "net lower-flux contract",
+      "HELIOS radiation transport",
+      "either convection closure"
+    ],
+    "next_run": {
+      "mode": "stock_iterative",
+      "physical_timestep": "no",
+      "isothermal_layers": "yes",
+      "maximum_number_of_iterations": 50000,
+      "initialization": "documented HELIOS isothermal 500 K (independent of MLT seed)",
+      "only_if_50k_aborts": "physical timestep + start from provided TP, then timestep bracket; else provenance-pinned IC patch"
+    }
+  },
+  "artifacts": {
+    "local_debug_bundle": "convection_mlt/stage4/results/helios_coupled_n96_abort_debug/",
+    "cluster_debug": "/project/ls-heng/Bethany.Burt/helios_coupled_n96_abort_debug_20260825/",
+    "staging": "/project/ls-heng/Bethany.Burt/convection_mlt_coupled_n96_20260825T135020Z",
+    "case_output": "/project/ls-heng/Bethany.Burt/helios_stage4_coupled_20260825T135235Z/stage4_coupled_n96"
+  },
+  "follow_up": {
+    "stock_50k_job_id": "16015568",
+    "staging": "/project/ls-heng/Bethany.Burt/convection_mlt_coupled_n96_20260825T145530Z",
+    "helios_coupled_out": "/project/ls-heng/Bethany.Burt/helios_stage4_coupled_20260825T145530Z",
+    "mode": "stock_iterative_isothermal_500K_maxiters_50000"
+  }
+}

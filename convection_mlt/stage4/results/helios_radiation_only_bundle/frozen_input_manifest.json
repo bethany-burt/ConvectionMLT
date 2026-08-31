@@ -1,0 +1,11 @@
+{
+  "purpose": "Checksums of frozen HELIOS inputs. Live wrappers must verify, never rebuild.",
+  "files": {
+    "analytic_grey_nested.h5": "9505247e1104c9d11500944975a2d26b82d55c4e3c7c66f579a5a9c08334cd3c",
+    "constant_grey.h5": "79e255f3cfec7a1b49087ed818d5ffdbeeb7534e86bee3105eba4e8a8cf10e7e",
+    "pressure_tagged.h5": "6b5338d3fb7750515e3de4d62912bc5a9de5aabaf6f12357c3ee98cb8674252a",
+    "radiation_only_tolerances.json": "c05a5e7548379ff2fa35d3fcd07d52a9a919681ed56d1ee5df1b3a2a31029439",
+    "helios_write_integrated_flux_b0800f9.patch": "fe5323668e80b0698d7d55e10ec7c9126a270e981dede64570b47840763ab9c2",
+    "helios_write_integrated_flux_b0800f9.patch.json": "9ae8a0bb720703a7d689a46fe0cceeb95e4d878ce56c4a7bd8d10350c7b1e493"
+  }
+}

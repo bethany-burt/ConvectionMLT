@@ -23,6 +23,7 @@ from convection_mlt import (
 )
 from convection_mlt.rce import (
     ManufacturedRadiativeTarget,
+    committed_energy_budget,
     committed_energy_ok,
     committed_energy_residual,
 )
@@ -188,7 +189,7 @@ def test_convection_off_recovers_radiative_only_shape_and_multiband_case_runs():
 
 
 def test_helios_adapter_roundtrip_orientation_exact():
-    adapter = HeliosAdapter(helios_top_to_bottom=True)
+    adapter = HeliosAdapter(legacy_reverse=True)
     layers = np.array([10.0, 20.0, 30.0, 40.0], dtype=np.float64)
     ifaces = np.array([1.0, 2.0, 3.0, 4.0, 5.0], dtype=np.float64)
     assert np.array_equal(adapter.roundtrip_layers(layers), layers)
@@ -204,8 +205,11 @@ def test_committed_energy_helpers_match_column_identity():
     resid = committed_energy_residual(mass, h_new, h_n, dt, f_total)
     assert resid == (1.0 * 1.0 + 2.0 * 1.0 + 3.0 * 2.0) - 2.0 * (4.0 - 1.0)
     cfg = RCEConfig()
+    allowed, ratio = committed_energy_budget(1e-20, 1.0, 1e-16, cfg)
+    assert ratio <= 1.0
     assert committed_energy_ok(1e-20, 1.0, 1e-16, cfg)
     assert not committed_energy_ok(1e-8, 1.0, 1e-16, cfg)
+    assert allowed == max(1e-12 * 1.0, 16.0 * 1e-16)
 
 
 def test_implicit_picard_step_meets_committed_energy():

@@ -1,0 +1,39 @@
+{
+  "status": "PASS",
+  "purpose": "frozen_T_iso_no_radiation_preflight",
+  "n_layers": 96,
+  "checks": {
+    "finite_net": true,
+    "finite_up": true,
+    "finite_down": true,
+    "up_nonnegative": true,
+    "down_nonnegative": true,
+    "boa_net_order_f_int": true,
+    "toa_net_finite_scale": true,
+    "no_planck_runaway_in_flux": true
+  },
+  "metrics": {
+    "f_int": 300.0,
+    "boa_net_W_m2": 18.123011406444014,
+    "toa_net_W_m2": 297.58267261764354,
+    "max_abs_net_W_m2": 297.58267261764354,
+    "max_abs_up_W_m2": 12257.874871042557,
+    "max_abs_down_W_m2": 12239.751859636113,
+    "planck_t_ceiling_k": 15998,
+    "iso_yes_boa_net_W_m2": 914.1225006350112,
+    "iso_yes_toa_net_W_m2": 297.7820430898753
+  },
+  "iso_yes_vs_iso_no": {
+    "max_abs_net_delta_W_m2": 1621.4932062532548,
+    "max_rel_net": 0.9801744171116513,
+    "max_rel_interface": 0,
+    "iso_no_at_max": 18.123011406444014,
+    "iso_yes_at_max": 914.1225006350112,
+    "note": "Same frozen MLT F_irr=0 T(P); only isothermal_layers changed. Not required to match prior radiation-only parity."
+  },
+  "helios_coupled_rce_n96_status": "NOT_RUN",
+  "full_stage4_claim": false,
+  "note": "Preflight only. Quantifies iso layer-source change and confirms finite oriented fluxes before iterative coupled HELIOS.",
+  "helios_process_returncode_iso_no": 0,
+  "helios_process_returncode_iso_yes": 0
+}

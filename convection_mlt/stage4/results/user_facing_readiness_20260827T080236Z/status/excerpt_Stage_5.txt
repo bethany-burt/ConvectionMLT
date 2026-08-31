@@ -1,0 +1,21 @@
+Stage-5 radiation source sensitivity (future requirement)
+--------------------------------------------------------------------
+Implement or construct a linear-in-optical-depth source diagnostic;
+compare it with the constant-source calculation on the same frozen
+T(P); repeat at N=96, 192 and 384; measure changes in flux, T(P), and
+RCB. Adequacy criterion: whether the two reconstructions converge as
+max Δτ decreases. If the RCB difference falls below the spatial gate
+with refinement, the present scheme is fully adequate; if a persistent
+nonzero offset remains, production radiation should gain a
+non-isothermal source option.
+
+MLT sensitivity campaign (internal track evidence)
+--------------------------------------------------------------------
+See stage4/results/mlt_sensitivity/mlt_sensitivity_summary.json and
+mlt_sensitivity_completion.json.
+Local closure PASS; N=96 α-sweep PASS with Δ∇∝α^{-4/3}; prescribed-Δt
+ladder PASS (order ~1.59, constant histories); broad IC basin PASS
+(RC / RE / ±5%); N=192 α=0.5,1,2 formally gated after discrete-RZ +
+five-check polish. Prior dt_hold_init ladder SUPERSEDED (adaptive grew
+Δt). Exact HELIOS RCB agreement is neither expected nor required; keep
+t

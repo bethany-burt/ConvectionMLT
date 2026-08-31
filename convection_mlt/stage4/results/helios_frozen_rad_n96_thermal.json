@@ -1,0 +1,165 @@
+{
+  "case": "n96_thermal",
+  "helios_commit": "b0800f9ea4366263241c13bb926e8ca68f266cc5",
+  "comparison_type": "radiation_only_not_mlt",
+  "reference_source": "nested_rce_family.json[96]",
+  "reference_grid": "helios_geometric",
+  "reference_file": "/project/ls-heng/Bethany.Burt/convection_mlt/stage4/fixtures/helios/helios_grid_n96_thermal_reference.json",
+  "grid_checksum_sha256": "61e471d1aebc0b6a4092ca950c0b6da6b9d8e146b365f05d76c9d9a0e3da1a2a",
+  "helios_flux_file": "/project/ls-heng/Bethany.Burt/helios_stage4_frozen/stage4_frozen_n96_thermal/stage4_frozen_n96_thermal/stage4_frozen_n96_thermal_integrated_flux.dat",
+  "helios_flux_checksum_sha256": "6a1cccc7068aeb2dbfe00be148223b6daaacf08c12e3c4d9107f1d3f54f88647",
+  "helios_runtime_config": {
+    "helios_commit": "b0800f9ea4366263241c13bb926e8ca68f266cc5",
+    "n_layers": 96,
+    "diffusivity_factor": 2.0,
+    "precision": "double",
+    "scattering": "no",
+    "convective_adjustment": "no",
+    "direct_irradiation": "no",
+    "planet_type": "rocky",
+    "internal_flux_temperature_k": 269.698,
+    "p_boa_microbar": 10000000.0,
+    "p_toa_microbar": 10.7461,
+    "run_type": "post-processing",
+    "stellar_model": "blackbody"
+  },
+  "tolerances_source": "/project/ls-heng/Bethany.Burt/convection_mlt/stage4/fixtures/helios/radiation_only_tolerances.json",
+  "tolerances_frozen_before_live": true,
+  "metrics": {
+    "pressure_grid_rel": 5.4092845832929015e-08,
+    "flux_decomposition_rel": 1.1133226041671601e-15,
+    "rocky_surface_up_rel": 2.460543991983944e-06,
+    "rocky_surface_net_rel": 2.4605439920669515e-06,
+    "toa_flux_down_rel": 0.0,
+    "flux_up_rel": 1.0373800946680492e-05,
+    "flux_down_rel": 1.037380126026526e-05,
+    "flux_net_rel": 8.977456358266566e-06,
+    "heating_from_flux_rel": 0.0007681614249488658,
+    "layer_energy_increment_rel": 0.00020176284550204316,
+    "reference_column_energy_identity_rel": 2.1715578005835634e-16,
+    "helios_column_energy_closure_rel": 4.343964284811281e-16,
+    "column_energy_closure_rel": 2.1715578005835634e-16,
+    "f_intern_parameter_rel": 3.1899701800360465e-06
+  },
+  "heating_units": "W kg^-1",
+  "local": {
+    "flux_up": {
+      "max_local_rel": 3.7450253755613014e-05,
+      "interface": 18,
+      "pressure_microbar": 749894.2093324558,
+      "helios": 829.6718401092414,
+      "reference": 829.6407686882955,
+      "abs_W_m2": 0.03107142094597748
+    },
+    "flux_down": {
+      "max_local_rel": 0.00012429783932023603,
+      "interface": 34,
+      "pressure_microbar": 74989.42093324561,
+      "helios": 33.91957329101619,
+      "reference": 33.915357161345455,
+      "abs_W_m2": 0.0042161296707377005
+    },
+    "flux_net": {
+      "max_local_rel": 0.00021315115001400284,
+      "interface": 12,
+      "pressure_microbar": 1778279.410038923,
+      "helios": 307.0716219302076,
+      "reference": 307.0061692608565,
+      "abs_W_m2": 0.06545266935108884
+    },
+    "layer_energy_increment": {
+      "max_local_rel": 0.0037681265514639723,
+      "interface": 12,
+      "pressure_microbar": 1654817.0999431815,
+      "helios": 29.397681160754757,
+      "reference": 29.286906977821445,
+      "abs_W_m2": 0.1107741829333122
+    }
+  },
+  "stages": {
+    "pressure_grid": {
+      "observed": 5.4092845832929015e-08,
+      "tolerance": 1e-06,
+      "status": "PASS"
+    },
+    "f_intern_parameter": {
+      "observed": 3.1899701800360465e-06,
+      "tolerance": 0.0001,
+      "status": "PASS"
+    },
+    "flux_decomposition": {
+      "observed": 1.1133226041671601e-15,
+      "tolerance": 0.0001,
+      "status": "PASS"
+    },
+    "rocky_surface_up": {
+      "observed": 2.460543991983944e-06,
+      "tolerance": 0.0001,
+      "status": "PASS"
+    },
+    "rocky_surface_net": {
+      "observed": 2.4605439920669515e-06,
+      "tolerance": 0.0001,
+      "status": "PASS"
+    },
+    "toa_flux_down": {
+      "observed": 0.0,
+      "tolerance": 0.0001,
+      "status": "PASS"
+    },
+    "flux_up": {
+      "observed": 1.0373800946680492e-05,
+      "tolerance": 0.005278229379031692,
+      "status": "PASS"
+    },
+    "flux_down": {
+      "observed": 1.037380126026526e-05,
+      "tolerance": 0.005278229379031692,
+      "status": "PASS"
+    },
+    "flux_net": {
+      "observed": 8.977456358266566e-06,
+      "tolerance": 0.005278229379031692,
+      "status": "PASS"
+    },
+    "heating_from_flux": {
+      "observed": 0.0007681614249488658,
+      "tolerance": 0.005278229379031692,
+      "status": "PASS"
+    },
+    "reference_column_energy_identity": {
+      "observed": 2.1715578005835634e-16,
+      "tolerance": 1e-12,
+      "status": "PASS"
+    },
+    "helios_column_energy_closure": {
+      "observed": 4.343964284811281e-16,
+      "tolerance": 0.0001,
+      "status": "PASS"
+    }
+  },
+  "comparison_order": [
+    "pressure_grid",
+    "f_intern_parameter",
+    "flux_decomposition",
+    "rocky_surface_up",
+    "rocky_surface_net",
+    "toa_flux_down",
+    "flux_up",
+    "flux_down",
+    "flux_net",
+    "heating_from_flux",
+    "reference_column_energy_identity",
+    "helios_column_energy_closure"
+  ],
+  "status": "PASS",
+  "coupled_helios_rce_claimed": false,
+  "helios_parity_headline": false,
+  "helios_parity_headline_means": "coupled_helios_rce_parity",
+  "helios_adapter_contract_status": "PASS",
+  "helios_radiation_only_n96_status": "PASS",
+  "helios_radiation_only_n192_status": "NOT_RUN",
+  "helios_radiation_only_parity_status": "NOT_RUN",
+  "helios_coupled_rce_status": "NOT_RUN",
+  "full_stage4_claim": false
+}

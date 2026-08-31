@@ -1,0 +1,15 @@
+{
+  "helios_commit": "b0800f9ea4366263241c13bb926e8ca68f266cc5",
+  "stage3_top_irradiation": {
+    "type": "TopIrradiation",
+    "description": "diffuse downward flux F_down(top) in W m^-2, grey single band",
+    "band_fractions": null
+  },
+  "helios_irradiation": {
+    "type": "direct_beam",
+    "description": "HELIOS direct irradiation beam with zenith angle and spectral stellar spectrum",
+    "exact_map_to_TopIrradiation": false
+  },
+  "n96b_status": "structural_comparison_only",
+  "note": "N96-B may run only after this contract is reviewed. No post-hoc empirical offset."
+}

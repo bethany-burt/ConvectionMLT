@@ -1,0 +1,37 @@
+{
+  "out": "/Users/burt/Desktop/USM/Exo/ConvectionMLT/convection_mlt/stage4/fixtures/helios/pressure_tagged.h5",
+  "checksum_sha256": "8a4caf65bc1e5abdecec744be03635612c6e9349e9afc8ee78af627a742fb17d",
+  "flatten": "helios",
+  "metadata": {
+    "kpoints_logical_axes": [
+      "y",
+      "wavelength",
+      "pressure",
+      "temperature"
+    ],
+    "linear_index_order": "y_fastest",
+    "linear_index_formula": "y + ny*x + ny*nx*p + ny*nx*npress*t",
+    "meanmolmass_logical_axes": [
+      "pressure",
+      "temperature"
+    ],
+    "meanmolmass_linear_index_formula": "p + npress*t",
+    "rayleigh_logical_axes": [
+      "wavelength",
+      "pressure",
+      "temperature"
+    ],
+    "rayleigh_linear_index_formula": "x + nx*p + nx*npress*t",
+    "hdf5_pressure_unit": "microbar",
+    "hdf5_pressure_note": "dyne cm^-2 = microbar; must match HELIOS p_lay",
+    "schema_version": "stage4_analytic_grey_v3",
+    "helios_commit": "b0800f9ea4366263241c13bb926e8ca68f266cc5",
+    "opacity_model": "PressureTagged",
+    "kappa_cgs": "kappa_scale_cgs * P_bar",
+    "kappa_scale_cgs": 1.0,
+    "pressure_unit": "microbar",
+    "opacity_unit": "cm^2 g^-1",
+    "temperature_unit": "K",
+    "diagnostic": "pressure_tagged_axis_probe"
+  }
+}

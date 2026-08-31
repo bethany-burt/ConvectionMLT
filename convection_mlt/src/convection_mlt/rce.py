@@ -311,6 +311,51 @@ NESTED_MASTER_LAYERS = 384
 NESTED_MASTER_PHOTOSPHERE = 64
 
 
+def default_analytic_photosphere_layers(n_layers: int) -> int:
+    """Photosphere layer count matching the nested 384/64 ratio when possible."""
+    n = int(n_layers)
+    if n < 4:
+        raise ValueError("n_layers must be at least 4")
+    n_phot = int(round(n * NESTED_MASTER_PHOTOSPHERE / NESTED_MASTER_LAYERS))
+    return max(2, min(n - 2, n_phot))
+
+
+def build_analytic_opacity_spec(
+    n_layers: int,
+    *,
+    n_master: int = NESTED_MASTER_LAYERS,
+    n_photosphere_master: int = NESTED_MASTER_PHOTOSPHERE,
+    **kwargs,
+) -> AnalyticOpacityRCESpec:
+    """Build analytic-opacity RCE spec for any n_layers >= 4.
+
+    When n_layers evenly coarsens the 384-layer nested master (96/192/384/…),
+    use nested pressure edges for resolution parity. Otherwise build a fresh
+    τ-uniform interior grid with a geometric photosphere.
+    """
+    n = int(n_layers)
+    if n < 4:
+        raise ValueError(f"n_layers must be >= 4; got {n}")
+    if n_master % n == 0:
+        stride = n_master // n
+        if n_photosphere_master % stride == 0:
+            return nested_analytic_opacity_spec(
+                n,
+                n_master=n_master,
+                n_photosphere_master=n_photosphere_master,
+                **kwargs,
+            )
+    kwargs.pop("n_photosphere", None)
+    kwargs.pop("n_layers", None)
+    kwargs.pop("nested_master_layers", None)
+    kwargs.pop("nested_master_photosphere", None)
+    return AnalyticOpacityRCESpec(
+        n_layers=n,
+        n_photosphere=default_analytic_photosphere_layers(n),
+        **kwargs,
+    )
+
+
 def nested_analytic_opacity_spec(
     n_layers: int,
     *,

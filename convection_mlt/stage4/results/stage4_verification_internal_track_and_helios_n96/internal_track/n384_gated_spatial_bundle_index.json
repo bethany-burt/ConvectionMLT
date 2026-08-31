@@ -1,0 +1,54 @@
+{
+  "purpose": "Gated N=384 spatial source of truth plus nested 96/192/384 scoring. The live record is the five-check polish n384_implicit_rce.json (profile 5e0bd\u2026), not the discrete-RZ accelerator snapshot.",
+  "n384_live_record": "n384_implicit_rce.json",
+  "n384_profile_checksum_sha256": "5e0bd359a7e352863c767faf5441d93968370d358a5b0270c8f6ebf293d875ec",
+  "n384_record_checksum_sha256": "3ed6a56ddf840fa7c46a96694664d3f0af102de0ffd15c1d0109d5bb64394c44",
+  "n192_profile_checksum_sha256": "4b7d67555f64b74d5d820d488f29b5d4024e802fd12ab2a4614df9160de8713f",
+  "n192_implicit_record_excluded": true,
+  "n192_implicit_record_bytes": 16191797,
+  "n384_9500_archive_excluded": true,
+  "n384_9500_archive_sha256": "b14b9215b7ed743029e57fa9659bc09c87ee164c412af556ff4b6543509785f2",
+  "accelerator_snapshot": "n384_discrete_rz_rce.json",
+  "internal_numerical_track_complete": true,
+  "core_single_resolution_status": "PASS",
+  "spatial_and_operator_convergence_status": "PASS",
+  "algebraic_identity_status": "PASS",
+  "helios_radiation_only_parity_status": "PASS",
+  "helios_coupled_rce_status": "NOT_RUN",
+  "helios_parity_headline": false,
+  "full_stage4_claim": false,
+  "files": {
+    "n384_implicit_rce.json": {
+      "bytes": 77559,
+      "sha256": "270d4890c4a083c643ba4a85341151d4d06a28618475e94feeb174cf7657bafd"
+    },
+    "nested_rce_family.json": {
+      "bytes": 659206,
+      "sha256": "c0ef2fed9cb6d9595e2b03e2f1d99a5a1a79b82a8c4cab54cb5cc3c8cfb534db"
+    },
+    "exit_gate_audit.json": {
+      "bytes": 22992,
+      "sha256": "faa17ca398284c31666bf7cd5b6b370c850d4878197a21a9c26e3bfe1b160264"
+    },
+    "STAGE4_STATUS_REPORT.txt": {
+      "bytes": 3528,
+      "sha256": "3aa6d12e5333b9a3bf496b7bf85478e34fd1acd79e8b7e88e4443c4c03d3ca75"
+    },
+    "n384_discrete_rz_rce.json": {
+      "bytes": 61536,
+      "sha256": "0deb48dee8d016d40ac12d767afb50ffd1947b1e7215c84a035257289c8f16aa"
+    },
+    "n384_discrete_rz_flux_profiles.json": {
+      "bytes": 98945,
+      "sha256": "a9c4f858cee05433320d2f293fbe5f0a97ba84d3319c06a4c3458b496b4793cb"
+    },
+    "nested_spatial_1e-3.png": {
+      "bytes": 93352,
+      "sha256": "890dcae83542c4f948eb1834c9082531de5adb4b890a88256a580f338713c143"
+    },
+    "coupled_rce_benchmark_tolerances.json": {
+      "bytes": 1366,
+      "sha256": "f51bb589b052f272e117eca72351492bbdb9012978405a0735441fa4725a140c"
+    }
+  }
+}

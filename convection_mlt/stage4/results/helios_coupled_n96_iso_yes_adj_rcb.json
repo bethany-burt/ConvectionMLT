@@ -1,0 +1,40 @@
+{
+  "purpose": "labelled_helios_n96_iso_yes_adj_source_counterfactual",
+  "job_id": "16024505",
+  "n_layers": 96,
+  "isothermal_layers": true,
+  "convective_adjustment": true,
+  "iso1_patch": "helios_iso1_conv_check_b0800f9.patch",
+  "helios_process_returncode": 0,
+  "status": "COMPLETE",
+  "convection_entered": true,
+  "log_evidence": "Convectively unstable layers found. Starting convective adjustment",
+  "scoring_method": "near_adiabat_T_P",
+  "scoring_note": "Stock write.py blanks conv flags under iso=yes; scored from T(P) near-adiabat (same helper as attribution). Bottom-connected CZ absent.",
+  "rcb_log10p": null,
+  "n_cz_layers": 0,
+  "near_adiabat": {
+    "rcb_log10p": null,
+    "n_near_adiabatic_interfaces": 5,
+    "n_bottom_connected_cz_layers": 0,
+    "max_lapse": 0.28572162160168335,
+    "mean_lapse_in_cz": null
+  },
+  "iso_no_pilot_rcb_log10p": 4.7187499048239445,
+  "mlt_reference_rcb_log10p": 5.028032313236911,
+  "delta_T_deep_K_vs_iso_no_pilot": -144.75099999999998,
+  "T_deep_K": 555.599,
+  "T_deep_iso_no_K": 700.35,
+  "source_treatment_rcb_shift_dex": null,
+  "source_treatment_structural": {
+    "iso_no_adj": "bottom-connected CZ, RCB_log10p\u22484.719 (lapse flags)",
+    "iso_yes_adj": "no bottom-connected CZ; detached mid-column near-ad band only",
+    "interpretation": "Holding grid/adjustment/opacity/forcing/N=96 fixed, switching only layer-source iso=no\u2192yes removes the bottom CZ. Source treatment is not a small RCB nudge; it changes CZ topology. Cannot quote a single \u0394RCB dex between two RCBs when one is undefined."
+  },
+  "compare_to_iso_no_pilot_rcb_log10p": 4.7187499048239445,
+  "helios_parity_headline": false,
+  "full_stage4_claim": false,
+  "frozen_rcb_gate_0p15_dex": "FAIL_UNCHANGED",
+  "note": "Counterfactual only. Quantifies source-treatment contribution under coupled adjustment. Does not relabel the coupled benchmark as PASS.",
+  "helios_tp": "stage4/results/helios_coupled_n96_iso_yes_adj_job16024505/stage4_coupled_n96_iso_yes_adj_tp.dat"
+}

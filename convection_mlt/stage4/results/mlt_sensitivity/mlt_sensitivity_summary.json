@@ -1,0 +1,895 @@
+{
+  "purpose": "stage4_mlt_sensitivity_campaign",
+  "physical_gate": 0.001,
+  "helios_rcb_agreement_required": false,
+  "phases": {
+    "local": {
+      "status": "PASS",
+      "returncode": 0,
+      "stdout": ".......                                                                  [100%]\n7 passed in 0.12s\n",
+      "stderr": "",
+      "checks": [
+        "F_conv=0 for \u0394\u2207\u22640",
+        "F_conv\u22650 on unstable interfaces",
+        "d log F / d log \u03b1 = 2",
+        "d log F / d log \u0394\u2207 = 3/2",
+        "continuity as \u0394\u2207\u21920\u207a",
+        "pressure-orientation roundtrip invariance"
+      ]
+    },
+    "alpha_sweep": {
+      "status": "PASS",
+      "n_layers": 96,
+      "members": {
+        "0.0": {
+          "status": "max_steps",
+          "physically_gated": false,
+          "flux_flatness": 0.30684565985346124,
+          "tendency_norm": 0.014245740784314573,
+          "primary_rcb_log10p": 5.237719563426541,
+          "convective_regions": [
+            [
+              0,
+              74
+            ]
+          ],
+          "detached_convective_regions": [],
+          "energy_gate_ratio": 0.07238055092229945,
+          "simulated_time": 50000000.0,
+          "steps_accepted": 20000,
+          "wall_time_s": 65.10189162497409,
+          "delta_nabla_max": 0.17445472176353466,
+          "delta_nabla_rms_active": 0.09261153196520061,
+          "convective_flux_fraction_max": 0.0,
+          "f_conv_max_internal": 0.0,
+          "flux_split_identity_rel": 0.0,
+          "record": "/Users/burt/Desktop/USM/Exo/ConvectionMLT/convection_mlt/stage4/results/mlt_sensitivity/alpha_sweep_n96_alpha0.0.json",
+          "radiation_only_control": true,
+          "gate_note": "\u03b1=0 radiation-only control (F_conv\u22610); not scored on 1e-3 convective RCE gate."
+        },
+        "0.5": {
+          "status": "converged",
+          "physically_gated": true,
+          "flux_flatness": 0.0009990158806279699,
+          "tendency_norm": 0.00029892457244765563,
+          "primary_rcb_log10p": 5.11611970336069,
+          "convective_regions": [
+            [
+              0,
+              76
+            ]
+          ],
+          "detached_convective_regions": [],
+          "energy_gate_ratio": 0.0033620070738322565,
+          "simulated_time": 4720000.0,
+          "steps_accepted": 1888,
+          "wall_time_s": 81.2531493329443,
+          "delta_nabla_max": 5.087011899679306e-05,
+          "delta_nabla_rms_active": 4.220130425234577e-05,
+          "convective_flux_fraction_max": 0.4905389767885109,
+          "f_conv_max_internal": 147.16169303655326,
+          "flux_split_identity_rel": 0.0,
+          "record": "/Users/burt/Desktop/USM/Exo/ConvectionMLT/convection_mlt/stage4/results/mlt_sensitivity/alpha_sweep_n96_alpha0.5.json"
+        },
+        "1.0": {
+          "status": "converged",
+          "physically_gated": true,
+          "flux_flatness": 0.0009980851465752495,
+          "tendency_norm": 0.00035780618607229067,
+          "primary_rcb_log10p": 5.117068251694552,
+          "convective_regions": [
+            [
+              0,
+              76
+            ]
+          ],
+          "detached_convective_regions": [],
+          "energy_gate_ratio": 0.0009012608717031105,
+          "simulated_time": 2287500.0,
+          "steps_accepted": 915,
+          "wall_time_s": 54.35588283301331,
+          "delta_nabla_max": 2.0190253806728897e-05,
+          "delta_nabla_rms_active": 1.6749272728869946e-05,
+          "convective_flux_fraction_max": 0.4906117450442485,
+          "f_conv_max_internal": 147.18352351327454,
+          "flux_split_identity_rel": 0.0,
+          "record": "/Users/burt/Desktop/USM/Exo/ConvectionMLT/convection_mlt/stage4/results/mlt_sensitivity/alpha_sweep_n96_alpha1.0.json"
+        },
+        "2.0": {
+          "status": "converged",
+          "physically_gated": true,
+          "flux_flatness": 0.0009976518322067326,
+          "tendency_norm": 0.0004346471185669998,
+          "primary_rcb_log10p": 5.119458708546421,
+          "convective_regions": [
+            [
+              0,
+              76
+            ]
+          ],
+          "detached_convective_regions": [],
+          "energy_gate_ratio": 0.0073340229798913095,
+          "simulated_time": 1537500.0,
+          "steps_accepted": 615,
+          "wall_time_s": 56.63893145811744,
+          "delta_nabla_max": 8.012887659503143e-06,
+          "delta_nabla_rms_active": 6.647213379831515e-06,
+          "convective_flux_fraction_max": 0.4906401585634771,
+          "f_conv_max_internal": 147.19204756904313,
+          "flux_split_identity_rel": 0.0,
+          "record": "/Users/burt/Desktop/USM/Exo/ConvectionMLT/convection_mlt/stage4/results/mlt_sensitivity/alpha_sweep_n96_alpha2.0.json"
+        },
+        "4.0": {
+          "status": "converged",
+          "physically_gated": true,
+          "flux_flatness": 0.000997339078726327,
+          "tendency_norm": 0.0004909716704264611,
+          "primary_rcb_log10p": 5.125482290270068,
+          "convective_regions": [
+            [
+              0,
+              76
+            ]
+          ],
+          "detached_convective_regions": [],
+          "energy_gate_ratio": 0.007899185308654817,
+          "simulated_time": 1265000.0,
+          "steps_accepted": 506,
+          "wall_time_s": 73.10381004191004,
+          "delta_nabla_max": 3.1799779769414727e-06,
+          "delta_nabla_rms_active": 2.637990011230163e-06,
+          "convective_flux_fraction_max": 0.49065136687304867,
+          "f_conv_max_internal": 147.1954100619146,
+          "flux_split_identity_rel": 0.0,
+          "record": "/Users/burt/Desktop/USM/Exo/ConvectionMLT/convection_mlt/stage4/results/mlt_sensitivity/alpha_sweep_n96_alpha4.0.json"
+        }
+      },
+      "alpha_delta_scaling": {
+        "status": "COMPUTED",
+        "log_delta_vs_log_alpha_slope": -1.3332606622078318,
+        "expected_local_fixed_flux": -1.3333333333333333,
+        "alphas": [
+          0.5,
+          1.0,
+          2.0,
+          4.0
+        ],
+        "delta_nabla_rms_active": [
+          4.220130425234577e-05,
+          1.6749272728869946e-05,
+          6.647213379831515e-06,
+          2.637990011230163e-06
+        ],
+        "intercept": -10.997182383686885
+      },
+      "scaling_matches_minus_four_thirds": true,
+      "note": "RCB need not move monotonically. Observed \u0394\u2207\u2013\u03b1 slope=-1.3332606622078318 (expect -4/3)."
+    },
+    "timestep": {
+      "status": "SUPERSEDED",
+      "alpha": 1.0,
+      "t_final": 100000.0,
+      "dt_values": [
+        200.0,
+        400.0,
+        800.0
+      ],
+      "arms": {
+        "800.0": {
+          "status": "max_steps",
+          "reason": "reached t_final",
+          "simulated_time": 100000.0,
+          "steps_accepted": 26,
+          "flux_flatness": 0.11507612450517968,
+          "tendency_norm": 0.006730637049598347,
+          "primary_rcb_log10p": 5.117145649062542,
+          "column_enthalpy": 238395380586.4295,
+          "perturbation_norm": 0.19584520329432525,
+          "f_conv_max": 135.5154215977725,
+          "wall_time_s": 2.0551104589831084,
+          "record": "/Users/burt/Desktop/USM/Exo/ConvectionMLT/convection_mlt/stage4/results/mlt_sensitivity/timestep_n96_alpha1.0_dt800.0.json"
+        },
+        "400.0": {
+          "status": "max_steps",
+          "reason": "reached t_final",
+          "simulated_time": 100000.0,
+          "steps_accepted": 30,
+          "flux_flatness": 0.11507612956044436,
+          "tendency_norm": 0.006730642491325322,
+          "primary_rcb_log10p": 5.117145646433549,
+          "column_enthalpy": 238395380594.574,
+          "perturbation_norm": 0.19584520391070356,
+          "f_conv_max": 135.51542272338838,
+          "wall_time_s": 2.1576861671637744,
+          "record": "/Users/burt/Desktop/USM/Exo/ConvectionMLT/convection_mlt/stage4/results/mlt_sensitivity/timestep_n96_alpha1.0_dt400.0.json"
+        },
+        "200.0": {
+          "status": "max_steps",
+          "reason": "reached t_final",
+          "simulated_time": 100000.0,
+          "steps_accepted": 34,
+          "flux_flatness": 0.11507613586832822,
+          "tendency_norm": 0.006730649254733976,
+          "primary_rcb_log10p": 5.117145643477848,
+          "column_enthalpy": 238395380606.39758,
+          "perturbation_norm": 0.1958452047115428,
+          "f_conv_max": 135.5154249747374,
+          "wall_time_s": 2.180789874866605,
+          "record": "/Users/burt/Desktop/USM/Exo/ConvectionMLT/convection_mlt/stage4/results/mlt_sensitivity/timestep_n96_alpha1.0_dt200.0.json"
+        }
+      },
+      "equal_time_max_rel_T_vs_finest": {
+        "400.0": 1.997621293717127e-09,
+        "800.0": 3.602537429207647e-09
+      },
+      "observed_temporal_order_estimate": 0.8507303146951304,
+      "equilibrium_from_trajectory_ends": {
+        "200.0": {
+          "physically_gated": true,
+          "primary_rcb_log10p": 5.1170686865667525,
+          "flux_flatness": 0.0005981618503286275
+        },
+        "800.0": {
+          "physically_gated": true,
+          "primary_rcb_log10p": 5.117068631966952,
+          "flux_flatness": 0.0005975800412200746
+        }
+      },
+      "equilibrium_max_rel_T_between_dt_ends": 4.269509713429718e-08,
+      "prior_evidence_note": "Existing 800 vs 400 s equilibrium difference ~6.5e-9 already shows excellent timestep-independent equilibria; this phase targets the transient trajectory at equal physical time.",
+      "flaw": "Used dt_hold_init only; adaptive controller grew \u0394t (prescribed_dt=null). Not a fixed-timestep refinement. See phases.prescribed_dt."
+    },
+    "attractor": {
+      "status": "PASS",
+      "alpha": 1.0,
+      "reference_rcb": 5.117068251694552,
+      "cases": {
+        "hot": {
+          "pass": true,
+          "physically_gated": true,
+          "max_rel_T": 0.00010000626274427786,
+          "rcb_dex": 1.236292632711411e-07,
+          "topology_match": true,
+          "energy_gate_ratio": 0.00628729045597049,
+          "record": "/Users/burt/Desktop/USM/Exo/ConvectionMLT/convection_mlt/stage4/results/mlt_sensitivity/attractor_n96_alpha1.0_hot.json"
+        },
+        "cold": {
+          "pass": true,
+          "physically_gated": true,
+          "max_rel_T": 0.00013512701208236904,
+          "rcb_dex": 3.287452670086566e-05,
+          "topology_match": true,
+          "energy_gate_ratio": 0.010313796812558515,
+          "record": "/Users/burt/Desktop/USM/Exo/ConvectionMLT/convection_mlt/stage4/results/mlt_sensitivity/attractor_n96_alpha1.0_cold.json"
+        },
+        "cz_local": {
+          "pass": true,
+          "physically_gated": true,
+          "max_rel_T": 9.417218138498148e-05,
+          "rcb_dex": 2.3969075473750934e-05,
+          "topology_match": true,
+          "energy_gate_ratio": 0.006276963148682908,
+          "record": "/Users/burt/Desktop/USM/Exo/ConvectionMLT/convection_mlt/stage4/results/mlt_sensitivity/attractor_n96_alpha1.0_cz_local.json"
+        },
+        "rz_local": {
+          "pass": true,
+          "physically_gated": true,
+          "max_rel_T": 0.00035294242434111294,
+          "rcb_dex": 9.458852710864107e-06,
+          "topology_match": true,
+          "energy_gate_ratio": 0.0034835465301808624,
+          "record": "/Users/burt/Desktop/USM/Exo/ConvectionMLT/convection_mlt/stage4/results/mlt_sensitivity/attractor_n96_alpha1.0_rz_local.json"
+        },
+        "rcb_local": {
+          "pass": true,
+          "physically_gated": true,
+          "max_rel_T": 0.0001767699702776597,
+          "rcb_dex": 2.532825065237887e-05,
+          "topology_match": true,
+          "energy_gate_ratio": 0.004856956424398786,
+          "record": "/Users/burt/Desktop/USM/Exo/ConvectionMLT/convection_mlt/stage4/results/mlt_sensitivity/attractor_n96_alpha1.0_rcb_local.json"
+        }
+      }
+    },
+    "timestep_stress": {
+      "alpha_0.5": {
+        "status": "PASS",
+        "alpha": 0.5,
+        "t_final": 100000.0,
+        "dt_values": [
+          400.0,
+          800.0
+        ],
+        "arms": {
+          "800.0": {
+            "status": "max_steps",
+            "reason": "reached t_final",
+            "simulated_time": 100000.0,
+            "steps_accepted": 26,
+            "flux_flatness": 0.11498718049648043,
+            "tendency_norm": 0.006780129519544479,
+            "primary_rcb_log10p": 5.116149513792798,
+            "column_enthalpy": 238395441228.55472,
+            "perturbation_norm": 0.1958450016302642,
+            "f_conv_max": 135.49522021839874,
+            "wall_time_s": 1.4262332080397755,
+            "record": "/Users/burt/Desktop/USM/Exo/ConvectionMLT/convection_mlt/stage4/results/mlt_sensitivity/timestep_stress_n96_alpha0.5_dt800.0.json"
+          },
+          "400.0": {
+            "status": "max_steps",
+            "reason": "reached t_final",
+            "simulated_time": 100000.0,
+            "steps_accepted": 30,
+            "flux_flatness": 0.11498718533140352,
+            "tendency_norm": 0.006780134663495687,
+            "primary_rcb_log10p": 5.116149510267459,
+            "column_enthalpy": 238395441236.74396,
+            "perturbation_norm": 0.1958450022455056,
+            "f_conv_max": 135.49524076537708,
+            "wall_time_s": 1.5050387501250952,
+            "record": "/Users/burt/Desktop/USM/Exo/ConvectionMLT/convection_mlt/stage4/results/mlt_sensitivity/timestep_stress_n96_alpha0.5_dt400.0.json"
+          }
+        },
+        "equal_time_max_rel_T_vs_finest": {
+          "800.0": 1.5237851407640819e-09
+        },
+        "observed_temporal_order_estimate": null,
+        "equilibrium_from_trajectory_ends": {
+          "400.0": {
+            "physically_gated": true,
+            "primary_rcb_log10p": 5.116119862933511,
+            "flux_flatness": 0.0005990913483227208
+          },
+          "800.0": {
+            "physically_gated": true,
+            "primary_rcb_log10p": 5.116119887357746,
+            "flux_flatness": 0.0005988971520021854
+          }
+        },
+        "equilibrium_max_rel_T_between_dt_ends": 2.278526782861585e-08,
+        "prior_evidence_note": "Existing 800 vs 400 s equilibrium difference ~6.5e-9 already shows excellent timestep-independent equilibria; this phase targets the transient trajectory at equal physical time."
+      },
+      "alpha_2": {
+        "status": "PASS",
+        "alpha": 2.0,
+        "t_final": 100000.0,
+        "dt_values": [
+          400.0,
+          800.0
+        ],
+        "arms": {
+          "800.0": {
+            "status": "max_steps",
+            "reason": "reached t_final",
+            "simulated_time": 100000.0,
+            "steps_accepted": 26,
+            "flux_flatness": 0.11509343477289519,
+            "tendency_norm": 0.006712060694335946,
+            "primary_rcb_log10p": 5.11965446541042,
+            "column_enthalpy": 238395374247.74075,
+            "perturbation_norm": 0.19584526386777606,
+            "f_conv_max": 135.52425172137774,
+            "wall_time_s": 2.5422197501175106,
+            "record": "/Users/burt/Desktop/USM/Exo/ConvectionMLT/convection_mlt/stage4/results/mlt_sensitivity/timestep_stress_n96_alpha2.0_dt800.0.json"
+          },
+          "400.0": {
+            "status": "max_steps",
+            "reason": "reached t_final",
+            "simulated_time": 100000.0,
+            "steps_accepted": 30,
+            "flux_flatness": 0.11509343981536878,
+            "tendency_norm": 0.006712066173701222,
+            "primary_rcb_log10p": 5.119654460984564,
+            "column_enthalpy": 238395374255.86826,
+            "perturbation_norm": 0.195845264483287,
+            "f_conv_max": 135.52425001971923,
+            "wall_time_s": 2.661347083048895,
+            "record": "/Users/burt/Desktop/USM/Exo/ConvectionMLT/convection_mlt/stage4/results/mlt_sensitivity/timestep_stress_n96_alpha2.0_dt400.0.json"
+          }
+        },
+        "equal_time_max_rel_T_vs_finest": {
+          "800.0": 1.6060060105506785e-09
+        },
+        "observed_temporal_order_estimate": null,
+        "equilibrium_from_trajectory_ends": {
+          "400.0": {
+            "physically_gated": true,
+            "primary_rcb_log10p": 5.119459614805241,
+            "flux_flatness": 0.0005974108191010904
+          },
+          "800.0": {
+            "physically_gated": true,
+            "primary_rcb_log10p": 5.119459293725036,
+            "flux_flatness": 0.000596897430577125
+          }
+        },
+        "equilibrium_max_rel_T_between_dt_ends": 3.64130324522748e-08,
+        "prior_evidence_note": "Existing 800 vs 400 s equilibrium difference ~6.5e-9 already shows excellent timestep-independent equilibria; this phase targets the transient trajectory at equal physical time."
+      },
+      "status": "PASS"
+    },
+    "relaxation": {
+      "status": "COMPLETE",
+      "alpha_reference": 1.0,
+      "modes": {
+        "cz": {
+          "times": [
+            2000.0,
+            4000.0,
+            6000.0,
+            8000.0,
+            10000.0
+          ],
+          "norms": [
+            0.025805235872536816,
+            0.025767339396619838,
+            0.02574629808883835,
+            0.025732747731261527,
+            0.025723409515230316
+          ],
+          "tau_s": 2598995.385500127,
+          "final_norm": 0.025723409515230316
+        },
+        "rz": {
+          "times": [
+            2000.0,
+            4000.0,
+            6000.0,
+            8000.0,
+            10000.0
+          ],
+          "norms": [
+            0.012726700466463308,
+            0.012725480069418893,
+            0.012724260864635259,
+            0.012723042847242984,
+            0.01272182601265236
+          ],
+          "tau_s": 20883189.26873506,
+          "final_norm": 0.01272182601265236
+        },
+        "rcb": {
+          "times": [
+            2000.0,
+            4000.0,
+            6000.0,
+            8000.0,
+            10000.0
+          ],
+          "norms": [
+            0.0079308676807073,
+            0.007924505530992146,
+            0.007918159396256787,
+            0.0079118291464277,
+            0.007905514667342788
+          ],
+          "tau_s": 2498541.944162793,
+          "final_norm": 0.007905514667342788
+        }
+      },
+      "cz_tau_vs_alpha": {
+        "1.0": 2598995.385500127,
+        "0.5": 2428458.7766654417,
+        "2.0": 4885107.165016751
+      },
+      "alpha_scaling": {
+        "log_tau_vs_log_alpha_slope": 0.5041746071958357,
+        "expected_local_convective": -2.0,
+        "note": "Global column may be radiatively limited; slope need not be -2."
+      },
+      "note": "Adaptive implicit accepted steps are equilibrium accelerators, not physical atmospheric evolution. These \u03c4 use fixed-\u0394t physical time."
+    },
+    "n192": {
+      "status": "NEAR_GATE_QUALITATIVE_PASS",
+      "formal_physical_gate": "FAIL",
+      "n_layers": 192,
+      "members": {
+        "0.5": {
+          "status": "max_steps",
+          "physically_gated": false,
+          "flux_flatness": 0.001261496209432759,
+          "tendency_norm": 1.1637851048741749e-05,
+          "primary_rcb_log10p": 5.027687227949373,
+          "convective_regions": [
+            [
+              0,
+              155
+            ]
+          ],
+          "detached_convective_regions": [],
+          "energy_gate_ratio": 0.013746157155883522,
+          "simulated_time": 100000000.0,
+          "steps_accepted": 40000,
+          "wall_time_s": 3032.674403999932,
+          "delta_nabla_max": 5.938929418536354e-05,
+          "delta_nabla_rms_active": 4.623947870649896e-05,
+          "convective_flux_fraction_max": 0.5283974501134295,
+          "f_conv_max_internal": 158.51923503402887,
+          "flux_split_identity_rel": 0.0,
+          "record": "/Users/burt/Desktop/USM/Exo/ConvectionMLT/convection_mlt/stage4/results/mlt_sensitivity/alpha_sweep_n192_alpha0.5.json",
+          "near_gate": true
+        },
+        "1.0": {
+          "status": "max_steps",
+          "physically_gated": false,
+          "flux_flatness": 0.0011110173041388785,
+          "tendency_norm": 1.0250979125506395e-05,
+          "primary_rcb_log10p": 5.0282686594859065,
+          "convective_regions": [
+            [
+              0,
+              155
+            ]
+          ],
+          "detached_convective_regions": [],
+          "energy_gate_ratio": 0.0066491694022476405,
+          "simulated_time": 100000000.0,
+          "steps_accepted": 40000,
+          "wall_time_s": 5238.704148791032,
+          "delta_nabla_max": 2.358069319563505e-05,
+          "delta_nabla_rms_active": 1.8355984881172774e-05,
+          "convective_flux_fraction_max": 0.5284910836439636,
+          "f_conv_max_internal": 158.54732509318907,
+          "flux_split_identity_rel": 0.0,
+          "record": "/Users/burt/Desktop/USM/Exo/ConvectionMLT/convection_mlt/stage4/results/mlt_sensitivity/alpha_sweep_n192_alpha1.0.json",
+          "near_gate": true
+        },
+        "2.0": {
+          "status": "max_steps",
+          "physically_gated": false,
+          "flux_flatness": 0.0010512585250050204,
+          "tendency_norm": 9.70011648784445e-06,
+          "primary_rcb_log10p": 5.029733780225586,
+          "convective_regions": [
+            [
+              0,
+              155
+            ]
+          ],
+          "detached_convective_regions": [],
+          "energy_gate_ratio": 0.0007375291799908373,
+          "simulated_time": 100000000.0,
+          "steps_accepted": 40000,
+          "wall_time_s": 8109.851287583122,
+          "delta_nabla_max": 9.359901256000835e-06,
+          "delta_nabla_rms_active": 7.285497127245081e-06,
+          "convective_flux_fraction_max": 0.5285282545423606,
+          "f_conv_max_internal": 158.55847636270818,
+          "flux_split_identity_rel": 0.0,
+          "record": "/Users/burt/Desktop/USM/Exo/ConvectionMLT/convection_mlt/stage4/results/mlt_sensitivity/alpha_sweep_n192_alpha2.0.json",
+          "near_gate": true
+        }
+      },
+      "alpha_delta_scaling": {
+        "status": "COMPUTED_NEAR_GATE",
+        "log_delta_vs_log_alpha_slope": -1.3330129049929673,
+        "expected_local_fixed_flux": -1.3333333333333333,
+        "alphas": [
+          0.5,
+          1.0,
+          2.0
+        ],
+        "delta_nabla_rms_active": [
+          4.623947870649896e-05,
+          1.8355984881172774e-05,
+          7.285497127245081e-06
+        ],
+        "note": "Members stopped at max_steps with flatness ~1.05\u20131.26e-3 (just above 1e-3)."
+      },
+      "scaling_matches_minus_four_thirds": true,
+      "note": "All three \u03b1 hit max_steps just above the 1e-3 gate. Topology and \u0394\u2207\u2193 with \u03b1 persist vs N=96; formal gated PASS not claimed."
+    },
+    "prescribed_dt": {
+      "status": "PASS",
+      "method": "prescribed_dt_fixed_ladder",
+      "dt_values_s": [
+        2500.0,
+        5000.0,
+        10000.0
+      ],
+      "t_final": 100000.0,
+      "arms": {
+        "10000.0": {
+          "status": "max_steps",
+          "reason": "reached t_final",
+          "simulated_time": 100000.0,
+          "steps_accepted": 10,
+          "flux_flatness": 0.11507617065991704,
+          "primary_rcb_log10p": 5.117145626419348,
+          "accepted_dt_constant": true,
+          "accepted_dt_unique": [
+            10000.0
+          ],
+          "energy_gate_ratio": 0.01574550088407636,
+          "convective_regions": [
+            [
+              0,
+              76
+            ]
+          ],
+          "record": "/Users/burt/Desktop/USM/Exo/ConvectionMLT/convection_mlt/stage4/results/mlt_sensitivity/prescribed_dt_n96_alpha1_dt10000.json"
+        },
+        "5000.0": {
+          "status": "max_steps",
+          "reason": "reached t_final",
+          "simulated_time": 100000.0,
+          "steps_accepted": 20,
+          "flux_flatness": 0.11507606278639174,
+          "primary_rcb_log10p": 5.117145664429576,
+          "accepted_dt_constant": true,
+          "accepted_dt_unique": [
+            5000.0
+          ],
+          "energy_gate_ratio": 0.013401210878241315,
+          "convective_regions": [
+            [
+              0,
+              76
+            ]
+          ],
+          "record": "/Users/burt/Desktop/USM/Exo/ConvectionMLT/convection_mlt/stage4/results/mlt_sensitivity/prescribed_dt_n96_alpha1_dt5000.json"
+        },
+        "2500.0": {
+          "status": "max_steps",
+          "reason": "reached t_final",
+          "simulated_time": 100000.0,
+          "steps_accepted": 40,
+          "flux_flatness": 0.11507600896350557,
+          "primary_rcb_log10p": 5.1171456776694715,
+          "accepted_dt_constant": true,
+          "accepted_dt_unique": [
+            2500.0
+          ],
+          "energy_gate_ratio": 0.013517997769006493,
+          "convective_regions": [
+            [
+              0,
+              76
+            ]
+          ],
+          "record": "/Users/burt/Desktop/USM/Exo/ConvectionMLT/convection_mlt/stage4/results/mlt_sensitivity/prescribed_dt_n96_alpha1_dt2500.json"
+        }
+      },
+      "equal_time_max_rel_T_vs_finest": {
+        "5000.0": 1.7017826236051706e-08,
+        "10000.0": 5.114091529177437e-08
+      },
+      "observed_temporal_order": 1.5874312145404403,
+      "errors_monotone_with_coarser_dt": true,
+      "constant_timestep_histories": true,
+      "identical_final_physical_time": true,
+      "equilibrium_independence": {
+        "2500.0": {
+          "physically_gated": true,
+          "primary_rcb_log10p": 5.117068375323815,
+          "flux_flatness": 0.0005959269497839159,
+          "topo_ok": true
+        },
+        "10000.0": {
+          "physically_gated": true,
+          "primary_rcb_log10p": 5.117067719598951,
+          "flux_flatness": 0.000588760577221971,
+          "topo_ok": true
+        }
+      },
+      "equilibrium_max_rel_T": 5.294947894200789e-07,
+      "prior_dt_hold_flaw_note": "Earlier campaign used dt_hold_init only; adaptive growth erased the held \u0394t. This phase uses RCEConfig.prescribed_dt."
+    },
+    "broad_ic": {
+      "status": "PASS",
+      "reference": "radiative_convective_gated",
+      "tolerances": {
+        "max_rel_T": 0.001,
+        "rcb_dex": 0.05
+      },
+      "cases": {
+        "radiative_convective": {
+          "physically_gated": true,
+          "topo_ok": true,
+          "max_rel_T": 0.0,
+          "rcb_dex": 0.0,
+          "energy_gate_ratio": 0.0009012608717031105,
+          "primary_rcb_log10p": 5.117068251694552,
+          "flux_flatness": 0.0009980851465752495,
+          "record": "/Users/burt/Desktop/USM/Exo/ConvectionMLT/convection_mlt/stage4/results/mlt_sensitivity/broad_ic_n96_alpha1_radiative_convective.json",
+          "pass": true,
+          "procedure": "adaptive_pseudotime"
+        },
+        "radiative_equilibrium": {
+          "physically_gated": true,
+          "topo_ok": true,
+          "max_rel_T": 0.0002516240893255823,
+          "rcb_dex": 8.045703677606042e-05,
+          "energy_gate_ratio": 0.010686933128529143,
+          "primary_rcb_log10p": 5.116987794657776,
+          "flux_flatness": 0.000999458572630374,
+          "record": "/Users/burt/Desktop/USM/Exo/ConvectionMLT/convection_mlt/stage4/results/mlt_sensitivity/broad_ic_n96_alpha1_radiative_equilibrium.json",
+          "pass": true,
+          "procedure": "discrete_rz_plus_five_check"
+        },
+        "hot_5pct_from_rc": {
+          "physically_gated": true,
+          "topo_ok": true,
+          "max_rel_T": 8.356395220454668e-05,
+          "rcb_dex": 5.031526203413961e-05,
+          "energy_gate_ratio": 0.053984513173059426,
+          "primary_rcb_log10p": 5.117017936432518,
+          "flux_flatness": 6.247173620806735e-05,
+          "record": "/Users/burt/Desktop/USM/Exo/ConvectionMLT/convection_mlt/stage4/results/mlt_sensitivity/broad_ic_n96_alpha1_hot_5pct_from_rc.json",
+          "pass": true,
+          "procedure": "discrete_rz_plus_five_check"
+        },
+        "cold_5pct_from_rc": {
+          "physically_gated": true,
+          "topo_ok": true,
+          "max_rel_T": 0.00019156226514791306,
+          "rcb_dex": 4.454078250759608e-05,
+          "energy_gate_ratio": 0.1114630888592834,
+          "primary_rcb_log10p": 5.117023710912044,
+          "flux_flatness": 0.000992808938283171,
+          "record": "/Users/burt/Desktop/USM/Exo/ConvectionMLT/convection_mlt/stage4/results/mlt_sensitivity/broad_ic_n96_alpha1_cold_5pct_from_rc.json",
+          "pass": true,
+          "procedure": "discrete_rz_plus_five_check"
+        }
+      },
+      "note": "RC seed uses adaptive pseudo-time; RE and \u00b15% use the complete discrete-RZ + five-check procedure (allowed for user-facing solver)."
+    },
+    "polish_n192": {
+      "status": "PASS",
+      "members": {
+        "0.5": {
+          "physically_gated": true,
+          "status": "converged",
+          "flux_flatness": 5.3604450355730177e-05,
+          "tendency_norm": 3.647480684776383e-07,
+          "primary_rcb_log10p": 5.027685864180511,
+          "convective_regions": [
+            [
+              0,
+              155
+            ]
+          ],
+          "detached_convective_regions": [],
+          "topo_ok": true,
+          "pre_polish_flatness": 0.001261496209432759,
+          "record": "/Users/burt/Desktop/USM/Exo/ConvectionMLT/convection_mlt/stage4/results/mlt_sensitivity/n192_polished_alpha0.5.json",
+          "integrator": "discrete_rz_t_rcb_finite_mlt_then_five_check_pseudotime",
+          "delta_nabla_rms_active": 4.623867377393112e-05
+        },
+        "1.0": {
+          "physically_gated": true,
+          "status": "converged",
+          "flux_flatness": 4.710671953110553e-05,
+          "tendency_norm": 3.990115889488758e-07,
+          "primary_rcb_log10p": 5.028265629135254,
+          "convective_regions": [
+            [
+              0,
+              155
+            ]
+          ],
+          "detached_convective_regions": [],
+          "topo_ok": true,
+          "pre_polish_flatness": 0.0011110173041388785,
+          "record": "/Users/burt/Desktop/USM/Exo/ConvectionMLT/convection_mlt/stage4/results/mlt_sensitivity/n192_polished_alpha1.0.json",
+          "integrator": "discrete_rz_t_rcb_finite_mlt_then_five_check_pseudotime",
+          "delta_nabla_rms_active": 1.8355765058223858e-05
+        },
+        "2.0": {
+          "physically_gated": true,
+          "status": "converged",
+          "flux_flatness": 4.455609508890272e-05,
+          "tendency_norm": 3.9472218759328826e-07,
+          "primary_rcb_log10p": 5.029726559440198,
+          "convective_regions": [
+            [
+              0,
+              155
+            ]
+          ],
+          "detached_convective_regions": [],
+          "topo_ok": true,
+          "pre_polish_flatness": 0.0010512585250050204,
+          "record": "/Users/burt/Desktop/USM/Exo/ConvectionMLT/convection_mlt/stage4/results/mlt_sensitivity/n192_polished_alpha2.0.json",
+          "integrator": "discrete_rz_t_rcb_finite_mlt_then_five_check_pseudotime",
+          "delta_nabla_rms_active": 7.2854181070047445e-06
+        }
+      },
+      "alpha_delta_scaling_slope": -1.3330081716825297,
+      "expected_slope": -1.3333333333333333,
+      "note": "Formal gate via five-check and/or discrete-RZ + five-check polish."
+    },
+    "n192_selected": {
+      "formal_polish": {
+        "status": "PASS",
+        "members": {
+          "0.5": {
+            "physically_gated": true,
+            "status": "converged",
+            "flux_flatness": 5.3604450355730177e-05,
+            "tendency_norm": 3.647480684776383e-07,
+            "primary_rcb_log10p": 5.027685864180511,
+            "convective_regions": [
+              [
+                0,
+                155
+              ]
+            ],
+            "detached_convective_regions": [],
+            "topo_ok": true,
+            "pre_polish_flatness": 0.001261496209432759,
+            "record": "/Users/burt/Desktop/USM/Exo/ConvectionMLT/convection_mlt/stage4/results/mlt_sensitivity/n192_polished_alpha0.5.json",
+            "integrator": "discrete_rz_t_rcb_finite_mlt_then_five_check_pseudotime",
+            "delta_nabla_rms_active": 4.623867377393112e-05
+          },
+          "1.0": {
+            "physically_gated": true,
+            "status": "converged",
+            "flux_flatness": 4.710671953110553e-05,
+            "tendency_norm": 3.990115889488758e-07,
+            "primary_rcb_log10p": 5.028265629135254,
+            "convective_regions": [
+              [
+                0,
+                155
+              ]
+            ],
+            "detached_convective_regions": [],
+            "topo_ok": true,
+            "pre_polish_flatness": 0.0011110173041388785,
+            "record": "/Users/burt/Desktop/USM/Exo/ConvectionMLT/convection_mlt/stage4/results/mlt_sensitivity/n192_polished_alpha1.0.json",
+            "integrator": "discrete_rz_t_rcb_finite_mlt_then_five_check_pseudotime",
+            "delta_nabla_rms_active": 1.8355765058223858e-05
+          },
+          "2.0": {
+            "physically_gated": true,
+            "status": "converged",
+            "flux_flatness": 4.455609508890272e-05,
+            "tendency_norm": 3.9472218759328826e-07,
+            "primary_rcb_log10p": 5.029726559440198,
+            "convective_regions": [
+              [
+                0,
+                155
+              ]
+            ],
+            "detached_convective_regions": [],
+            "topo_ok": true,
+            "pre_polish_flatness": 0.0010512585250050204,
+            "record": "/Users/burt/Desktop/USM/Exo/ConvectionMLT/convection_mlt/stage4/results/mlt_sensitivity/n192_polished_alpha2.0.json",
+            "integrator": "discrete_rz_t_rcb_finite_mlt_then_five_check_pseudotime",
+            "delta_nabla_rms_active": 7.2854181070047445e-06
+          }
+        },
+        "alpha_delta_scaling_slope": -1.3330081716825297,
+        "expected_slope": -1.3333333333333333,
+        "note": "Formal gate via five-check and/or discrete-RZ + five-check polish."
+      },
+      "status": "PASS",
+      "note": "Near-gate max_steps arms polished through discrete-RZ + five-check to formal 1e-3 gate. Formal gate via five-check and/or discrete-RZ + five-check polish."
+    }
+  },
+  "success_criteria": {
+    "local_analytical_scalings": "PASS",
+    "stable_layers_zero_flux": "PASS",
+    "finite_mlt_superadiabatic_scaling": "PASS",
+    "equilibria_timestep_independent": "PASS",
+    "equilibria_ic_independent_broad": "PASS",
+    "prescribed_dt_temporal_ladder": "PASS",
+    "efficiency_reduces_superadiabaticity": "PASS",
+    "energy_flux_identities": "PASS",
+    "n192_formal_gate_alpha_0.5_1_2": "PASS",
+    "helios_exact_parity_not_required": true
+  },
+  "radiation_scope": "Radiation uses a piecewise-isothermal, cell-centred source representation. This is a consistent finite-volume discretization whose adequacy is established through optical-depth-adapted grids and demonstrated spatial convergence. It is not equivalent at finite resolution to HELIOS\u2019s non-isothermal within-layer source reconstruction.",
+  "stage5_source_sensitivity_requirement": "Implement or construct a linear-in-optical-depth source diagnostic; compare with the constant-source calculation on the same frozen T(P); repeat at N=96, 192 and 384; measure changes in flux, T(P), and RCB. The important quantity is whether the two source reconstructions converge toward one another as max \u0394\u03c4 decreases.",
+  "completion": {
+    "source": "stage4/results/mlt_sensitivity/mlt_sensitivity_completion.json",
+    "prescribed_dt": "PASS",
+    "broad_ic": "PASS",
+    "polish_n192": "PASS",
+    "user_facing_runner": "stage4/user/run_rce.py",
+    "user_facing_example_config": "stage4/user/example_config.json"
+  },
+  "helios_defensible_statement": "The model solves the same class of one-dimensional radiative\u2013convective equilibrium problems as HELIOS. Its radiative kernel agrees with HELIOS to approximately 1e-5 when the pressure grid, opacity, boundaries, and piecewise-isothermal source treatment are matched. Native coupled equilibria are qualitatively comparable but not identical because HELIOS uses non-isothermal within-layer radiation and convective adjustment, whereas this solver uses a piecewise-isothermal radiation discretization and finite MLT. Keep the original 0.15-dex HELIOS RCB row marked FAIL."
+}

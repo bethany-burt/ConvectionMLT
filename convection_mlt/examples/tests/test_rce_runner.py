@@ -14,7 +14,7 @@ EXAMPLES = PKG / "examples"
 RCE = EXAMPLES / "rce"
 RUNNER = RCE / "run_rce.py"
 SRC = PKG / "src"
-EXAMPLE = RCE / "example_config.json"
+EXAMPLE = RCE / "cfg_demo.py"
 PYTHON = sys.executable
 
 
@@ -33,66 +33,97 @@ def _run_cli(args: list[str], *, cwd: Path | None = None) -> subprocess.Complete
     )
 
 
-def test_invalid_n48_rejected(tmp_path: Path) -> None:
-    cfg = json.loads(EXAMPLE.read_text())
-    cfg["physics"]["n_layers"] = 48
-    cfg["solve"]["output_dir"] = str(tmp_path / "out")
-    path = tmp_path / "bad_n.json"
-    path.write_text(json.dumps(cfg))
+def _write_cfg(tmp_path: Path, **overrides: object) -> Path:
+    lines = [EXAMPLE.read_text().rstrip(), ""]
+    for key, value in overrides.items():
+        if isinstance(value, str):
+            lines.append(f"{key} = {value!r}")
+        elif value is None:
+            lines.append(f"{key} = None")
+        elif isinstance(value, bool):
+            lines.append(f"{key} = {str(value)}")
+        else:
+            lines.append(f"{key} = {value}")
+    path = tmp_path / "case.py"
+    path.write_text("\n".join(lines) + "\n")
+    return path
+
+
+def test_invalid_n3_rejected(tmp_path: Path) -> None:
+    path = _write_cfg(tmp_path, n_layers=3, output_dir=str(tmp_path / "out"))
     proc = _run_cli(["--config", str(path)])
     assert proc.returncode == 2
-    assert "INVALID INPUT" in proc.stdout or "INVALID INPUT" in proc.stderr
+    assert "n_layers" in (proc.stdout + proc.stderr).lower()
 
 
-def test_gate_cannot_be_loosened(tmp_path: Path) -> None:
-    cfg = json.loads(EXAMPLE.read_text())
-    cfg["solve"]["gate"] = 0.01
-    cfg["solve"]["output_dir"] = str(tmp_path / "out")
-    path = tmp_path / "loose_gate.json"
-    path.write_text(json.dumps(cfg))
+def test_gate_cannot_be_set_in_case_file(tmp_path: Path) -> None:
+    text = EXAMPLE.read_text() + "\ngate = 0.01\n"
+    path = tmp_path / "bad_gate.py"
+    path.write_text(text)
     proc = _run_cli(["--config", str(path)])
     assert proc.returncode == 2
     assert "gate" in (proc.stdout + proc.stderr).lower()
 
 
 def test_isothermal_seed_rejected(tmp_path: Path) -> None:
-    cfg = json.loads(EXAMPLE.read_text())
-    cfg["physics"]["seed"] = "isothermal"
-    cfg["solve"]["output_dir"] = str(tmp_path / "out")
-    path = tmp_path / "iso.json"
-    path.write_text(json.dumps(cfg))
+    path = _write_cfg(tmp_path, seed="isothermal", output_dir=str(tmp_path / "out"))
     proc = _run_cli(["--config", str(path)])
     assert proc.returncode == 2
 
 
-def test_unknown_key_rejected(tmp_path: Path) -> None:
-    cfg = json.loads(EXAMPLE.read_text())
-    cfg["physics"]["magic"] = 1
-    path = tmp_path / "unk.json"
-    path.write_text(json.dumps(cfg))
+def test_invalid_x_he_rejected(tmp_path: Path) -> None:
+    path = _write_cfg(tmp_path, x_he=1.5, output_dir=str(tmp_path / "out"))
     proc = _run_cli(["--config", str(path)])
     assert proc.returncode == 2
+    assert "x_he" in (proc.stdout + proc.stderr).lower()
 
 
-def test_validate_config_unit() -> None:
+def test_validate_cfg_unit() -> None:
     sys.path.insert(0, str(RCE))
-    from config import ConfigError, default_example_dict, validate_config
+    from load_cfg import ConfigError, load_and_validate, validate_user_cfg
 
-    ok = validate_config(default_example_dict())
+    ok = load_and_validate(EXAMPLE)
     assert ok.gate == 0.001
-    assert ok.envelope_status == "INSIDE"
+    assert ok.p_bottom_bar == 10.0
+    assert ok.p_top_bar == 1.0e-5
+    assert ok.p_bottom == 1.0e6
+    assert ok.p_top == 1.0
+    assert ok.envelope_status in {
+        "INSIDE",
+        "INSIDE_VALIDATED_ENVELOPE",
+        "OUTSIDE",
+        "EXPERIMENTAL_OUTSIDE_VALIDATED_ENVELOPE",
+    }
+    assert ok.resolved_output_dir.endswith("firr1500_alpha1_n100")
+
     with pytest.raises(ConfigError):
-        validate_config({"physics": {"n_layers": 48}, "solve": {"output_dir": "x"}})
+        validate_user_cfg({"n_layers": 3, "output_dir": "x"})
+
+    snap = ok.to_snapshot()
+    assert snap["atmosphere"]["nabla_ad_at_1500K"] > 0.0
+    assert snap["atmosphere"]["cp_at_1500K"] > 0.0
+
+
+def test_arbitrary_n_layers_loads(tmp_path: Path) -> None:
+    sys.path.insert(0, str(RCE))
+    from load_cfg import load_and_validate
+
+    path = _write_cfg(tmp_path, n_layers=100, output_dir=str(tmp_path / "out100"))
+    cfg = load_and_validate(path)
+    assert cfg.n_layers == 100
+    assert cfg.envelope_status != "INSIDE_VALIDATED_ENVELOPE"
+    assert any("n_layers=100" in w for w in cfg.envelope_warnings)
 
 
 @pytest.mark.slow
 def test_rc_seed_production_converged(tmp_path: Path) -> None:
-    cfg = json.loads(EXAMPLE.read_text())
     out = tmp_path / "rc_out"
-    cfg["physics"]["seed"] = "radiative_convective"
-    cfg["solve"]["output_dir"] = str(out)
-    path = tmp_path / "rc.json"
-    path.write_text(json.dumps(cfg))
+    path = _write_cfg(
+        tmp_path,
+        seed="radiative_convective",
+        output_dir=str(out),
+        out_name="",
+    )
     proc = _run_cli(["--config", str(path), "--force"])
     assert proc.returncode == 0, proc.stdout + proc.stderr
     assert "CONVERGED" in proc.stdout
@@ -100,6 +131,8 @@ def test_rc_seed_production_converged(tmp_path: Path) -> None:
     assert status["verdict"] == "CONVERGED"
     assert status["topology_ok"] is True
     assert status["convergence"] is True
+    assert (out / "input_cfg.py").is_file()
+    assert (out / "input_resolved.json").is_file()
     centres = (out / "profiles_centres.csv").read_text().strip().splitlines()
     interfaces = (out / "profiles_interfaces.csv").read_text().strip().splitlines()
     assert len(centres) - 1 == 96
@@ -114,12 +147,13 @@ def test_rc_seed_production_converged(tmp_path: Path) -> None:
 
 @pytest.mark.slow
 def test_re_seed_production_converged(tmp_path: Path) -> None:
-    cfg = json.loads(EXAMPLE.read_text())
     out = tmp_path / "re_out"
-    cfg["physics"]["seed"] = "radiative_equilibrium"
-    cfg["solve"]["output_dir"] = str(out)
-    path = tmp_path / "re.json"
-    path.write_text(json.dumps(cfg))
+    path = _write_cfg(
+        tmp_path,
+        seed="radiative_equilibrium",
+        output_dir=str(out),
+        out_name="",
+    )
     proc = _run_cli(["--config", str(path), "--force"])
     assert proc.returncode == 0, proc.stdout + proc.stderr
     status = json.loads((out / "status.json").read_text())
@@ -129,15 +163,16 @@ def test_re_seed_production_converged(tmp_path: Path) -> None:
 
 @pytest.mark.slow
 def test_under_resourced_not_converged(tmp_path: Path) -> None:
-    cfg = json.loads(EXAMPLE.read_text())
     out = tmp_path / "fail_out"
-    cfg["physics"]["seed"] = "radiative_equilibrium"
-    cfg["solve"]["output_dir"] = str(out)
-    cfg["advanced"]["max_steps_live_polish"] = 1
-    cfg["advanced"]["max_recovery_cycles"] = 0
-    cfg["advanced"]["max_steps_continuation"] = 1
-    path = tmp_path / "under.json"
-    path.write_text(json.dumps(cfg))
+    path = _write_cfg(
+        tmp_path,
+        seed="radiative_equilibrium",
+        output_dir=str(out),
+        out_name="",
+        max_steps_live_polish=1,
+        max_recovery_cycles=0,
+        max_steps_continuation=1,
+    )
     proc = _run_cli(["--config", str(path), "--force"])
     assert proc.returncode == 1, proc.stdout + proc.stderr
     assert "NOT CONVERGED" in proc.stdout
@@ -146,15 +181,16 @@ def test_under_resourced_not_converged(tmp_path: Path) -> None:
 
 
 def test_refuse_nonempty_without_force(tmp_path: Path) -> None:
-    cfg = json.loads(EXAMPLE.read_text())
     out = tmp_path / "busy"
     out.mkdir()
     (out / "marker.txt").write_text("x")
-    cfg["solve"]["output_dir"] = str(out)
-    cfg["advanced"]["max_recovery_cycles"] = 0
-    cfg["advanced"]["max_steps_live_polish"] = 1
-    path = tmp_path / "busy.json"
-    path.write_text(json.dumps(cfg))
+    path = _write_cfg(
+        tmp_path,
+        output_dir=str(out),
+        out_name="",
+        max_recovery_cycles=0,
+        max_steps_live_polish=1,
+    )
     proc = _run_cli(["--config", str(path)])
     assert proc.returncode == 2
     assert "non-empty" in (proc.stdout + proc.stderr).lower() or "INVALID INPUT" in proc.stdout

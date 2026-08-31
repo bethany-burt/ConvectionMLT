@@ -1,0 +1,46 @@
+{
+  "radiative_convective": {
+    "physically_gated": true,
+    "flux_flatness": 0.0009980851465752495,
+    "primary_rcb_log10p": 5.117068251694552,
+    "topo_ok": true,
+    "max_rel_T": 0.0,
+    "rcb_dex": 0.0,
+    "pass": true,
+    "energy_gate_ratio": 0.0009012608717031105,
+    "procedure": "adaptive_pseudotime"
+  },
+  "radiative_equilibrium": {
+    "physically_gated": true,
+    "flux_flatness": 0.000999458572630374,
+    "primary_rcb_log10p": 5.116987794657776,
+    "topo_ok": true,
+    "max_rel_T": 0.0002516240893255823,
+    "rcb_dex": 8.045703677606042e-05,
+    "pass": true,
+    "energy_gate_ratio": 0.010686933128529143,
+    "procedure": "discrete_rz_plus_five_check"
+  },
+  "hot_5pct_from_rc": {
+    "physically_gated": true,
+    "flux_flatness": 6.247173620806735e-05,
+    "primary_rcb_log10p": 5.117017936432518,
+    "topo_ok": true,
+    "max_rel_T": 8.356395220454668e-05,
+    "rcb_dex": 5.031526203413961e-05,
+    "pass": true,
+    "energy_gate_ratio": 0.053984513173059426,
+    "procedure": "discrete_rz_plus_five_check"
+  },
+  "cold_5pct_from_rc": {
+    "physically_gated": true,
+    "flux_flatness": 0.000992808938283171,
+    "primary_rcb_log10p": 5.117023710912044,
+    "topo_ok": true,
+    "max_rel_T": 0.00019156226514791306,
+    "rcb_dex": 4.454078250759608e-05,
+    "pass": true,
+    "energy_gate_ratio": 0.1114630888592834,
+    "procedure": "discrete_rz_plus_five_check"
+  }
+}

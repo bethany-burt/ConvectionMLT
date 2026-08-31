@@ -1,0 +1,44 @@
+{
+  "prepare": {
+    "case_dir": "/tmp/helios_smoke_n8",
+    "tp_path": "/tmp/helios_smoke_n8/smoke_n8_tp.dat",
+    "param_path": "/tmp/helios_smoke_n8/param.dat",
+    "opacity_path": "/tmp/helios_smoke_n8/smoke_n8_opacity.h5",
+    "reference_path": "/Users/burt/Desktop/USM/Exo/ConvectionMLT/convection_mlt/stage4/results/helios_grid_n8_thermal_reference.json",
+    "grid": {
+      "p_int_microbar": [
+        1000000000.0,
+        85769589.85908942,
+        7356422.544596413,
+        630957.344480193,
+        54116.952654646375,
+        4641.588833612782,
+        398.1071705534969,
+        34.14548873833601,
+        2.9286445646252366
+      ],
+      "p_lay_microbar": [
+        292864456.4625237,
+        25118864.315095793,
+        2154434.6900318842,
+        184784.97974222907,
+        15848.93192461114,
+        1359.356390878527,
+        116.59144011798311,
+        10.0
+      ]
+    },
+    "temperature_boa_k": 640.0,
+    "temperature_lay_k": [
+      500.0,
+      530.5182070541442,
+      559.0295702940253,
+      583.6592137528918,
+      602.7875190981447,
+      615.1566299560022,
+      619.9531671666405,
+      616.8617157053834
+    ]
+  },
+  "status": "PREPARED"
+}

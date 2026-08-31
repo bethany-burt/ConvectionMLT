@@ -31,9 +31,9 @@ from convection_mlt import (
 from build_current_exit_audit import assert_n192_audit_sync, main as rebuild_audit
 from rce_record import (
     PHYSICAL_GATE,
-    _record_checksum,
     dumps,
     enrich_stored_record,
+    finalize_record,
     merge_continuation,
     production_rce_config,
     production_solver_config,
@@ -118,7 +118,7 @@ def _refresh_audit(record: dict) -> dict:
 
 def _write_status_report(record: dict, audit: dict) -> None:
     energy = next(
-        (r for r in audit["rows"] if r["name"] == "algebraic_n192_energy_residual_rel"),
+        (r for r in audit["rows"] if r["name"] == "algebraic_n192_energy_gate_ratio"),
         {},
     )
     STATUS.write_text(
@@ -152,14 +152,19 @@ def _write_status_report(record: dict, audit: dict) -> None:
         f"  primary_rcb_log10p: {record.get('primary_rcb_log10p')}\n"
         f"  median_accepted_dt: {record.get('median_accepted_dt')}\n"
         f"  last_accepted_dt: {record.get('last_accepted_dt')}\n"
-        f"  energy_committed_residual_rel: {record.get('energy_committed_residual_rel')}\n"
-        f"  energy_residual_rel: {record.get('energy_residual_rel')}\n"
+        f"  energy_committed_residual: {record.get('energy_committed_residual')}\n"
+        f"  energy_scale: {record.get('energy_scale')}\n"
+        f"  energy_ulp_floor: {record.get('energy_ulp_floor')}\n"
+        f"  energy_allowed: {record.get('energy_allowed')}\n"
+        f"  energy_gate_ratio: {record.get('energy_gate_ratio')}\n"
         f"  coupled_defect: {record.get('coupled_defect')}\n"
         f"  profile_checksum_sha256: {record.get('profile_checksum_sha256') or record.get('checksum_sha256')}\n"
+        f"  record_checksum_sha256: {record.get('record_checksum_sha256')}\n"
         f"  continuation_phase: {(record.get('continuation') or {}).get('phase')}\n"
-        f"  algebraic_n192_energy_status: {energy.get('status')}\n"
-        "  N=384 is not started until N=192 is gate-converged.\n"
-        "  Coupled HELIOS RCE is not the next validation experiment.\n"
+        f"  algebraic_n192_energy_gate_ratio: {energy.get('status')} "
+        f"(observed {energy.get('observed')})\n"
+        "  N=192 is gate-converged. Nested N=384 is the spatial next step.\n"
+        "  Coupled HELIOS RCE waits on the 192→384 spatial gate.\n"
     )
 
 
@@ -187,11 +192,12 @@ def _merge_chunk(record: dict, payload: dict, extra_done: int, prev: dict) -> di
             "n_consec=5 are unchanged."
         ),
     }
-    record["record_checksum_sha256"] = _record_checksum(record)
+    finalize_record(record)
     return record, extra_done
 
 
 def _write_record(record: dict) -> None:
+    finalize_record(record)
     OUT.parent.mkdir(parents=True, exist_ok=True)
     text = dumps(record)
     OUT.write_text(text)
@@ -282,7 +288,6 @@ def main(max_extra: int = MAX_EXTRA_ACCEPTED, chunk: int = CHUNK_ACCEPTED) -> di
         record["continuation"]["tighten_dt_accuracy"] = TIGHTEN_DT_ACCURACY
         record["continuation"]["tighten_steps"] = int(payload["steps_accepted"])
         record["continuation"]["tighten_status"] = payload.get("status")
-        record["record_checksum_sha256"] = _record_checksum(record)
         _write_record(record)
         _refresh_audit(record)
         print(

@@ -1,0 +1,22 @@
+def initial_temp(quant, read):
+    """ determines the initial temperature profile """
+
+    if quant.singlewalk == 0 and (quant.force_start_tp_from_file == 0 or quant.physical_tstep == 0):
+
+        # calculate effective planetary temperature
+        T_eff = (1.0-quant.dir_beam) * quant.f_factor ** 0.25 * (quant.R_star / quant.a) ** 0.5 * quant.T_star \
+                + quant.dir_beam * abs(quant.mu_star) ** 0.25 * (quant.R_star / quant.a) ** 0.5 * quant.T_star
+
+        # for efficiency reasons initial temperature has a lower limit of 500 K
+        quant.T_lay = np.ones(quant.nlayer+1) * max(T_eff, 500)
+
+        print("\nStarting with an isothermal TP-profile at {:g}".format(max(T_eff, 500))+" K.")
+
+    elif quant.singlewalk == 1 or (quant.force_start_tp_from_file == 1 and quant.physical_tstep != 0):
+
+        read.read_temperature_file(quant)
+
+        quant.T_lay = np.append(quant.T_restart[1:], quant.T_restart[0])
+
+        print("\nStarting with chosen temperature profile.")
+

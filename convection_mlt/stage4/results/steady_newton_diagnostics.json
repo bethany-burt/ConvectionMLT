@@ -1,0 +1,72 @@
+{
+  "live_n384_checksum": "1e23c0a90bf8125db3a61720e8f05b5f5d7cf80680597dde9fa289b5cbf70511",
+  "coupled_helios_rce_status": "NOT_RUN",
+  "five_check_polish": "NOT_RUN",
+  "bundle": "/Users/burt/Desktop/USM/Exo/ConvectionMLT/convection_mlt/stage4/results/steady_newton_diagnostic_bundle",
+  "n96": {
+    "status": "converged",
+    "newton_iterations": 0,
+    "max_rel_T": 0.0,
+    "flux_flatness": 0.0009980851465752495,
+    "history_len": 0,
+    "profile_checksum_sha256": "395a16264b107381ce97c501b44d1ef8fb14f5b137a7387988c1f18d5fbad14a"
+  },
+  "n192": {
+    "status": "converged",
+    "newton_iterations": 0,
+    "max_rel_T": 0.0,
+    "flux_flatness": 0.0009993962280939665,
+    "history_len": 0,
+    "profile_checksum_sha256": "4b7d67555f64b74d5d820d488f29b5d4024e802fd12ab2a4614df9160de8713f"
+  },
+  "jv_epsilon_ladder": {
+    "any_live_unstable_fine": true,
+    "any_lagged_unstable_fine": false,
+    "max_live_pairwise_rel_full": 0.6836225032276063,
+    "max_lagged_pairwise_rel_full": 0.00359931842085113,
+    "max_live_pairwise_rel_fine": 0.5953130138230446,
+    "max_lagged_pairwise_rel_fine": 3.605408566459766e-06
+  },
+  "n384": {
+    "status": "newton_limit",
+    "newton_iterations": 8,
+    "max_rel_T": 0.00022596997167955823,
+    "flux_flatness": 0.02685322545552329,
+    "tendency_norm": 0.0019998007315386226,
+    "line_search_factors": [
+      0.001953125,
+      0.015625,
+      0.015625,
+      0.001953125,
+      0.001953125,
+      3.0517578125e-05,
+      1.52587890625e-05,
+      7.62939453125e-06
+    ],
+    "line_search_reasons": [
+      "accepted",
+      "accepted",
+      "accepted",
+      "accepted",
+      "accepted",
+      "accepted",
+      "accepted",
+      "accepted"
+    ],
+    "history_len": 8,
+    "profile_checksum_sha256": "774a13e62c4583c70ce55653b25fdf552f43e7885e22692ee44973f06ffbc37b",
+    "source_profile_checksum_sha256": "1e23c0a90bf8125db3a61720e8f05b5f5d7cf80680597dde9fa289b5cbf70511",
+    "live_record_unchanged": true
+  },
+  "bundle_files": [
+    "jv_epsilon_ladder.json",
+    "n192_steady_rce.json",
+    "n384_implicit_rce.json",
+    "n384_steady_rce.json",
+    "n96_steady_rce.json",
+    "solve_steady_rce.py",
+    "solver_settings.json",
+    "steady_newton_diagnostics.py",
+    "steady_rce.py"
+  ]
+}

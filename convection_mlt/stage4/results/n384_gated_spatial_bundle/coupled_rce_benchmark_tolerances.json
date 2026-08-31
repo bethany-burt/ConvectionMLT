@@ -1,0 +1,50 @@
+{
+  "frozen_before_live": true,
+  "frozen_date": "2026-08-24",
+  "comparison_type": "independently_discretized_rce_matched_forcing",
+  "forcing": "F_int=300, F_irr=0",
+  "f_irr": 0.0,
+  "f_int": 300.0,
+  "mlt_grid": "nested_tau_interpolated_to_helios",
+  "helios_grid": "helios_geometric",
+  "helios_grid_mlt_resolves": false,
+  "helios_grid_mlt_note": "Negative diagnostic: an MLT re-solve on HELIOS geometric (log-P) interfaces does not retain the deep CZ for this opacity (see results/helios_grid_mlt_negative_diagnostic/). Live comparison is independently discretized RCE with matched forcing, not grid-level parity.",
+  "benchmark_interpretation": "Agreement between independently discretized RCE solutions with matched forcing, opacity law, gravity, EOS/adiabatic gradient, and lower net flux.",
+  "irradiated_nested_mlt": "structural_diagnostic_only",
+  "helios_commit": "b0800f9ea4366263241c13bb926e8ca68f266cc5",
+  "pilot_resolution": 96,
+  "headline_resolution": 192,
+  "sequence": [
+    "freeze_this_file",
+    "freeze_mlt_nested_tau_n96_firr0",
+    "cluster_coupled_manifest_pass",
+    "n96_coupled_pilot",
+    "n192_matched_construction_then_headline_if_pilot_passes"
+  ],
+  "blocking": {
+    "internal_spatial_must_pass": true,
+    "helios_radiation_only_must_pass": true,
+    "forcing_must_match": true,
+    "coupled_manifest_must_verify": true,
+    "helios_must_converge": true,
+    "expected_n_interfaces": "n_layers+1"
+  },
+  "note": "HELIOS convective adjustment and the finite mixing-length closure are different convection models on the same F_irr=0 column. Numerical gate values are unchanged. Irradiated nested MLT is not this benchmark. No bottom-connected HELIOS CZ is first a geometric-grid/τ-resolution result.",
+  "gates": {
+    "toa_flux_rel": 0.05,
+    "max_rel_T": 0.10,
+    "rcb_dex": 0.15,
+    "topology_single_bottom_cz": true,
+    "no_detached_convective_regions": true,
+    "energy_closure_rel": 0.05
+  },
+  "norms": {
+    "toa_flux_rel": "|F_total,TOA - F_int| / F_int and |F_total,BOA - F_int| / F_int, with F_total = F_rad,net + F_conv",
+    "max_column_flatness": "max_i |F_total,i - F_int| / F_int",
+    "max_rel_T": "max |T_HELIOS - T_MLT| / max(|T_MLT|, 1 K) on the common log-P domain only (no endpoint extrapolation)",
+    "rcb_dex": "|log10 P_RCB,HELIOS - log10 P_RCB,MLT|",
+    "topology": "single bottom-connected convective zone; no detached convective cells",
+    "energy_closure_rel": "|F_total,BOA - F_total,TOA| / F_int",
+    "f_intern_rel": "|F_intern - 300 W m^-2| / F_int"
+  }
+}

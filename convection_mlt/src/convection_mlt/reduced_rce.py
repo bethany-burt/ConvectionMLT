@@ -42,6 +42,7 @@ from .radiation import (
 )
 from .rce import (
     _internal_flux_reference,
+    _temperature_on_adiabat,
     grey_radiative_equilibrium_temperature,
 )
 from .state import build_column_state
@@ -244,15 +245,30 @@ def reconstruct_cz_temperature(
     temperature: NDArray[np.float64],
     delta: NDArray[np.float64],
     i_hi: int,
-    nabla_ad: float,
+    thermo: ThermoProvider,
 ) -> NDArray[np.float64]:
-    """Anchor T[i_hi] and integrate ∇_ad+Δ∇ downward through the CZ."""
+    """Anchor T[i_hi] and integrate downward through the CZ.
+
+    For negligible MLT excess, use a constant-entropy (mixture-aware) adiabat.
+    Otherwise integrate with temperature-dependent nabla_ad(T) + Delta_nabla.
+    """
     t = np.asarray(temperature, dtype=np.float64).copy()
-    logp = np.log(np.maximum(grid.pressure_centres, 1.0e-30))
+    p = np.asarray(grid.pressure_centres, dtype=np.float64)
+    logp = np.log(np.maximum(p, 1.0e-30))
+    delta_arr = np.asarray(delta, dtype=np.float64)
     i_hi = int(np.clip(i_hi, 0, t.size - 1))
-    for k in range(i_hi, 0, -1):
-        nabla = float(nabla_ad) + float(delta[k])
-        t[k - 1] = t[k] * np.exp(nabla * (logp[k - 1] - logp[k]))
+    internal = delta_arr[1:-1] if delta_arr.size >= 3 else delta_arr
+    if internal.size == 0 or float(np.max(np.abs(internal))) <= 1.0e-15:
+        t[: i_hi + 1] = _temperature_on_adiabat(
+            thermo, float(t[i_hi]), float(p[i_hi]), p[: i_hi + 1]
+        )
+    else:
+        for k in range(i_hi, 0, -1):
+            nabla_ad = float(
+                np.asarray(thermo.nabla_ad_at(np.array([t[k]], dtype=np.float64))).reshape(-1)[0]
+            )
+            nabla = nabla_ad + float(delta_arr[k])
+            t[k - 1] = t[k] * np.exp(nabla * (logp[k - 1] - logp[k]))
     if np.any(t <= 0.0) or not np.all(np.isfinite(t)):
         return np.asarray(temperature, dtype=np.float64).copy()
     return t
@@ -264,7 +280,7 @@ def reconstruct_column_from_rcb(
     t_rcb: float,
     i_hi: int,
     delta: NDArray[np.float64],
-    nabla_ad: float,
+    thermo: ThermoProvider,
     *,
     t_re: NDArray[np.float64] | None = None,
     rz_blend: float = 0.0,
@@ -278,7 +294,7 @@ def reconstruct_column_from_rcb(
     t = np.asarray(t_ref, dtype=np.float64).copy()
     i_hi = int(np.clip(i_hi, 0, t.size - 1))
     t[i_hi] = float(t_rcb)
-    t = reconstruct_cz_temperature(grid, t, delta, i_hi, nabla_ad)
+    t = reconstruct_cz_temperature(grid, t, delta, i_hi, thermo)
     t[i_hi] = float(t_rcb)
     if i_hi < t.size - 1:
         t_old = float(np.asarray(t_ref, dtype=np.float64)[i_hi])
@@ -510,13 +526,6 @@ def _interior_support(support: NDArray[np.bool_]) -> NDArray[np.bool_]:
     return interior
 
 
-def _nabla_ad_value(thermo: ThermoProvider, t_ref: float) -> float:
-    nabla = getattr(thermo, "nabla_ad", None)
-    if nabla is not None and not callable(nabla):
-        return float(nabla)
-    return float(np.asarray(thermo.nabla_ad_at(np.array([t_ref], dtype=np.float64))).reshape(-1)[0])
-
-
 def _blend_radiative_zone(
     temperature: NDArray[np.float64],
     i_hi: int,
@@ -738,7 +747,6 @@ def solve_coupled_radiative_matching(
     )
     start_worst = worst_gate_violation(current.flux_flatness, current.tendency_norm, cfg)
     start_defect = f_top_defect(current, f_int)
-    nabla_ad = _nabla_ad_value(thermo, float(t_ref[0]))
     if _gates_ok(current, cfg):
         return _result_from_trial(
             ReducedRCEStatus.CONVERGED,
@@ -767,7 +775,7 @@ def solve_coupled_radiative_matching(
     ) -> tuple[NDArray[np.float64], bool]:
         t_col = np.asarray(t_shape, dtype=np.float64).copy()
         t_col[i_hi] = float(t_rcb)
-        t_col = reconstruct_cz_temperature(grid, t_col, delta, i_hi, nabla_ad)
+        t_col = reconstruct_cz_temperature(grid, t_col, delta, i_hi, thermo)
         t_col[i_hi] = float(t_rcb)
         linear_ok = True
         if i_hi >= t_col.size - 1:
@@ -1237,7 +1245,6 @@ def solve_lagged_radiative_matching(
     start_worst = worst_gate_violation(current.flux_flatness, current.tendency_norm, cfg)
     damping = cfg.damping_init
     consecutive_reject = 0
-    nabla_ad = _nabla_ad_value(thermo, float(t[0]))
 
     def _inner_ok(trial: TrialFluxes) -> bool:
         return (
@@ -1297,7 +1304,7 @@ def solve_lagged_radiative_matching(
         else:
             if not np.any(delta_req[interior] > 0.0):
                 delta_req = np.where(interior, np.maximum(live_delta, 0.0), 0.0)
-            t_cz = reconstruct_cz_temperature(grid, t, delta_req, i_hi, nabla_ad)
+            t_cz = reconstruct_cz_temperature(grid, t, delta_req, i_hi, thermo)
         t_prop = (1.0 - damping) * t + damping * t_cz
         if cfg.match_rz_to_grey_re and i_hi < t_prop.size - 1:
             t_prop = _blend_radiative_zone(

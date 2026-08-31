@@ -1,0 +1,56 @@
+{
+  "purpose": "Gated N=384 spatial source of truth plus nested 96/192/384 scoring. The live record is the five-check polish n384_implicit_rce.json (profile 5e0bd\u2026), not the discrete-RZ accelerator snapshot.",
+  "n384_live_record": "n384_implicit_rce.json",
+  "n384_profile_checksum_sha256": "5e0bd359a7e352863c767faf5441d93968370d358a5b0270c8f6ebf293d875ec",
+  "n384_record_checksum_sha256": "3ed6a56ddf840fa7c46a96694664d3f0af102de0ffd15c1d0109d5bb64394c44",
+  "n192_profile_checksum_sha256": "4b7d67555f64b74d5d820d488f29b5d4024e802fd12ab2a4614df9160de8713f",
+  "n192_implicit_record_excluded": true,
+  "n192_implicit_record_bytes": 16191797,
+  "n384_9500_archive_excluded": true,
+  "n384_9500_archive_sha256": "b14b9215b7ed743029e57fa9659bc09c87ee164c412af556ff4b6543509785f2",
+  "accelerator_snapshot": "n384_discrete_rz_rce.json",
+  "internal_numerical_track_complete": true,
+  "core_single_resolution_status": "PASS",
+  "spatial_and_operator_convergence_status": "PASS",
+  "algebraic_identity_status": "PASS",
+  "helios_radiation_only_parity_status": "PASS",
+  "helios_coupled_rce_n96_status": "FAIL",
+  "helios_coupled_rce_n192_status": "RESOLUTION_COMPLETE",
+  "helios_coupled_rce_status": "FAIL",
+  "helios_parity_headline": false,
+  "full_stage4_claim": false,
+  "files": {
+    "n384_implicit_rce.json": {
+      "bytes": 77559,
+      "sha256": "270d4890c4a083c643ba4a85341151d4d06a28618475e94feeb174cf7657bafd"
+    },
+    "nested_rce_family.json": {
+      "bytes": 659206,
+      "sha256": "c0ef2fed9cb6d9595e2b03e2f1d99a5a1a79b82a8c4cab54cb5cc3c8cfb534db"
+    },
+    "exit_gate_audit.json": {
+      "bytes": 23879,
+      "sha256": "8d764233be4afb5deb8c39a82067903eea94bd891a4f02127d4fb390b161e25b"
+    },
+    "STAGE4_STATUS_REPORT.txt": {
+      "bytes": 6144,
+      "sha256": "30834403f368603d590fcf8347babcf6f3dd44db4495a8e4b92499b7ba24a5d8"
+    },
+    "n384_discrete_rz_rce.json": {
+      "bytes": 61536,
+      "sha256": "0deb48dee8d016d40ac12d767afb50ffd1947b1e7215c84a035257289c8f16aa"
+    },
+    "n384_discrete_rz_flux_profiles.json": {
+      "bytes": 98945,
+      "sha256": "a9c4f858cee05433320d2f293fbe5f0a97ba84d3319c06a4c3458b496b4793cb"
+    },
+    "nested_spatial_1e-3.png": {
+      "bytes": 93352,
+      "sha256": "890dcae83542c4f948eb1834c9082531de5adb4b890a88256a580f338713c143"
+    },
+    "coupled_rce_benchmark_tolerances.json": {
+      "bytes": 2536,
+      "sha256": "f3c6ff38f950f108cd818e1d2b545cd373cd4e6289c0a1ac02cda2c24b8e5549"
+    }
+  }
+}

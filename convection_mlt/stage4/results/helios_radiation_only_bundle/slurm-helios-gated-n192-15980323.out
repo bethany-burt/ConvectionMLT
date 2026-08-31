@@ -1,0 +1,334 @@
+=== gated prerequisite: N=96 radiation-only PASS ===
+{
+  "label": "n96_radiation_only",
+  "path": "/project/ls-heng/Bethany.Burt/convection_mlt/stage4/results/helios_frozen_rad_n96_thermal.json",
+  "status": "PASS",
+  "failures": null,
+  "kappa_max_rel": null,
+  "helios_kappa_vs_P_exponent": null,
+  "helios_dtau_vs_P_exponent": null,
+  "gates": null
+}
+=== gated step 0: HDF5 HELIOS-index round-trip ===
+{
+  "status": "PASS",
+  "path": "/project/ls-heng/Bethany.Burt/convection_mlt/stage4/fixtures/helios/pressure_tagged.h5",
+  "kpoints_index_ok": true,
+  "meanmolmass_index_ok": true,
+  "rayleigh_index_ok": true,
+  "linear_index_formula": "y + ny*x + ny*nx*p + ny*nx*npress*t",
+  "shape": [
+    1,
+    64,
+    256,
+    32
+  ]
+}
+{
+  "status": "PASS",
+  "path": "/project/ls-heng/Bethany.Burt/convection_mlt/stage4/fixtures/helios/analytic_grey_nested.h5",
+  "kpoints_index_ok": true,
+  "meanmolmass_index_ok": true,
+  "rayleigh_index_ok": true,
+  "linear_index_formula": "y + ny*x + ny*nx*p + ny*nx*npress*t",
+  "shape": [
+    1,
+    64,
+    256,
+    32
+  ]
+}
+{
+  "status": "PASS",
+  "path": "/project/ls-heng/Bethany.Burt/convection_mlt/stage4/fixtures/helios/constant_grey.h5",
+  "kpoints_index_ok": true,
+  "meanmolmass_index_ok": true,
+  "rayleigh_index_ok": true,
+  "linear_index_formula": "y + ny*x + ny*nx*p + ny*nx*npress*t",
+  "shape": [
+    1,
+    64,
+    256,
+    32
+  ]
+}
+=== gated step 1: pressure-tagged layer opacity (κ∝P, Δτ∝P²) ===
+{
+  "status": "PASS",
+  "files": {
+    "analytic_grey_nested.h5": {
+      "status": "PASS",
+      "expected": "9505247e1104c9d11500944975a2d26b82d55c4e3c7c66f579a5a9c08334cd3c",
+      "observed": "9505247e1104c9d11500944975a2d26b82d55c4e3c7c66f579a5a9c08334cd3c",
+      "path": "/project/ls-heng/Bethany.Burt/convection_mlt/stage4/fixtures/helios/analytic_grey_nested.h5"
+    },
+    "constant_grey.h5": {
+      "status": "PASS",
+      "expected": "79e255f3cfec7a1b49087ed818d5ffdbeeb7534e86bee3105eba4e8a8cf10e7e",
+      "observed": "79e255f3cfec7a1b49087ed818d5ffdbeeb7534e86bee3105eba4e8a8cf10e7e",
+      "path": "/project/ls-heng/Bethany.Burt/convection_mlt/stage4/fixtures/helios/constant_grey.h5"
+    },
+    "pressure_tagged.h5": {
+      "status": "PASS",
+      "expected": "6b5338d3fb7750515e3de4d62912bc5a9de5aabaf6f12357c3ee98cb8674252a",
+      "observed": "6b5338d3fb7750515e3de4d62912bc5a9de5aabaf6f12357c3ee98cb8674252a",
+      "path": "/project/ls-heng/Bethany.Burt/convection_mlt/stage4/fixtures/helios/pressure_tagged.h5"
+    },
+    "radiation_only_tolerances.json": {
+      "status": "PASS",
+      "expected": "c05a5e7548379ff2fa35d3fcd07d52a9a919681ed56d1ee5df1b3a2a31029439",
+      "observed": "c05a5e7548379ff2fa35d3fcd07d52a9a919681ed56d1ee5df1b3a2a31029439",
+      "path": "/project/ls-heng/Bethany.Burt/convection_mlt/stage4/fixtures/helios/radiation_only_tolerances.json"
+    },
+    "helios_write_integrated_flux_b0800f9.patch": {
+      "status": "PASS",
+      "expected": "fe5323668e80b0698d7d55e10ec7c9126a270e981dede64570b47840763ab9c2",
+      "observed": "fe5323668e80b0698d7d55e10ec7c9126a270e981dede64570b47840763ab9c2",
+      "path": "/project/ls-heng/Bethany.Burt/convection_mlt/stage4/fixtures/helios/helios_write_integrated_flux_b0800f9.patch"
+    },
+    "helios_write_integrated_flux_b0800f9.patch.json": {
+      "status": "PASS",
+      "expected": "9ae8a0bb720703a7d689a46fe0cceeb95e4d878ce56c4a7bd8d10350c7b1e493",
+      "observed": "9ae8a0bb720703a7d689a46fe0cceeb95e4d878ce56c4a7bd8d10350c7b1e493",
+      "path": "/project/ls-heng/Bethany.Burt/convection_mlt/stage4/fixtures/helios/helios_write_integrated_flux_b0800f9.patch.json"
+    }
+  }
+}
+M	source/write.py
+{"status": "patched", "helios_commit": "b0800f9ea4366263241c13bb926e8ca68f266cc5", "patch_file": "helios_write_integrated_flux_b0800f9.patch", "sha256": "fe5323668e80b0698d7d55e10ec7c9126a270e981dede64570b47840763ab9c2", "applies_to": "source/write.py write_integrated_flux", "format": "unified_diff", "purpose": "space-delimited {:.17e} integrated-flux writer after git checkout of the pinned commit"}
+
+### Welcome to HELIOS! This run has the name: stage4_opacity_diag_n192_tagged. Enjoy the ride! ###
+
+Reading opacity file: /project/ls-heng/Bethany.Burt/convection_mlt/stage4/fixtures/helios/pressure_tagged.h5
+
+Using blackbody flux for the stellar irradiation.
+
+Using manual input for the planetary and orbital parameters.
+
+Starting with chosen temperature profile.
+
+Time for radiative iteration [s]: 0.01
+Total number of iterative steps: 0
+
+Done! Everything appears to have worked fine :-)
+
+This has been a post-processing run with name stage4_opacity_diag_n192_tagged.
+
+
+Final Check for numerical energy balance:
+  --> Theoretical effective temperature of planet: 
+	global (f=0.25): 1.16919 K, 
+	day-side (f=2/3): 1.49428 K, 
+	used in model (f=0.000): 0 K.
+  --> Incident TOA brightness temperature: 0 K 
+      Interior temperature: 269.698 K 
+      Outgoing (planetary) brightness temperature: 264.001 K
+  --> Global energy imbalance: 81854.918ppm (positive: too much uptake, negative: too much loss). 
+
+{
+  "out": "/project/ls-heng/Bethany.Burt/helios_stage4_frozen/stage4_opacity_diag_n192_tagged/helios_layer_opacity_n192_tagged.json",
+  "status": "PASS",
+  "failures": [],
+  "kappa_max_rel": 0.00044091939370523493,
+  "helios_kappa_vs_P_exponent": 1.0000005887236951,
+  "expected_kappa_vs_P_exponent": 0.9999999999999994,
+  "helios_dtau_vs_P_exponent": 2.0000005887236947,
+  "expected_dtau_vs_P_exponent": 1.9999999999999996
+}
+tagged diagnostic: flux parity skipped; layer-opacity dump is the contract.
+HELIOS opacity diagnostic stage4_opacity_diag_n192_tagged completed
+{
+  "label": "tagged_layer",
+  "path": "/project/ls-heng/Bethany.Burt/convection_mlt/stage4/results/helios_layer_opacity_n192_tagged.json",
+  "status": "PASS",
+  "failures": [],
+  "kappa_max_rel": 0.00044091939370523493,
+  "helios_kappa_vs_P_exponent": 1.0000005887236951,
+  "helios_dtau_vs_P_exponent": 2.0000005887236947,
+  "gates": null
+}
+=== gated step 2: analytic layer opacity (κ∝P^{1/2}, Δτ∝P^{3/2}) ===
+{
+  "status": "PASS",
+  "files": {
+    "analytic_grey_nested.h5": {
+      "status": "PASS",
+      "expected": "9505247e1104c9d11500944975a2d26b82d55c4e3c7c66f579a5a9c08334cd3c",
+      "observed": "9505247e1104c9d11500944975a2d26b82d55c4e3c7c66f579a5a9c08334cd3c",
+      "path": "/project/ls-heng/Bethany.Burt/convection_mlt/stage4/fixtures/helios/analytic_grey_nested.h5"
+    },
+    "constant_grey.h5": {
+      "status": "PASS",
+      "expected": "79e255f3cfec7a1b49087ed818d5ffdbeeb7534e86bee3105eba4e8a8cf10e7e",
+      "observed": "79e255f3cfec7a1b49087ed818d5ffdbeeb7534e86bee3105eba4e8a8cf10e7e",
+      "path": "/project/ls-heng/Bethany.Burt/convection_mlt/stage4/fixtures/helios/constant_grey.h5"
+    },
+    "pressure_tagged.h5": {
+      "status": "PASS",
+      "expected": "6b5338d3fb7750515e3de4d62912bc5a9de5aabaf6f12357c3ee98cb8674252a",
+      "observed": "6b5338d3fb7750515e3de4d62912bc5a9de5aabaf6f12357c3ee98cb8674252a",
+      "path": "/project/ls-heng/Bethany.Burt/convection_mlt/stage4/fixtures/helios/pressure_tagged.h5"
+    },
+    "radiation_only_tolerances.json": {
+      "status": "PASS",
+      "expected": "c05a5e7548379ff2fa35d3fcd07d52a9a919681ed56d1ee5df1b3a2a31029439",
+      "observed": "c05a5e7548379ff2fa35d3fcd07d52a9a919681ed56d1ee5df1b3a2a31029439",
+      "path": "/project/ls-heng/Bethany.Burt/convection_mlt/stage4/fixtures/helios/radiation_only_tolerances.json"
+    },
+    "helios_write_integrated_flux_b0800f9.patch": {
+      "status": "PASS",
+      "expected": "fe5323668e80b0698d7d55e10ec7c9126a270e981dede64570b47840763ab9c2",
+      "observed": "fe5323668e80b0698d7d55e10ec7c9126a270e981dede64570b47840763ab9c2",
+      "path": "/project/ls-heng/Bethany.Burt/convection_mlt/stage4/fixtures/helios/helios_write_integrated_flux_b0800f9.patch"
+    },
+    "helios_write_integrated_flux_b0800f9.patch.json": {
+      "status": "PASS",
+      "expected": "9ae8a0bb720703a7d689a46fe0cceeb95e4d878ce56c4a7bd8d10350c7b1e493",
+      "observed": "9ae8a0bb720703a7d689a46fe0cceeb95e4d878ce56c4a7bd8d10350c7b1e493",
+      "path": "/project/ls-heng/Bethany.Burt/convection_mlt/stage4/fixtures/helios/helios_write_integrated_flux_b0800f9.patch.json"
+    }
+  }
+}
+M	source/write.py
+{"status": "patched", "helios_commit": "b0800f9ea4366263241c13bb926e8ca68f266cc5", "patch_file": "helios_write_integrated_flux_b0800f9.patch", "sha256": "fe5323668e80b0698d7d55e10ec7c9126a270e981dede64570b47840763ab9c2", "applies_to": "source/write.py write_integrated_flux", "format": "unified_diff", "purpose": "space-delimited {:.17e} integrated-flux writer after git checkout of the pinned commit"}
+
+### Welcome to HELIOS! This run has the name: stage4_opacity_diag_n192_analytic. Enjoy the ride! ###
+
+Reading opacity file: /project/ls-heng/Bethany.Burt/convection_mlt/stage4/fixtures/helios/analytic_grey_nested.h5
+
+Using blackbody flux for the stellar irradiation.
+
+Using manual input for the planetary and orbital parameters.
+
+Starting with chosen temperature profile.
+
+Time for radiative iteration [s]: 0.00
+Total number of iterative steps: 0
+
+Done! Everything appears to have worked fine :-)
+
+This has been a post-processing run with name stage4_opacity_diag_n192_analytic.
+
+
+Final Check for numerical energy balance:
+  --> Theoretical effective temperature of planet: 
+	global (f=0.25): 1.16919 K, 
+	day-side (f=2/3): 1.49428 K, 
+	used in model (f=0.000): 0 K.
+  --> Incident TOA brightness temperature: 0 K 
+      Interior temperature: 269.698 K 
+      Outgoing (planetary) brightness temperature: 288.84 K
+  --> Global energy imbalance: -315576.420ppm (positive: too much uptake, negative: too much loss). 
+
+{
+  "out": "/project/ls-heng/Bethany.Burt/helios_stage4_frozen/stage4_opacity_diag_n192_analytic/helios_layer_opacity_n192_analytic.json",
+  "status": "PASS",
+  "failures": [],
+  "kappa_max_rel": 0.00011239382103806541,
+  "helios_kappa_vs_P_exponent": 0.5000001949131155,
+  "expected_kappa_vs_P_exponent": 0.4999999999999997,
+  "helios_dtau_vs_P_exponent": 1.5000001949131159,
+  "expected_dtau_vs_P_exponent": 1.5000000000000002
+}
+analytic diagnostic: flux parity skipped; layer-opacity dump is the contract.
+HELIOS opacity diagnostic stage4_opacity_diag_n192_analytic completed
+{
+  "label": "analytic_layer",
+  "path": "/project/ls-heng/Bethany.Burt/convection_mlt/stage4/results/helios_layer_opacity_n192_analytic.json",
+  "status": "PASS",
+  "failures": [],
+  "kappa_max_rel": 0.00011239382103806541,
+  "helios_kappa_vs_P_exponent": 0.5000001949131155,
+  "helios_dtau_vs_P_exponent": 1.5000001949131159,
+  "gates": null
+}
+=== gated step 3 skipped: constant-κ already scored at N=96 ===
+=== gated step 4: formal analytic N=192 flux/heating/energy-increment parity ===
+{
+  "status": "PASS",
+  "files": {
+    "analytic_grey_nested.h5": {
+      "status": "PASS",
+      "expected": "9505247e1104c9d11500944975a2d26b82d55c4e3c7c66f579a5a9c08334cd3c",
+      "observed": "9505247e1104c9d11500944975a2d26b82d55c4e3c7c66f579a5a9c08334cd3c",
+      "path": "/project/ls-heng/Bethany.Burt/convection_mlt/stage4/fixtures/helios/analytic_grey_nested.h5"
+    },
+    "constant_grey.h5": {
+      "status": "PASS",
+      "expected": "79e255f3cfec7a1b49087ed818d5ffdbeeb7534e86bee3105eba4e8a8cf10e7e",
+      "observed": "79e255f3cfec7a1b49087ed818d5ffdbeeb7534e86bee3105eba4e8a8cf10e7e",
+      "path": "/project/ls-heng/Bethany.Burt/convection_mlt/stage4/fixtures/helios/constant_grey.h5"
+    },
+    "pressure_tagged.h5": {
+      "status": "PASS",
+      "expected": "6b5338d3fb7750515e3de4d62912bc5a9de5aabaf6f12357c3ee98cb8674252a",
+      "observed": "6b5338d3fb7750515e3de4d62912bc5a9de5aabaf6f12357c3ee98cb8674252a",
+      "path": "/project/ls-heng/Bethany.Burt/convection_mlt/stage4/fixtures/helios/pressure_tagged.h5"
+    },
+    "radiation_only_tolerances.json": {
+      "status": "PASS",
+      "expected": "c05a5e7548379ff2fa35d3fcd07d52a9a919681ed56d1ee5df1b3a2a31029439",
+      "observed": "c05a5e7548379ff2fa35d3fcd07d52a9a919681ed56d1ee5df1b3a2a31029439",
+      "path": "/project/ls-heng/Bethany.Burt/convection_mlt/stage4/fixtures/helios/radiation_only_tolerances.json"
+    },
+    "helios_write_integrated_flux_b0800f9.patch": {
+      "status": "PASS",
+      "expected": "fe5323668e80b0698d7d55e10ec7c9126a270e981dede64570b47840763ab9c2",
+      "observed": "fe5323668e80b0698d7d55e10ec7c9126a270e981dede64570b47840763ab9c2",
+      "path": "/project/ls-heng/Bethany.Burt/convection_mlt/stage4/fixtures/helios/helios_write_integrated_flux_b0800f9.patch"
+    },
+    "helios_write_integrated_flux_b0800f9.patch.json": {
+      "status": "PASS",
+      "expected": "9ae8a0bb720703a7d689a46fe0cceeb95e4d878ce56c4a7bd8d10350c7b1e493",
+      "observed": "9ae8a0bb720703a7d689a46fe0cceeb95e4d878ce56c4a7bd8d10350c7b1e493",
+      "path": "/project/ls-heng/Bethany.Burt/convection_mlt/stage4/fixtures/helios/helios_write_integrated_flux_b0800f9.patch.json"
+    }
+  }
+}
+M	source/write.py
+{"status": "patched", "helios_commit": "b0800f9ea4366263241c13bb926e8ca68f266cc5", "patch_file": "helios_write_integrated_flux_b0800f9.patch", "sha256": "fe5323668e80b0698d7d55e10ec7c9126a270e981dede64570b47840763ab9c2", "applies_to": "source/write.py write_integrated_flux", "format": "unified_diff", "purpose": "space-delimited {:.17e} integrated-flux writer after git checkout of the pinned commit"}
+
+### Welcome to HELIOS! This run has the name: stage4_frozen_n192_thermal. Enjoy the ride! ###
+
+Reading opacity file: /project/ls-heng/Bethany.Burt/convection_mlt/stage4/fixtures/helios/analytic_grey_nested.h5
+
+Using blackbody flux for the stellar irradiation.
+
+Using manual input for the planetary and orbital parameters.
+
+Starting with chosen temperature profile.
+
+Time for radiative iteration [s]: 0.00
+Total number of iterative steps: 0
+
+Done! Everything appears to have worked fine :-)
+
+This has been a post-processing run with name stage4_frozen_n192_thermal.
+
+
+Final Check for numerical energy balance:
+  --> Theoretical effective temperature of planet: 
+	global (f=0.25): 1.16919 K, 
+	day-side (f=2/3): 1.49428 K, 
+	used in model (f=0.000): 0 K.
+  --> Incident TOA brightness temperature: 0 K 
+      Interior temperature: 269.698 K 
+      Outgoing (planetary) brightness temperature: 288.84 K
+  --> Global energy imbalance: -315576.420ppm (positive: too much uptake, negative: too much loss). 
+
+{
+  "out": "stage4/results/helios_frozen_rad_n192_thermal.json",
+  "status": "PASS"
+}
+Frozen HELIOS radiation-only stage4_frozen_n192_thermal completed
+{
+  "label": "analytic_n192_flux",
+  "path": "/project/ls-heng/Bethany.Burt/convection_mlt/stage4/results/helios_frozen_rad_n192_thermal.json",
+  "status": "PASS",
+  "failures": null,
+  "kappa_max_rel": null,
+  "helios_kappa_vs_P_exponent": null,
+  "helios_dtau_vs_P_exponent": null,
+  "gates": null
+}
+Gated HELIOS radiation-only sequence completed for N=192

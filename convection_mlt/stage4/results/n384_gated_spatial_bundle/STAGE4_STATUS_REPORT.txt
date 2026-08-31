@@ -1,0 +1,129 @@
+Stage 4 status report
+Fixed-composition H2 radiative-convective equilibrium (handbook points 35-40)
+
+Current claim (auto-rebuilt after nested 192→384 scoring)
+--------------------------------------------------------------------
+core_single_resolution_status: PASS
+spatial_and_operator_convergence_status: PASS
+algebraic_identity_status: PASS
+internal_numerical_track_complete: true
+helios_parity_status: NOT_RUN_OR_PILOT_ONLY
+helios_radiation_only_parity_status: PASS
+helios_coupled_rce_n96_status: FAIL
+helios_coupled_rce_n192_status: RESOLUTION_COMPLETE
+helios_coupled_rce_status: FAIL
+full_stage4_claim: false
+
+HELIOS N=192 note: labelled resolution study is RESOLUTION_COMPLETE
+(ΔRCB vs N=96 ≈ 0.019 dex). That is not a 0.15-dex parity PASS; the
+frozen coupled RCB gate remains FAIL.
+
+Statuses are computed from current rows in stage4/results/exit_gate_audit.json.
+The live N=384 source of truth is n384_implicit_rce.json (five-check polish),
+not the discrete-RZ accelerator snapshot.
+
+Gates
+  algebraic identities: 1e-12, including committed-step energy
+  physical RCE: 1e-3 (unchanged; not relaxed)
+  spatial: max rel T 0.02 and 0.05 dex RCB; Richardson in (0.25, 3)
+  coupled HELIOS: predeclared benchmark tolerances; not solver identity
+
+N=96 nested member
+  physically_gated: True
+  flux_flatness: 0.0009980851465752495
+  tendency_norm: 0.00035780618607229067
+  primary_rcb_log10p: 5.117068251694552
+  convective_regions: [[0, 76]]
+  profile_checksum_sha256: 395a16264b107381ce97c501b44d1ef8fb14f5b137a7387988c1f18d5fbad14a
+
+N=192 live record
+  status: converged
+  physically_gated: True
+  steps_accepted: 81348
+  flux_flatness: 0.0009993962280939665
+  tendency_norm: 9.232731100989137e-06
+  primary_rcb_log10p: 5.028268331954913
+  convective_regions: [[0, 155]]
+  energy_gate_ratio: 0.2236850675934482 (PASS)
+  profile_checksum_sha256: 4b7d67555f64b74d5d820d488f29b5d4024e802fd12ab2a4614df9160de8713f
+  record_checksum_sha256: 0913a545f190c11c7a38d61b40597df9d51c1534e81535bdf7a747c5d807b070
+
+N=384 live record (five-check polish)
+  status: converged
+  physically_gated: True
+  steps_accepted: 5
+  actual_integrator: discrete_rz_t_rcb_finite_mlt_then_five_check_pseudotime
+  flux_flatness: 0.0009042133436567686
+  tendency_norm: 4.441790670739465e-06
+  primary_rcb_log10p: 5.001033159946048
+  convective_regions: [[0, 312]]
+  energy_gate_ratio: 0.3014839490732196 (PASS)
+  physical_rce_n384_implicit: PASS (observed 0.0009042133436567686)
+  profile_checksum_sha256: 5e0bd359a7e352863c767faf5441d93968370d358a5b0270c8f6ebf293d875ec
+  record_checksum_sha256: 3ed6a56ddf840fa7c46a96694664d3f0af102de0ffd15c1d0109d5bb64394c44
+
+Nested 192→384 spatial exit pair
+  max_rel_T: PASS (observed 0.00894612278854308)
+  location_index: 155
+  location_P: 112467.0705449986 Pa
+  location_log10P: 5.051025383122798
+  rcb_dex: PASS (observed 0.02723517200886505)
+  n192_rcb: 5.028268331954913
+  n384_rcb: 5.001033159946048
+  column_enthalpy_rel: 0.018340004636107472
+  topology_agree: True
+  n192_single_bottom_cz: True
+  n384_single_bottom_cz: True
+  both_physically_gated: True
+  richardson_nested_96_192_384: PASS (observed 1.8245999325184894; common-grid max_rel_T)
+  e_192_vs_96: 0.0315895321322694
+  e_384_vs_192: 0.008918337097819263
+
+Coupled HELIOS RCE (next, not claimed until N=192)
+  n96_status: FAIL
+  n192_status: RESOLUTION_COMPLETE
+  overall: FAIL
+  forcing: F_int=300, F_irr=0
+  mlt_grid: nested_tau_interpolated_to_helios
+  irradiated_nested_mlt: structural_diagnostic_only
+  comparison_type: independently_discretized_rce_matched_forcing
+  frozen_before_live: True
+  pilot: N=96; headline: N=192
+  gates: {'toa_flux_rel': 0.05, 'max_rel_T': 0.1, 'rcb_dex': 0.15, 'topology_single_bottom_cz': True, 'no_detached_convective_regions': True, 'energy_closure_rel': 0.05}
+  Internal Stage-4 numerical track is complete. Next: freeze the F_irr=0 HELIOS-grid MLT N=96 reference, then the N=96 coupled HELIOS pilot. Do not submit GPU until the coupled manifest verifies. full_stage4_claim stays false until N=192 coupled PASS.
+
+Radiation scope (isothermal cell-centred source)
+--------------------------------------------------------------------
+Radiation uses a piecewise-isothermal, cell-centred source
+representation. This is a consistent finite-volume discretization
+whose adequacy is established through optical-depth-adapted grids
+and demonstrated spatial convergence. It is not equivalent at finite
+resolution to HELIOS non-isothermal within-layer source reconstruction.
+The HELIOS N=96 iso=yes vs iso=no+adj counterfactual (different CZ
+topology, ~145 K deep-T shift) warns that the radiative-convective
+transition is sensitive to within-layer source treatment on a coarse
+geometric grid; that result does not transfer directly to the nested-τ
+internal track.
+
+Stage-5 radiation source sensitivity (future requirement)
+--------------------------------------------------------------------
+Implement or construct a linear-in-optical-depth source diagnostic;
+compare it with the constant-source calculation on the same frozen
+T(P); repeat at N=96, 192 and 384; measure changes in flux, T(P), and
+RCB. Adequacy criterion: whether the two reconstructions converge as
+max Δτ decreases. If the RCB difference falls below the spatial gate
+with refinement, the present scheme is fully adequate; if a persistent
+nonzero offset remains, production radiation should gain a
+non-isothermal source option.
+
+MLT sensitivity campaign (internal track evidence)
+--------------------------------------------------------------------
+See stage4/results/mlt_sensitivity/mlt_sensitivity_summary.json and
+mlt_sensitivity_completion.json.
+Local closure PASS; N=96 α-sweep PASS with Δ∇∝α^{-4/3}; prescribed-Δt
+ladder PASS (order ~1.59, constant histories); broad IC basin PASS
+(RC / RE / ±5%); N=192 α=0.5,1,2 formally gated after discrete-RZ +
+five-check polish. Prior dt_hold_init ladder SUPERSEDED (adaptive grew
+Δt). Exact HELIOS RCB agreement is neither expected nor required; keep
+the 0.15-dex HELIOS row FAIL. User-facing runner:
+examples/rce/run_rce.py + example_config.json (production discrete-RZ + five-check; frozen 1e-3 gate).

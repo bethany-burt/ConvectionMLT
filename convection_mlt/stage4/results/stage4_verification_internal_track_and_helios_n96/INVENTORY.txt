@@ -1,0 +1,78 @@
+Stage 4 verification package
+Packed 2026-08-24
+
+This zip is for internal-track confirmation and coupled-HELIOS N=96 readiness.
+It is not the full repository. Failed N=384 trajectories are excluded.
+analytic_grey_nested.h5 is cluster-side; checksums are in coupled_helios/frozen_input_manifest.json.
+No live coupled HELIOS result is included. helios_coupled_rce_status remains NOT_RUN.
+
+Headline statuses
+  core_single_resolution_status: PASS
+  spatial_and_operator_convergence_status: PASS
+  algebraic_identity_status: PASS
+  internal_numerical_track_complete: True
+  helios_coupled_rce_status: NOT_RUN
+  full_stage4_claim: False
+
+Record checksums
+  nested N=96 profile: 395a16264b107381ce97c501b44d1ef8fb14f5b137a7387988c1f18d5fbad14a
+  N=192 profile: 4b7d67555f64b74d5d820d488f29b5d4024e802fd12ab2a4614df9160de8713f
+  N=384 profile: 5e0bd359a7e352863c767faf5441d93968370d358a5b0270c8f6ebf293d875ec
+  N=384 record: 3ed6a56ddf840fa7c46a96694664d3f0af102de0ffd15c1d0109d5bb64394c44
+  N=384 steps_accepted / n_dt: 5 / 5
+
+Contents (sha256 of packed files)
+  coupled_helios/analytic_grey_nested.json
+    bytes=1481 sha256=aa79d82982c1cf44fb83f8d787374946221797f7152de730e58cc96f6057f6bd
+  coupled_helios/apply_helios_write_precision.py
+    bytes=6958 sha256=85809421bfba4c00737fa60052ff2b3200382c8d2a5deb5e3d527fed02384ef6
+  coupled_helios/beam_contract.json
+    bytes=584 sha256=657278e9156e3d1ffa482af68815398e8d0b2e87d0cebd824af196b26526d3f2
+  coupled_helios/compare_coupled_helios_rce.py
+    bytes=8683 sha256=4d3f6163f85234cbc158c51aee014a930c605523793965df73f5a7cbc34ed9ba
+  coupled_helios/coupled_input_manifest.json
+    bytes=1259 sha256=1ac93c2f4dffeba5d2ffa782d7bc2fe7630dbdaf698561fbb3e579471869bf5b
+  coupled_helios/coupled_rce_benchmark_tolerances.json
+    bytes=1366 sha256=f51bb589b052f272e117eca72351492bbdb9012978405a0735441fa4725a140c
+  coupled_helios/export_coupled_helios_case.py
+    bytes=5275 sha256=49c5012a6aec780fb5325df5cb1d18afeedbff6a20f7ffec675f7fead9417ca3
+  coupled_helios/export_helios_grid_reference.py
+    bytes=9156 sha256=509bb4448a87ed24cbe92d3a390bbeca5a97fbec14f19bd1cde42ff0b38c1e19
+  coupled_helios/frozen_input_manifest.json
+    bytes=745 sha256=036d0943074511a300f69de7b154b52023e26f6fcee44a364090f1e2e364808c
+  coupled_helios/helios_coupled_n96_runtime_config.json
+    bytes=1044 sha256=89a60f7c55c102ee0aa1b87dee0e37d9fc0f9c7d62a1ad1db47e743ddc25ae45
+  coupled_helios/helios_param_template.dat
+    bytes=12964 sha256=2f9a1d2de869d035b05eb72310df4b5dc453030466155935319741226f670fcd
+  coupled_helios/helios_write_integrated_flux_b0800f9.patch
+    bytes=3259 sha256=fe5323668e80b0698d7d55e10ec7c9126a270e981dede64570b47840763ab9c2
+  coupled_helios/helios_write_integrated_flux_b0800f9.patch.json
+    bytes=396 sha256=9ae8a0bb720703a7d689a46fe0cceeb95e4d878ce56c4a7bd8d10350c7b1e493
+  coupled_helios/run_stage4_helios_coupled_n96.sh
+    bytes=3763 sha256=64b2191572ecb3fa00b12c6035c13e6ee1a783abd460813a80cc4d0f4e20bdd2
+  coupled_helios/stage4_helios_coupled_n96.slurm
+    bytes=614 sha256=40ed642dbf01edb01929c13ace6eb9033d03ebfa1893c529e7918463b1d08c12
+  coupled_helios/verify_frozen_inputs.py
+    bytes=3399 sha256=9b585e6191cf0454b0e37b25909f2d2b6761309d4700106f0c9bdde50992eb7e
+  coupled_helios/write_analytic_helios_opacity.py
+    bytes=3371 sha256=9dd3231148a28e9a9e2288ef34c33ff7014cfc2aaa77268dd0c28da5c49ff82e
+  internal_track/STAGE4_STATUS_REPORT.txt
+    bytes=3528 sha256=3aa6d12e5333b9a3bf496b7bf85478e34fd1acd79e8b7e88e4443c4c03d3ca75
+  internal_track/exit_gate_audit.json
+    bytes=22992 sha256=faa17ca398284c31666bf7cd5b6b370c850d4878197a21a9c26e3bfe1b160264
+  internal_track/n192_implicit_rce.json
+    bytes=16191797 sha256=e4cd42f956c4d89bd23fe4d1bdcb23046130d32cdad1e6f9a8a9643ddb363270
+  internal_track/n384_gated_spatial_bundle_index.json
+    bytes=2379 sha256=c6a8b1c4613b3fc17570124ebeceaa234d79524df3b54c40a2ad7ed2ac05fd56
+  internal_track/n384_implicit_rce.json
+    bytes=77559 sha256=270d4890c4a083c643ba4a85341151d4d06a28618475e94feeb174cf7657bafd
+  internal_track/n96_nested_rce.json
+    bytes=212830 sha256=1e93f0401d186a8df02bd9440fdd0184367722ff413ef6f70d7a7bcf75d61386
+  internal_track/nested_rce_family.json
+    bytes=659206 sha256=c0ef2fed9cb6d9595e2b03e2f1d99a5a1a79b82a8c4cab54cb5cc3c8cfb534db
+  internal_track/nested_spatial_1e-3.png
+    bytes=93352 sha256=890dcae83542c4f948eb1834c9082531de5adb4b890a88256a580f338713c143
+  internal_track/rce_record.py
+    bytes=18733 sha256=e40b7bd214e007e157ac0dfd08b8e8b5fdebca4254cf068559bc31d9ec628e17
+  internal_track/run_nested_family.py
+    bytes=16420 sha256=607cfe221de73414954a89967f9b0cc5d20a1f98163fcd436b32b87d84a24525

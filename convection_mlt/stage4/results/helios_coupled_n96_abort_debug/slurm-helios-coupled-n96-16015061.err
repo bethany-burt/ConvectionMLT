@@ -1,0 +1,23 @@
+HEAD is now at b0800f9 Update input data link in README.md
+Traceback (most recent call last):
+  File "/project/ls-heng/Bethany.Burt/convection_mlt_coupled_n96_20260825T135020Z/stage4/experiments/compare_coupled_helios_rce.py", line 506, in <module>
+    main()
+  File "/project/ls-heng/Bethany.Burt/convection_mlt_coupled_n96_20260825T135020Z/stage4/experiments/compare_coupled_helios_rce.py", line 479, in main
+    payload = score(
+              ^^^^^^
+  File "/project/ls-heng/Bethany.Burt/convection_mlt_coupled_n96_20260825T135020Z/stage4/experiments/compare_coupled_helios_rce.py", line 333, in score
+    "structural_irradiated": score_structural_irradiated(n_layers, rec),
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/project/ls-heng/Bethany.Burt/convection_mlt_coupled_n96_20260825T135020Z/stage4/experiments/compare_coupled_helios_rce.py", line 255, in score_structural_irradiated
+    nested = _load_record(n_layers)
+             ^^^^^^^^^^^^^^^^^^^^^^
+  File "/project/ls-heng/Bethany.Burt/convection_mlt_coupled_n96_20260825T135020Z/stage4/experiments/export_helios_grid_reference.py", line 55, in _load_record
+    members = json.loads(NESTED.read_text()).get("members") or {}
+                         ^^^^^^^^^^^^^^^^^^
+  File "/software/opt/el_9/x86_64/python/3.12-2024.10/lib/python3.12/pathlib.py", line 1027, in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/software/opt/el_9/x86_64/python/3.12-2024.10/lib/python3.12/pathlib.py", line 1013, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/project/ls-heng/Bethany.Burt/convection_mlt_coupled_n96_20260825T135020Z/stage4/results/nested_rce_family.json'

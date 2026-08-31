@@ -1,0 +1,94 @@
+{
+  "job_id": "16015698",
+  "helios_tp": "/Users/burt/Desktop/USM/Exo/ConvectionMLT/convection_mlt/stage4/results/helios_coupled_n96_job16015698_debug/iterative/final_tp.dat",
+  "helios_flux": "/Users/burt/Desktop/USM/Exo/ConvectionMLT/convection_mlt/stage4/results/helios_coupled_n96_job16015698_debug/iterative/final_integrated_flux.dat",
+  "stage3_radiation_on_helios_tp": {
+    "purpose": "Matched Stage-3 radiation on final HELIOS T(P); compare F\u2191/F\u2193/F_rad,net/\u0394F_rad",
+    "diffusivity_factor": 2.0,
+    "f_irr": 0.0,
+    "temperature_source": "native_helios_layer_centres",
+    "max_layer_pressure_rel": 2.020899380027188e-06,
+    "lower_bc": {
+      "type": "LowerUpwardFlux",
+      "f_up_boa_W_m2": 14811.043247836697,
+      "helios_boa_temperature_k": 714.897,
+      "sigma_Tboa4_W_m2": 14811.042733776278,
+      "sigma_Tboa4_vs_Fup_rel": 3.470791424577791e-08,
+      "note": "F\u2191_BOA is HELIOS surface emission, not F_int=300. Prior bug: np.interp on descending layer P extrapolated a bogus T_boa\u2248227 K \u2192 \u03c3T\u2074\u2248150 W m\u207b\u00b2 and scrambled layer T."
+    },
+    "helios_column": {
+      "f_up_boa_W_m2": 14811.043247836697,
+      "f_down_boa_W_m2": 14719.274901581486,
+      "f_rad_net_boa_W_m2": 91.7683462552093,
+      "f_up_toa_W_m2": 299.99999705975523,
+      "f_down_toa_W_m2": 0.0,
+      "f_rad_net_toa_W_m2": 299.99999705975523
+    },
+    "stage3_column": {
+      "f_up_boa_W_m2": 14811.043247836697,
+      "f_down_boa_W_m2": 13641.818546640645,
+      "f_rad_net_boa_W_m2": 1169.2247011960517,
+      "f_up_toa_W_m2": 300.19691511914334,
+      "f_down_toa_W_m2": 0.0,
+      "f_rad_net_toa_W_m2": 300.19691511914334
+    },
+    "matched_metrics": {
+      "flux_up_rel": 0.06806914969087124,
+      "flux_down_rel": 0.07274682390102498,
+      "flux_net_rel": 0.13166142873783335,
+      "dF_rad_rel": 0.05891460483680829,
+      "gate_rel": 0.005278229379031692,
+      "agree": false
+    },
+    "decision_tree": "If matched radiation agrees: RCB shift is convection closure and/or grid. If it disagrees: quantify radiation/source treatment before like-for-like claims.",
+    "stage3_rcb_log10p_from_adiabat_join": 4.781249719544374,
+    "helios_rcb_log10p_from_flags": 4.7187499048239445,
+    "rcb_dex_stage3_vs_helios_flags": 0.06249981472042965,
+    "n_near_adiabatic_interfaces": 20,
+    "n_cz_helios_layers": 21,
+    "mean_nabla_in_flagged_cz": 0.28571396153381884,
+    "nabla_ad": 0.2857142857142857,
+    "untrustworthy_prior_f_net_toa_W_m2": 149.99562134482326,
+    "note": "Do not compare Stage-3 F_rad to F_int=300. Prior ~150 W m\u207b\u00b2 TOA result was an unmatched lower-BC / descending-P interp bug, not HELIOS physics."
+  },
+  "cross_convective_stability": {
+    "purpose": "Cross convective-stability diagnostic for RCB discrepancy",
+    "alpha": 1.0,
+    "mlt_reference_rcb_log10p": 5.028032313236911,
+    "mlt_superadiabatic_on_helios_T": {
+      "rcb_log10p": 5.9375,
+      "n_unstable": 9,
+      "note": "Expected near zero for HELIOS convective-adjustment T (already driven to \u2207\u2248\u2207ad)."
+    },
+    "adiabat_join_on_helios_T": {
+      "rcb_log10p": 4.781249719544374,
+      "n_near_adiabatic": 20,
+      "dex_vs_mlt_ref": 0.24678259369253652,
+      "dex_vs_helios_flags": 0.06249981472042965
+    },
+    "helios_lapse_flags_on_helios_T": {
+      "rcb_log10p": 4.7187499048239445,
+      "n_cz_layers": 21,
+      "dex_vs_mlt_ref": 0.30928240841296617
+    },
+    "helios_like_superadiabatic_on_mlt_T": {
+      "rcb_log10p": 5.149256115152421,
+      "n_unstable_interfaces": 77,
+      "dex_vs_mlt_ref": 0.12122380191551052
+    },
+    "adiabat_join_on_mlt_T": {
+      "rcb_log10p": 5.149256115152421,
+      "n_near_adiabatic": 77,
+      "dex_vs_mlt_ref": 0.12122380191551052
+    },
+    "flag_vs_adiabat_join_on_helios_T": {
+      "n_agree": 94,
+      "n_compared": 95,
+      "fraction": 0.9894736842105263
+    },
+    "interpretation_hint": "If adiabat-join on HELIOS T matches HELIOS lapse flags and both sit ~0.3 dex above the MLT RCB, the shift is in the HELIOS T structure (radiation/source / exact adjustment), not in the instability diagnostic applied to a shared profile."
+  },
+  "helios_parity_headline": false,
+  "full_stage4_claim": false,
+  "note": "Offline only; N=192 postponed until RCB discrepancy is classified. Matched Stage-3 radiation uses HELIOS F\u2191_BOA, not F_int."
+}

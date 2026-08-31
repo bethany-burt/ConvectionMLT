@@ -1,0 +1,353 @@
+{
+  "status": "PASS",
+  "files": {
+    "coupled_rce_benchmark_tolerances.json": {
+      "status": "PASS",
+      "expected": "f3c6ff38f950f108cd818e1d2b545cd373cd4e6289c0a1ac02cda2c24b8e5549",
+      "observed": "f3c6ff38f950f108cd818e1d2b545cd373cd4e6289c0a1ac02cda2c24b8e5549",
+      "path": "/project/ls-heng/Bethany.Burt/convection_mlt_coupled_n96_20260825T150702Z/stage4/fixtures/helios/coupled_rce_benchmark_tolerances.json"
+    },
+    "helios_coupled_n96_runtime_config.json": {
+      "status": "PASS",
+      "expected": "4de9e3bacf8739508110701612381ef6f7b991498609dcf6f234d7df403a3518",
+      "observed": "4de9e3bacf8739508110701612381ef6f7b991498609dcf6f234d7df403a3518",
+      "path": "/project/ls-heng/Bethany.Burt/convection_mlt_coupled_n96_20260825T150702Z/stage4/fixtures/helios/helios_coupled_n96_runtime_config.json"
+    },
+    "helios_param_template.dat": {
+      "status": "PASS",
+      "expected": "2f9a1d2de869d035b05eb72310df4b5dc453030466155935319741226f670fcd",
+      "observed": "2f9a1d2de869d035b05eb72310df4b5dc453030466155935319741226f670fcd",
+      "path": "/project/ls-heng/Bethany.Burt/convection_mlt_coupled_n96_20260825T150702Z/stage4/fixtures/helios/helios_param_template.dat"
+    },
+    "beam_contract.json": {
+      "status": "PASS",
+      "expected": "657278e9156e3d1ffa482af68815398e8d0b2e87d0cebd824af196b26526d3f2",
+      "observed": "657278e9156e3d1ffa482af68815398e8d0b2e87d0cebd824af196b26526d3f2",
+      "path": "/project/ls-heng/Bethany.Burt/convection_mlt_coupled_n96_20260825T150702Z/stage4/fixtures/helios/beam_contract.json"
+    },
+    "analytic_grey_nested.json": {
+      "status": "PASS",
+      "expected": "be529759360e58b98da296e1ba4f83f8b668be3e7983c9ae4240ebd2f59f7d0c",
+      "observed": "be529759360e58b98da296e1ba4f83f8b668be3e7983c9ae4240ebd2f59f7d0c",
+      "path": "/project/ls-heng/Bethany.Burt/convection_mlt_coupled_n96_20260825T150702Z/stage4/fixtures/helios/analytic_grey_nested.json"
+    },
+    "helios_write_integrated_flux_b0800f9.patch": {
+      "status": "PASS",
+      "expected": "fe5323668e80b0698d7d55e10ec7c9126a270e981dede64570b47840763ab9c2",
+      "observed": "fe5323668e80b0698d7d55e10ec7c9126a270e981dede64570b47840763ab9c2",
+      "path": "/project/ls-heng/Bethany.Burt/convection_mlt_coupled_n96_20260825T150702Z/stage4/fixtures/helios/helios_write_integrated_flux_b0800f9.patch"
+    },
+    "helios_write_integrated_flux_b0800f9.patch.json": {
+      "status": "PASS",
+      "expected": "9ae8a0bb720703a7d689a46fe0cceeb95e4d878ce56c4a7bd8d10350c7b1e493",
+      "observed": "9ae8a0bb720703a7d689a46fe0cceeb95e4d878ce56c4a7bd8d10350c7b1e493",
+      "path": "/project/ls-heng/Bethany.Burt/convection_mlt_coupled_n96_20260825T150702Z/stage4/fixtures/helios/helios_write_integrated_flux_b0800f9.patch.json"
+    },
+    "analytic_grey_nested.h5": {
+      "status": "PASS",
+      "expected": "9505247e1104c9d11500944975a2d26b82d55c4e3c7c66f579a5a9c08334cd3c",
+      "observed": "9505247e1104c9d11500944975a2d26b82d55c4e3c7c66f579a5a9c08334cd3c",
+      "path": "/project/ls-heng/Bethany.Burt/convection_mlt_coupled_n96_20260825T150702Z/stage4/fixtures/helios/analytic_grey_nested.h5"
+    },
+    "mlt_nested_tau_n96_firr0.json": {
+      "status": "PASS",
+      "expected": "cab84d966521438bb08ec1571dbb2e97abe2f749f34fa1b7aceadb3b0a5e1215",
+      "observed": "cab84d966521438bb08ec1571dbb2e97abe2f749f34fa1b7aceadb3b0a5e1215",
+      "path": "/project/ls-heng/Bethany.Burt/convection_mlt_coupled_n96_20260825T150702Z/stage4/fixtures/helios/mlt_nested_tau_n96_firr0.json"
+    }
+  }
+}
+{
+  "purpose": "Declared N=96 coupled-HELIOS runtime. Not a live HELIOS result.",
+  "comparison_type": "independently_discretized_rce_matched_forcing",
+  "forcing": "F_int=300, F_irr=0",
+  "f_irr": 0.0,
+  "mlt_grid": "nested_tau",
+  "helios_commit": "b0800f9ea4366263241c13bb926e8ca68f266cc5",
+  "n_layers": 96,
+  "run_type": "iterative",
+  "physical_timestep": "no",
+  "start_from_provided_tp_profile": "no",
+  "isothermal_layers": false,
+  "maximum_number_of_iterations": 50000,
+  "radiative_equilibrium_criterion": 1e-08,
+  "relax_radiative_criterion_at": [
+    10000,
+    20000
+  ],
+  "initialization": "stock_helios_isothermal_500K initial profile; isothermal_layers=false for non-iso radiation + convective adjustment (HELIOS b0800f9 requires iso==0 for conv_check). MLT tp.dat is provenance / later seed trial only.",
+  "convective_adjustment": "yes",
+  "kappa_nabla_ad": 0.2857142857142857,
+  "scattering": "no",
+  "direct_irradiation": "no",
+  "diffusivity_factor": 2.0,
+  "internal_flux_temperature_k": 269.6977849204774,
+  "f_int": 300.0,
+  "gravity_si": 15.0,
+  "planet_type": "rocky",
+  "precision": "double",
+  "planck_table_dimension_and_stepsize": [
+    8000,
+    2
+  ],
+  "planck_t_ceiling_k": 15998,
+  "planck_table_policy": "Do not enlarge. Physical reference T < 700 K; ceiling approach is numerical runaway \u2014 diagnose iteration/damping instead.",
+  "prior_job_16015568": "HELIOS_RUNTIME_BUG_ISO1",
+  "opacity_path": "/project/ls-heng/Bethany.Burt/convection_mlt_coupled_n96_20260825T150702Z/stage4/fixtures/helios/analytic_grey_nested.h5",
+  "mlt_reference": "/project/ls-heng/Bethany.Burt/convection_mlt_coupled_n96_20260825T150702Z/stage4/fixtures/helios/mlt_nested_tau_n96_firr0.json",
+  "mlt_profile_checksum_sha256": "b5eb35083b2049ecfae3d63874867e76c2b07ef896fdea609d0fee6ae51826ca",
+  "source_status": "converged",
+  "source_rcb_log10p": 5.028032313236911,
+  "p_boa_microbar": 10000000.0,
+  "p_toa_microbar": 10.746078283213178,
+  "tolerances": "/project/ls-heng/Bethany.Burt/convection_mlt_coupled_n96_20260825T150702Z/stage4/fixtures/helios/coupled_rce_benchmark_tolerances.json",
+  "param_dat": "/project/ls-heng/Bethany.Burt/helios_stage4_coupled_20260825T150702Z/stage4_coupled_n96/param.dat",
+  "tp_seed": "/project/ls-heng/Bethany.Burt/helios_stage4_coupled_20260825T150702Z/stage4_coupled_n96/stage4_coupled_n96_tp.dat",
+  "helios_coupled_rce_status": "NOT_RUN",
+  "helios_parity_headline": false,
+  "full_stage4_claim": false,
+  "irradiated_nested_mlt": "structural_diagnostic_only",
+  "frozen_iso_diag_dir": "/project/ls-heng/Bethany.Burt/helios_stage4_coupled_20260825T150702Z/stage4_coupled_n96_frozen_iso_diag"
+}
+exported case preflight PASS {'n_layers': 96, 'T_int': 269.6977849204774, 'F_int': 299.9999999999999, 'iso': 'no', 'max_iters': 50000}
+M	source/write.py
+{"status": "patched", "helios_commit": "b0800f9ea4366263241c13bb926e8ca68f266cc5", "patch_file": "helios_write_integrated_flux_b0800f9.patch", "sha256": "fe5323668e80b0698d7d55e10ec7c9126a270e981dede64570b47840763ab9c2", "applies_to": "source/write.py write_integrated_flux", "format": "unified_diff", "purpose": "space-delimited {:.17e} integrated-flux writer after git checkout of the pinned commit"}
+
+### Welcome to HELIOS! This run has the name: stage4_coupled_n96_frozen_iso_no. Enjoy the ride! ###
+
+Reading opacity file: /project/ls-heng/Bethany.Burt/convection_mlt_coupled_n96_20260825T150702Z/stage4/fixtures/helios/analytic_grey_nested.h5
+
+Using blackbody flux for the stellar irradiation.
+
+Using manual input for the planetary and orbital parameters.
+
+Starting with chosen temperature profile.
+
+Time for radiative iteration [s]: 0.00
+Total number of iterative steps: 0
+
+Done! Everything appears to have worked fine :-)
+
+This has been a post-processing run with name stage4_coupled_n96_frozen_iso_no.
+
+
+Final Check for numerical energy balance:
+  --> Theoretical effective temperature of planet: 
+	global (f=0.25): 1.16919 K, 
+	day-side (f=2/3): 1.49428 K, 
+	used in model (f=0.000): 0 K.
+  --> Incident TOA brightness temperature: 0 K 
+      Interior temperature: 269.698 K 
+      Outgoing (planetary) brightness temperature: 269.153 K
+  --> Global energy imbalance: 8057.758ppm (positive: too much uptake, negative: too much loss). 
+
+
+### Welcome to HELIOS! This run has the name: stage4_coupled_n96_frozen_iso_yes. Enjoy the ride! ###
+
+Reading opacity file: /project/ls-heng/Bethany.Burt/convection_mlt_coupled_n96_20260825T150702Z/stage4/fixtures/helios/analytic_grey_nested.h5
+
+Using blackbody flux for the stellar irradiation.
+
+Using manual input for the planetary and orbital parameters.
+
+Starting with chosen temperature profile.
+
+Time for radiative iteration [s]: 0.00
+Total number of iterative steps: 0
+
+Done! Everything appears to have worked fine :-)
+
+This has been a post-processing run with name stage4_coupled_n96_frozen_iso_yes.
+
+
+Final Check for numerical energy balance:
+  --> Theoretical effective temperature of planet: 
+	global (f=0.25): 1.16919 K, 
+	day-side (f=2/3): 1.49428 K, 
+	used in model (f=0.000): 0 K.
+  --> Incident TOA brightness temperature: 0 K 
+      Interior temperature: 269.698 K 
+      Outgoing (planetary) brightness temperature: 269.198 K
+  --> Global energy imbalance: 7393.190ppm (positive: too much uptake, negative: too much loss). 
+
+{
+  "frozen_preflight": "PASS",
+  "out": "/project/ls-heng/Bethany.Burt/convection_mlt_coupled_n96_20260825T150702Z/stage4/results/helios_coupled_frozen_iso_diag_n96.json",
+  "delta": {
+    "max_abs_net_delta_W_m2": 1621.4932062532548,
+    "max_rel_net": 0.9801744171116513,
+    "max_rel_interface": 0,
+    "iso_no_at_max": 18.123011406444014,
+    "iso_yes_at_max": 914.1225006350112,
+    "note": "Same frozen MLT F_irr=0 T(P); only isothermal_layers changed. Not required to match prior radiation-only parity."
+  }
+}
+
+### Welcome to HELIOS! This run has the name: stage4_coupled_n96. Enjoy the ride! ###
+
+Reading opacity file: /project/ls-heng/Bethany.Burt/convection_mlt_coupled_n96_20260825T150702Z/stage4/fixtures/helios/analytic_grey_nested.h5
+
+Using blackbody flux for the stellar irradiation.
+
+Using manual input for the planetary and orbital parameters.
+
+Starting with an isothermal TP-profile at 500 K.
+
+We are running "stage4_coupled_n96" at iteration step nr. : 0
+Layers (& surface/BOA) converged: 0 out of 97.
+
+We are running "stage4_coupled_n96" at iteration step nr. : 100
+Time for the last 100 steps [s]: 0.20
+Layers (& surface/BOA) converged: 0 out of 97.
+
+We are running "stage4_coupled_n96" at iteration step nr. : 200
+Time for the last 100 steps [s]: 0.20
+Layers (& surface/BOA) converged: 0 out of 97.
+
+We are running "stage4_coupled_n96" at iteration step nr. : 300
+Time for the last 100 steps [s]: 0.20
+Layers (& surface/BOA) converged: 0 out of 97.
+
+We are running "stage4_coupled_n96" at iteration step nr. : 400
+Time for the last 100 steps [s]: 0.20
+Layers (& surface/BOA) converged: 0 out of 97.
+
+We are running "stage4_coupled_n96" at iteration step nr. : 500
+Time for the last 100 steps [s]: 0.20
+Layers (& surface/BOA) converged: 0 out of 97.
+
+We are running "stage4_coupled_n96" at iteration step nr. : 600
+Time for the last 100 steps [s]: 0.20
+Layers (& surface/BOA) converged: 0 out of 97.
+
+We are running "stage4_coupled_n96" at iteration step nr. : 700
+Time for the last 100 steps [s]: 0.20
+Layers (& surface/BOA) converged: 0 out of 97.
+
+We are running "stage4_coupled_n96" at iteration step nr. : 800
+Time for the last 100 steps [s]: 0.20
+Layers (& surface/BOA) converged: 0 out of 97.
+
+We are running "stage4_coupled_n96" at iteration step nr. : 900
+Time for the last 100 steps [s]: 0.20
+Layers (& surface/BOA) converged: 0 out of 97.
+
+We are running "stage4_coupled_n96" at iteration step nr. : 1000
+Time for the last 100 steps [s]: 0.21
+Layers (& surface/BOA) converged: 0 out of 97.
+
+We are running "stage4_coupled_n96" at iteration step nr. : 1100
+Time for the last 100 steps [s]: 0.20
+Layers (& surface/BOA) converged: 0 out of 97.
+
+We are running "stage4_coupled_n96" at iteration step nr. : 1200
+Time for the last 100 steps [s]: 0.20
+Layers (& surface/BOA) converged: 0 out of 97.
+
+We are running "stage4_coupled_n96" at iteration step nr. : 1300
+Time for the last 100 steps [s]: 0.20
+Layers (& surface/BOA) converged: 0 out of 97.
+
+We are running "stage4_coupled_n96" at iteration step nr. : 1400
+Time for the last 100 steps [s]: 0.20
+Layers (& surface/BOA) converged: 0 out of 97.
+
+We are running "stage4_coupled_n96" at iteration step nr. : 1500
+Time for the last 100 steps [s]: 0.20
+Layers (& surface/BOA) converged: 1 out of 97.
+
+We are running "stage4_coupled_n96" at iteration step nr. : 1600
+Time for the last 100 steps [s]: 0.20
+Layers (& surface/BOA) converged: 4 out of 97.
+
+We are running "stage4_coupled_n96" at iteration step nr. : 1700
+Time for the last 100 steps [s]: 0.20
+Layers (& surface/BOA) converged: 6 out of 97.
+
+We are running "stage4_coupled_n96" at iteration step nr. : 1800
+Time for the last 100 steps [s]: 0.20
+Layers (& surface/BOA) converged: 12 out of 97.
+
+Time for radiative iteration [s]: 3.81
+Total number of iterative steps: 1848
+
+Convectively unstable layers found. Starting convective adjustment
+
+We are running "stage4_coupled_n96" at iteration step nr. : 0
+Number of radiative layers converged: 0 out of 75.
+Radiative energy imbalance in intermediate rad. layers is 3.066e+00 and should be less than 1.0e-08
+Global energy imbalance is 3.804e-01 and should be less than 1.0e-08
+
+We are running "stage4_coupled_n96" at iteration step nr. : 100
+Time for the last 100 steps [s]: 0.69
+Number of radiative layers converged: 0 out of 75.
+Global energy imbalance is 3.881e-02 and should be less than 1.0e-08
+
+We are running "stage4_coupled_n96" at iteration step nr. : 200
+Time for the last 100 steps [s]: 0.66
+Number of radiative layers converged: 0 out of 75.
+Global energy imbalance is 5.062e-03 and should be less than 1.0e-08
+
+We are running "stage4_coupled_n96" at iteration step nr. : 300
+Time for the last 100 steps [s]: 0.63
+Number of radiative layers converged: 0 out of 75.
+Global energy imbalance is 6.839e-04 and should be less than 1.0e-08
+
+We are running "stage4_coupled_n96" at iteration step nr. : 400
+Time for the last 100 steps [s]: 0.62
+Number of radiative layers converged: 0 out of 75.
+Global energy imbalance is 9.160e-05 and should be less than 1.0e-08
+
+We are running "stage4_coupled_n96" at iteration step nr. : 500
+Time for the last 100 steps [s]: 0.61
+Number of radiative layers converged: 0 out of 75.
+Global energy imbalance is 1.193e-05 and should be less than 1.0e-08
+
+We are running "stage4_coupled_n96" at iteration step nr. : 600
+Time for the last 100 steps [s]: 0.56
+Number of radiative layers converged: 0 out of 75.
+Global energy imbalance is 1.562e-06 and should be less than 1.0e-08
+
+We are running "stage4_coupled_n96" at iteration step nr. : 700
+Time for the last 100 steps [s]: 0.56
+Number of radiative layers converged: 0 out of 75.
+Global energy imbalance is 2.055e-07 and should be less than 1.0e-08
+
+We are running "stage4_coupled_n96" at iteration step nr. : 800
+Time for the last 100 steps [s]: 0.45
+Number of radiative layers converged: 0 out of 75.
+Global energy imbalance is 2.721e-08 and should be less than 1.0e-08
+
+Time for rad.-conv. iteration [s]: 4.98
+Total number of iterative steps: 843
+
+Done! Everything appears to have worked fine :-)
+
+This has been an iterative run with name stage4_coupled_n96.
+
+
+Final Check for numerical energy balance:
+  --> Theoretical effective temperature of planet: 
+	global (f=0.25): 1.16919 K, 
+	day-side (f=2/3): 1.49428 K, 
+	used in model (f=0.000): 0 K.
+  --> Incident TOA brightness temperature: 0 K 
+      Interior temperature: 269.698 K 
+      Outgoing (planetary) brightness temperature: 269.698 K
+  --> Global energy imbalance: 0.010ppm (positive: too much uptake, negative: too much loss). 
+
+HELIOS outputs present; invoking physical coupled scorer
+{
+  "status": "INFRASTRUCTURE_FAIL",
+  "helios_coupled_rce_n96_status": "NOT_RUN",
+  "helios_coupled_rce_n192_status": "NOT_RUN",
+  "helios_coupled_rce_status": "NOT_RUN",
+  "helios_parity_headline": false,
+  "full_stage4_claim": false,
+  "infrastructure_reason": "helios_not_converged",
+  "out": "/project/ls-heng/Bethany.Burt/convection_mlt_coupled_n96_20260825T150702Z/stage4/results/helios_coupled_rce_n96.json"
+}
+{
+  "scored_status": "INFRASTRUCTURE_FAIL",
+  "helios_coupled_rce_n96_status": "NOT_RUN"
+}

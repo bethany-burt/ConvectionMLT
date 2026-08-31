@@ -1,0 +1,7 @@
+{
+  "helios_commit": "b0800f9ea4366263241c13bb926e8ca68f266cc5",
+  "patch_file": "helios_iso1_conv_check_b0800f9.patch",
+  "patch_sha256": "51080d139280535f24f65fa0c0cf53561d0d13eb13621d035f98b0e021a88a02",
+  "purpose": "iso1_conv_check_minimal",
+  "note": "Enables conv_check under isothermal_layers=yes for source-treatment RCB counterfactual only."
+}

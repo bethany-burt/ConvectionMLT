@@ -1,0 +1,44 @@
+{
+  "purpose": "MLT sensitivity conclusion bundle for simple-solver demonstration",
+  "completion_status": {
+    "source": "stage4/results/mlt_sensitivity/mlt_sensitivity_completion.json",
+    "prescribed_dt": "PASS",
+    "broad_ic": "PASS",
+    "polish_n192": "PASS",
+    "user_facing_runner": "stage4/user/run_rce.py",
+    "user_facing_example_config": "stage4/user/example_config.json"
+  },
+  "success_criteria": {
+    "local_analytical_scalings": "PASS",
+    "stable_layers_zero_flux": "PASS",
+    "finite_mlt_superadiabatic_scaling": "PASS",
+    "equilibria_timestep_independent": "PASS",
+    "equilibria_ic_independent_broad": "PASS",
+    "prescribed_dt_temporal_ladder": "PASS",
+    "efficiency_reduces_superadiabaticity": "PASS",
+    "energy_flux_identities": "PASS",
+    "n192_formal_gate_alpha_0.5_1_2": "PASS",
+    "helios_exact_parity_not_required": true
+  },
+  "helios_statement": "The model solves the same class of one-dimensional radiative\u2013convective equilibrium problems as HELIOS. Its radiative kernel agrees with HELIOS to approximately 1e-5 when the pressure grid, opacity, boundaries, and piecewise-isothermal source treatment are matched. Native coupled equilibria are qualitatively comparable but not identical because HELIOS uses non-isothermal within-layer radiation and convective adjustment, whereas this solver uses a piecewise-isothermal radiation discretization and finite MLT. Keep the original 0.15-dex HELIOS RCB row marked FAIL.",
+  "files": [
+    "alpha_sweep_n96_alpha0.0.json",
+    "alpha_sweep_n96_alpha0.5.json",
+    "alpha_sweep_n96_alpha1.0.json",
+    "alpha_sweep_n96_alpha2.0.json",
+    "alpha_sweep_n96_alpha4.0.json",
+    "broad_ic_n96_alpha1_cold_5pct_from_rc.json",
+    "broad_ic_n96_alpha1_hot_5pct_from_rc.json",
+    "broad_ic_n96_alpha1_radiative_convective.json",
+    "broad_ic_n96_alpha1_radiative_equilibrium.json",
+    "mlt_sensitivity_completion.json",
+    "mlt_sensitivity_summary.json",
+    "n192_polished_alpha0.5.json",
+    "n192_polished_alpha1.0.json",
+    "n192_polished_alpha2.0.json",
+    "prescribed_dt_n96_alpha1_dt10000.json",
+    "prescribed_dt_n96_alpha1_dt2500.json",
+    "prescribed_dt_n96_alpha1_dt5000.json"
+  ],
+  "stamped_utc": "20260826T190544Z"
+}

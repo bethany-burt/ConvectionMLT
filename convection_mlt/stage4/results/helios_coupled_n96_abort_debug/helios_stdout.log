@@ -1,0 +1,55 @@
+
+### Welcome to HELIOS! This run has the name: stage4_coupled_n96. Enjoy the ride! ###
+
+Reading opacity file: /project/ls-heng/Bethany.Burt/convection_mlt_coupled_n96_20260825T135020Z/stage4/fixtures/helios/analytic_grey_nested.h5
+
+Using blackbody flux for the stellar irradiation.
+
+Using manual input for the planetary and orbital parameters.
+
+Starting with an isothermal TP-profile at 500 K.
+
+We are running "stage4_coupled_n96" at iteration step nr. : 0
+Layers (& surface/BOA) converged: 0 out of 97.
+
+We are running "stage4_coupled_n96" at iteration step nr. : 100
+Time for the last 100 steps [s]: 0.15
+Layers (& surface/BOA) converged: 0 out of 97.
+
+We are running "stage4_coupled_n96" at iteration step nr. : 200
+Time for the last 100 steps [s]: 0.14
+Layers (& surface/BOA) converged: 0 out of 97.
+
+We are running "stage4_coupled_n96" at iteration step nr. : 300
+Time for the last 100 steps [s]: 0.14
+Layers (& surface/BOA) converged: 0 out of 97.
+
+We are running "stage4_coupled_n96" at iteration step nr. : 400
+Time for the last 100 steps [s]: 0.13
+Layers (& surface/BOA) converged: 0 out of 97.
+
+We are running "stage4_coupled_n96" at iteration step nr. : 500
+Time for the last 100 steps [s]: 0.13
+Layers (& surface/BOA) converged: 0 out of 97.
+
+We are running "stage4_coupled_n96" at iteration step nr. : 600
+Time for the last 100 steps [s]: 0.13
+Layers (& surface/BOA) converged: 0 out of 97.
+
+We are running "stage4_coupled_n96" at iteration step nr. : 700
+Time for the last 100 steps [s]: 0.13
+Layers (& surface/BOA) converged: 0 out of 97.
+
+We are running "stage4_coupled_n96" at iteration step nr. : 800
+Time for the last 100 steps [s]: 0.13
+Layers (& surface/BOA) converged: 0 out of 97.
+
+We are running "stage4_coupled_n96" at iteration step nr. : 900
+Time for the last 100 steps [s]: 0.13
+Layers (& surface/BOA) converged: 0 out of 97.
+
+We are running "stage4_coupled_n96" at iteration step nr. : 1000
+Time for the last 100 steps [s]: 0.12
+Layers (& surface/BOA) converged: 0 out of 97.
+
+Run exceeds allowed maximum allowed number of iteration steps. Aborting...

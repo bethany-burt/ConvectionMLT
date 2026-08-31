@@ -1,0 +1,1162 @@
+{
+  "n_layers": 384,
+  "source_profile_checksum_sha256": "1e23c0a90bf8125db3a61720e8f05b5f5d7cf80680597dde9fa289b5cbf70511",
+  "source_flux_flatness": 0.025797668499786635,
+  "source_tendency_norm": 0.00011948398217176267,
+  "convective_regions": [
+    [
+      0,
+      312
+    ]
+  ],
+  "n_active_interfaces": 313,
+  "superadiabatic_excess": {
+    "activity_threshold": 1e-07,
+    "min_superadiabatic_excess_active": 3.3777320313965636e-06,
+    "max_superadiabatic_excess_inactive": 0.0,
+    "min_superadiabatic_excess_active_including_boundary": 0.0,
+    "n_inactive_above_threshold": 0.0,
+    "n_active_interfaces": 313.0,
+    "n_active_internal_interfaces": 312.0,
+    "rcb_active_excess": 3.3777320313965636e-06,
+    "rcb_inactive_excess": 0.0,
+    "rcb_active_distance_to_threshold": 3.2777320313965637e-06,
+    "rcb_inactive_distance_to_threshold": 1e-07
+  },
+  "h_norm": 80908170.43344429,
+  "h_scale_rms": 4128827.783001562,
+  "directions": {
+    "cz_relative": {
+      "direction_norm_before_unit": 80803071.8715309,
+      "live_mlt": {
+        "h_norm": 80908170.43344429,
+        "direction_norm": 0.9999999999999998,
+        "ladder": [
+          {
+            "fd_rel": 0.001,
+            "eps": 80908.1704334443,
+            "ok": true,
+            "jv_two_norm": 0.002411500631353614,
+            "jv_inf_norm": 0.0001843264262118967,
+            "delta_r_inf": 14.913513907339835,
+            "centered_jv_two_norm": 0.0012540990326263804,
+            "forward_vs_centered_rel": 0.4799581261579912,
+            "n_branch_crossings_plus": 0,
+            "n_branch_crossings_minus": 312,
+            "n_branch_crossings": 312
+          },
+          {
+            "fd_rel": 0.0001,
+            "eps": 8090.817043344431,
+            "ok": true,
+            "jv_two_norm": 0.0013213596829352446,
+            "jv_inf_norm": 9.937153895857209e-05,
+            "delta_r_inf": 0.8039969410293801,
+            "centered_jv_two_norm": 0.0010913855257518102,
+            "forward_vs_centered_rel": 0.17494285976589266,
+            "n_branch_crossings_plus": 0,
+            "n_branch_crossings_minus": 11,
+            "n_branch_crossings": 11
+          },
+          {
+            "fd_rel": 1e-05,
+            "eps": 809.0817043344432,
+            "ok": true,
+            "jv_two_norm": 0.0011462649269809964,
+            "jv_inf_norm": 8.55945894216789e-05,
+            "delta_r_inf": 0.06925301629109887,
+            "centered_jv_two_norm": 0.001124335600167376,
+            "forward_vs_centered_rel": 0.01922268477519763,
+            "n_branch_crossings_plus": 0,
+            "n_branch_crossings_minus": 0,
+            "n_branch_crossings": 0
+          },
+          {
+            "fd_rel": 1e-06,
+            "eps": 80.9081704334443,
+            "ok": true,
+            "jv_two_norm": 0.0011268128947242995,
+            "jv_inf_norm": 8.406060626125911e-05,
+            "delta_r_inf": 0.006801189858124607,
+            "centered_jv_two_norm": 0.0011246209934204351,
+            "forward_vs_centered_rel": 0.001954521313582583,
+            "n_branch_crossings_plus": 0,
+            "n_branch_crossings_minus": 0,
+            "n_branch_crossings": 0
+          },
+          {
+            "fd_rel": 1e-07,
+            "eps": 8.09081704334443,
+            "ok": true,
+            "jv_two_norm": 0.0011248430177489533,
+            "jv_inf_norm": 8.390486755768384e-05,
+            "delta_r_inf": 0.0006788589324552655,
+            "centered_jv_two_norm": 0.0011246238414393866,
+            "forward_vs_centered_rel": 0.00019584015261434507,
+            "n_branch_crossings_plus": 0,
+            "n_branch_crossings_minus": 0,
+            "n_branch_crossings": 0
+          },
+          {
+            "fd_rel": 1e-08,
+            "eps": 0.8090817043344432,
+            "ok": true,
+            "jv_two_norm": 0.0011246458769137145,
+            "jv_inf_norm": 8.388888777666695e-05,
+            "delta_r_inf": 6.787296429706653e-05,
+            "centered_jv_two_norm": 0.0011246239833916502,
+            "forward_vs_centered_rel": 5.017998568584611e-05,
+            "n_branch_crossings_plus": 0,
+            "n_branch_crossings_minus": 0,
+            "n_branch_crossings": 0
+          },
+          {
+            "fd_rel": 1.4901161193847656e-08,
+            "eps": 1.2056256895280526,
+            "ok": true,
+            "jv_two_norm": 0.0011246564660273928,
+            "jv_inf_norm": 8.389240466875597e-05,
+            "delta_r_inf": 0.00010114283822493535,
+            "centered_jv_two_norm": 0.0011246237938175518,
+            "forward_vs_centered_rel": 4.1252341294703095e-05,
+            "n_branch_crossings_plus": 0,
+            "n_branch_crossings_minus": 0,
+            "n_branch_crossings": 0
+          }
+        ],
+        "pairwise_rel_two_change": [
+          {
+            "from_fd_rel": 0.001,
+            "to_fd_rel": 0.0001,
+            "rel_two_change": 0.4522988776693719
+          },
+          {
+            "from_fd_rel": 0.0001,
+            "to_fd_rel": 1e-05,
+            "rel_two_change": 0.13285895381245727
+          },
+          {
+            "from_fd_rel": 1e-05,
+            "to_fd_rel": 1e-06,
+            "rel_two_change": 0.01704382634728453
+          },
+          {
+            "from_fd_rel": 1e-06,
+            "to_fd_rel": 1e-07,
+            "rel_two_change": 0.0017564782842377467
+          },
+          {
+            "from_fd_rel": 1e-07,
+            "to_fd_rel": 1e-08,
+            "rel_two_change": 0.00018352175327523743
+          },
+          {
+            "from_fd_rel": 1e-08,
+            "to_fd_rel": 1.4901161193847656e-08,
+            "rel_two_change": 5.109020863813272e-05
+          }
+        ],
+        "max_pairwise_rel_two_change": 0.4522988776693719,
+        "max_pairwise_rel_two_change_fine": 0.0017564782842377467,
+        "fine_fd_rel": 1e-06,
+        "jv_stable": true,
+        "jv_stable_full_ladder": false,
+        "note": "jv_stable uses only rungs with from_fd_rel \u2264 fine_fd_rel (1e-06), the local linear neighbourhood. jv_stable_full_ladder includes fd_rel = 10\u207b\u00b3, which is typically outside that neighbourhood. Larger fine-rung jumps indicate noise or MLT nonsmoothness; large full-ladder jumps at coarse fd_rel indicate nonlinearity."
+      },
+      "lagged_f_conv": {
+        "h_norm": 80908170.43344429,
+        "direction_norm": 0.9999999999999998,
+        "ladder": [
+          {
+            "fd_rel": 0.001,
+            "eps": 80908.1704334443,
+            "ok": true,
+            "jv_two_norm": 3.049548765992188e-07,
+            "jv_inf_norm": 4.129631982392395e-08,
+            "delta_r_inf": 0.0033412096825880637,
+            "centered_jv_two_norm": 3.0469625284542573e-07,
+            "forward_vs_centered_rel": 0.0008635881610387026,
+            "n_branch_crossings_plus": 0,
+            "n_branch_crossings_minus": 312,
+            "n_branch_crossings": 312
+          },
+          {
+            "fd_rel": 0.0001,
+            "eps": 8090.817043344431,
+            "ok": true,
+            "jv_two_norm": 3.0472201752011116e-07,
+            "jv_inf_norm": 4.128424153646068e-08,
+            "delta_r_inf": 0.0003340232450447442,
+            "centered_jv_two_norm": 3.046961555115729e-07,
+            "forward_vs_centered_rel": 8.64248033179964e-05,
+            "n_branch_crossings_plus": 0,
+            "n_branch_crossings_minus": 11,
+            "n_branch_crossings": 11
+          },
+          {
+            "fd_rel": 1e-05,
+            "eps": 809.0817043344432,
+            "ok": true,
+            "jv_two_norm": 3.046987407419192e-07,
+            "jv_inf_norm": 4.128303388272268e-08,
+            "delta_r_inf": 3.340134741392983e-05,
+            "centered_jv_two_norm": 3.046961545396067e-07,
+            "forward_vs_centered_rel": 8.643161161085675e-06,
+            "n_branch_crossings_plus": 0,
+            "n_branch_crossings_minus": 0,
+            "n_branch_crossings": 0
+          },
+          {
+            "fd_rel": 1e-06,
+            "eps": 80.9081704334443,
+            "ok": true,
+            "jv_two_norm": 3.0469641313660257e-07,
+            "jv_inf_norm": 4.1282913108629066e-08,
+            "delta_r_inf": 3.3401249697820323e-06,
+            "centered_jv_two_norm": 3.0469615447564573e-07,
+            "forward_vs_centered_rel": 8.645119501863906e-07,
+            "n_branch_crossings_plus": 0,
+            "n_branch_crossings_minus": 0,
+            "n_branch_crossings": 0
+          },
+          {
+            "fd_rel": 1e-07,
+            "eps": 8.09081704334443,
+            "ok": true,
+            "jv_two_norm": 3.046961819354121e-07,
+            "jv_inf_norm": 4.128290110898536e-08,
+            "delta_r_inf": 3.340123998912814e-07,
+            "centered_jv_two_norm": 3.0469615495509624e-07,
+            "forward_vs_centered_rel": 1.0821240799014832e-07,
+            "n_branch_crossings_plus": 0,
+            "n_branch_crossings_minus": 0,
+            "n_branch_crossings": 0
+          },
+          {
+            "fd_rel": 1e-08,
+            "eps": 0.8090817043344432,
+            "ok": true,
+            "jv_two_norm": 3.046961649075575e-07,
+            "jv_inf_norm": 4.128290007983432e-08,
+            "delta_r_inf": 3.340123915646087e-08,
+            "centered_jv_two_norm": 3.046961579079215e-07,
+            "forward_vs_centered_rel": 6.285082521801381e-07,
+            "n_branch_crossings_plus": 0,
+            "n_branch_crossings_minus": 0,
+            "n_branch_crossings": 0
+          },
+          {
+            "fd_rel": 1.4901161193847656e-08,
+            "eps": 1.2056256895280526,
+            "ok": true,
+            "jv_two_norm": 3.046961684292014e-07,
+            "jv_inf_norm": 4.128289990346665e-08,
+            "delta_r_inf": 4.977172466183455e-08,
+            "centered_jv_two_norm": 3.04696153697829e-07,
+            "forward_vs_centered_rel": 4.1647455440509046e-07,
+            "n_branch_crossings_plus": 0,
+            "n_branch_crossings_minus": 0,
+            "n_branch_crossings": 0
+          }
+        ],
+        "pairwise_rel_two_change": [
+          {
+            "from_fd_rel": 0.001,
+            "to_fd_rel": 0.0001,
+            "rel_two_change": 0.0007775618352510164
+          },
+          {
+            "from_fd_rel": 0.0001,
+            "to_fd_rel": 1e-05,
+            "rel_two_change": 7.77856241880452e-05
+          },
+          {
+            "from_fd_rel": 1e-05,
+            "to_fd_rel": 1e-06,
+            "rel_two_change": 7.778895922348116e-06
+          },
+          {
+            "from_fd_rel": 1e-06,
+            "to_fd_rel": 1e-07,
+            "rel_two_change": 7.754971670082859e-07
+          },
+          {
+            "from_fd_rel": 1e-07,
+            "to_fd_rel": 1e-08,
+            "rel_two_change": 7.024841948586789e-07
+          },
+          {
+            "from_fd_rel": 1e-08,
+            "to_fd_rel": 1.4901161193847656e-08,
+            "rel_two_change": 6.438893269349369e-07
+          }
+        ],
+        "max_pairwise_rel_two_change": 0.0007775618352510164,
+        "max_pairwise_rel_two_change_fine": 7.754971670082859e-07,
+        "fine_fd_rel": 1e-06,
+        "jv_stable": true,
+        "jv_stable_full_ladder": true,
+        "note": "jv_stable uses only rungs with from_fd_rel \u2264 fine_fd_rel (1e-06), the local linear neighbourhood. jv_stable_full_ladder includes fd_rel = 10\u207b\u00b3, which is typically outside that neighbourhood. Larger fine-rung jumps indicate noise or MLT nonsmoothness; large full-ladder jumps at coarse fd_rel indicate nonlinearity."
+      },
+      "live_jv_stable": true,
+      "lagged_jv_stable": true,
+      "live_jv_stable_full_ladder": false,
+      "lagged_jv_stable_full_ladder": true,
+      "live_max_pairwise_rel_two_change": 0.4522988776693719,
+      "lagged_max_pairwise_rel_two_change": 0.0007775618352510164,
+      "live_max_pairwise_rel_two_change_fine": 0.0017564782842377467,
+      "lagged_max_pairwise_rel_two_change_fine": 7.754971670082859e-07
+    },
+    "radiative_zone": {
+      "direction_norm_before_unit": 4122574.318490918,
+      "live_mlt": {
+        "h_norm": 80908170.43344429,
+        "direction_norm": 0.9999999999999999,
+        "ladder": [
+          {
+            "fd_rel": 0.001,
+            "eps": 80908.1704334443,
+            "ok": true,
+            "jv_two_norm": 9.595887641234097e-07,
+            "jv_inf_norm": 4.4889817231158296e-07,
+            "delta_r_inf": 0.036319529832647204,
+            "centered_jv_two_norm": 9.559394627417154e-07,
+            "forward_vs_centered_rel": 0.003990427648434679,
+            "n_branch_crossings_plus": 0,
+            "n_branch_crossings_minus": 1,
+            "n_branch_crossings": 1
+          },
+          {
+            "fd_rel": 0.0001,
+            "eps": 8090.81704334443,
+            "ok": true,
+            "jv_two_norm": 9.562975060475345e-07,
+            "jv_inf_norm": 4.469590530838729e-07,
+            "delta_r_inf": 0.003616263924368087,
+            "centered_jv_two_norm": 9.559326401626617e-07,
+            "forward_vs_centered_rel": 0.0004004155155524003,
+            "n_branch_crossings_plus": 0,
+            "n_branch_crossings_minus": 0,
+            "n_branch_crossings": 0
+          },
+          {
+            "fd_rel": 1e-05,
+            "eps": 809.0817043344431,
+            "ok": true,
+            "jv_two_norm": 9.55969057887132e-07,
+            "jv_inf_norm": 4.4676555875413403e-07,
+            "delta_r_inf": 0.0003614698397147245,
+            "centered_jv_two_norm": 9.55932571937526e-07,
+            "forward_vs_centered_rel": 4.005530686179161e-05,
+            "n_branch_crossings_plus": 0,
+            "n_branch_crossings_minus": 0,
+            "n_branch_crossings": 0
+          },
+          {
+            "fd_rel": 1e-06,
+            "eps": 80.9081704334443,
+            "ok": true,
+            "jv_two_norm": 9.559362198450037e-07,
+            "jv_inf_norm": 4.4674621349588297e-07,
+            "delta_r_inf": 3.6145418782020794e-05,
+            "centered_jv_two_norm": 9.55932571251621e-07,
+            "forward_vs_centered_rel": 4.0056745335056595e-06,
+            "n_branch_crossings_plus": 0,
+            "n_branch_crossings_minus": 0,
+            "n_branch_crossings": 0
+          },
+          {
+            "fd_rel": 1e-07,
+            "eps": 8.09081704334443,
+            "ok": true,
+            "jv_two_norm": 9.559329356232066e-07,
+            "jv_inf_norm": 4.4674427909447535e-07,
+            "delta_r_inf": 3.614526227314202e-06,
+            "centered_jv_two_norm": 9.559325711378698e-07,
+            "forward_vs_centered_rel": 4.0028774513160316e-07,
+            "n_branch_crossings_plus": 0,
+            "n_branch_crossings_minus": 0,
+            "n_branch_crossings": 0
+          },
+          {
+            "fd_rel": 1e-08,
+            "eps": 0.809081704334443,
+            "ok": true,
+            "jv_two_norm": 9.559326060221693e-07,
+            "jv_inf_norm": 4.467440857474427e-07,
+            "delta_r_inf": 3.6145246629787353e-07,
+            "centered_jv_two_norm": 9.559325716937428e-07,
+            "forward_vs_centered_rel": 3.923830297926849e-08,
+            "n_branch_crossings_plus": 0,
+            "n_branch_crossings_minus": 0,
+            "n_branch_crossings": 0
+          },
+          {
+            "fd_rel": 1.4901161193847656e-08,
+            "eps": 1.2056256895280526,
+            "ok": true,
+            "jv_two_norm": 9.559326270305712e-07,
+            "jv_inf_norm": 4.4674409584306817e-07,
+            "delta_r_inf": 5.386061585933855e-07,
+            "centered_jv_two_norm": 9.559325722011496e-07,
+            "forward_vs_centered_rel": 6.019649693864428e-08,
+            "n_branch_crossings_plus": 0,
+            "n_branch_crossings_minus": 0,
+            "n_branch_crossings": 0
+          }
+        ],
+        "pairwise_rel_two_change": [
+          {
+            "from_fd_rel": 0.001,
+            "to_fd_rel": 0.0001,
+            "rel_two_change": 0.00359931842085113
+          },
+          {
+            "from_fd_rel": 0.0001,
+            "to_fd_rel": 1e-05,
+            "rel_two_change": 0.00036045356494634844
+          },
+          {
+            "from_fd_rel": 1e-05,
+            "to_fd_rel": 1e-06,
+            "rel_two_change": 3.605057122132113e-05
+          },
+          {
+            "from_fd_rel": 1e-06,
+            "to_fd_rel": 1e-07,
+            "rel_two_change": 3.605408566459766e-06
+          },
+          {
+            "from_fd_rel": 1e-07,
+            "to_fd_rel": 1e-08,
+            "rel_two_change": 3.615404524367848e-07
+          },
+          {
+            "from_fd_rel": 1e-08,
+            "to_fd_rel": 1.4901161193847656e-08,
+            "rel_two_change": 2.320996939010841e-08
+          }
+        ],
+        "max_pairwise_rel_two_change": 0.00359931842085113,
+        "max_pairwise_rel_two_change_fine": 3.605408566459766e-06,
+        "fine_fd_rel": 1e-06,
+        "jv_stable": true,
+        "jv_stable_full_ladder": true,
+        "note": "jv_stable uses only rungs with from_fd_rel \u2264 fine_fd_rel (1e-06), the local linear neighbourhood. jv_stable_full_ladder includes fd_rel = 10\u207b\u00b3, which is typically outside that neighbourhood. Larger fine-rung jumps indicate noise or MLT nonsmoothness; large full-ladder jumps at coarse fd_rel indicate nonlinearity."
+      },
+      "lagged_f_conv": {
+        "h_norm": 80908170.43344429,
+        "direction_norm": 0.9999999999999999,
+        "ladder": [
+          {
+            "fd_rel": 0.001,
+            "eps": 80908.1704334443,
+            "ok": true,
+            "jv_two_norm": 9.595887641234097e-07,
+            "jv_inf_norm": 4.4889817231158296e-07,
+            "delta_r_inf": 0.036319529832647204,
+            "centered_jv_two_norm": 9.559394627417154e-07,
+            "forward_vs_centered_rel": 0.003990427648434679,
+            "n_branch_crossings_plus": 0,
+            "n_branch_crossings_minus": 1,
+            "n_branch_crossings": 1
+          },
+          {
+            "fd_rel": 0.0001,
+            "eps": 8090.81704334443,
+            "ok": true,
+            "jv_two_norm": 9.562975060475345e-07,
+            "jv_inf_norm": 4.469590530838729e-07,
+            "delta_r_inf": 0.003616263924368087,
+            "centered_jv_two_norm": 9.559326401626617e-07,
+            "forward_vs_centered_rel": 0.0004004155155524003,
+            "n_branch_crossings_plus": 0,
+            "n_branch_crossings_minus": 0,
+            "n_branch_crossings": 0
+          },
+          {
+            "fd_rel": 1e-05,
+            "eps": 809.0817043344431,
+            "ok": true,
+            "jv_two_norm": 9.55969057887132e-07,
+            "jv_inf_norm": 4.4676555875413403e-07,
+            "delta_r_inf": 0.0003614698397147245,
+            "centered_jv_two_norm": 9.55932571937526e-07,
+            "forward_vs_centered_rel": 4.005530686179161e-05,
+            "n_branch_crossings_plus": 0,
+            "n_branch_crossings_minus": 0,
+            "n_branch_crossings": 0
+          },
+          {
+            "fd_rel": 1e-06,
+            "eps": 80.9081704334443,
+            "ok": true,
+            "jv_two_norm": 9.559362198450037e-07,
+            "jv_inf_norm": 4.4674621349588297e-07,
+            "delta_r_inf": 3.6145418782020794e-05,
+            "centered_jv_two_norm": 9.55932571251621e-07,
+            "forward_vs_centered_rel": 4.0056745335056595e-06,
+            "n_branch_crossings_plus": 0,
+            "n_branch_crossings_minus": 0,
+            "n_branch_crossings": 0
+          },
+          {
+            "fd_rel": 1e-07,
+            "eps": 8.09081704334443,
+            "ok": true,
+            "jv_two_norm": 9.559329356232066e-07,
+            "jv_inf_norm": 4.4674427909447535e-07,
+            "delta_r_inf": 3.614526227314202e-06,
+            "centered_jv_two_norm": 9.559325711378698e-07,
+            "forward_vs_centered_rel": 4.0028774513160316e-07,
+            "n_branch_crossings_plus": 0,
+            "n_branch_crossings_minus": 0,
+            "n_branch_crossings": 0
+          },
+          {
+            "fd_rel": 1e-08,
+            "eps": 0.809081704334443,
+            "ok": true,
+            "jv_two_norm": 9.559326060221693e-07,
+            "jv_inf_norm": 4.467440857474427e-07,
+            "delta_r_inf": 3.6145246629787353e-07,
+            "centered_jv_two_norm": 9.559325716937428e-07,
+            "forward_vs_centered_rel": 3.923830297926849e-08,
+            "n_branch_crossings_plus": 0,
+            "n_branch_crossings_minus": 0,
+            "n_branch_crossings": 0
+          },
+          {
+            "fd_rel": 1.4901161193847656e-08,
+            "eps": 1.2056256895280526,
+            "ok": true,
+            "jv_two_norm": 9.559326270305712e-07,
+            "jv_inf_norm": 4.4674409584306817e-07,
+            "delta_r_inf": 5.386061585933855e-07,
+            "centered_jv_two_norm": 9.559325722011496e-07,
+            "forward_vs_centered_rel": 6.019649693864428e-08,
+            "n_branch_crossings_plus": 0,
+            "n_branch_crossings_minus": 0,
+            "n_branch_crossings": 0
+          }
+        ],
+        "pairwise_rel_two_change": [
+          {
+            "from_fd_rel": 0.001,
+            "to_fd_rel": 0.0001,
+            "rel_two_change": 0.00359931842085113
+          },
+          {
+            "from_fd_rel": 0.0001,
+            "to_fd_rel": 1e-05,
+            "rel_two_change": 0.00036045356494634844
+          },
+          {
+            "from_fd_rel": 1e-05,
+            "to_fd_rel": 1e-06,
+            "rel_two_change": 3.605057122132113e-05
+          },
+          {
+            "from_fd_rel": 1e-06,
+            "to_fd_rel": 1e-07,
+            "rel_two_change": 3.605408566459766e-06
+          },
+          {
+            "from_fd_rel": 1e-07,
+            "to_fd_rel": 1e-08,
+            "rel_two_change": 3.615404524367848e-07
+          },
+          {
+            "from_fd_rel": 1e-08,
+            "to_fd_rel": 1.4901161193847656e-08,
+            "rel_two_change": 2.320996939010841e-08
+          }
+        ],
+        "max_pairwise_rel_two_change": 0.00359931842085113,
+        "max_pairwise_rel_two_change_fine": 3.605408566459766e-06,
+        "fine_fd_rel": 1e-06,
+        "jv_stable": true,
+        "jv_stable_full_ladder": true,
+        "note": "jv_stable uses only rungs with from_fd_rel \u2264 fine_fd_rel (1e-06), the local linear neighbourhood. jv_stable_full_ladder includes fd_rel = 10\u207b\u00b3, which is typically outside that neighbourhood. Larger fine-rung jumps indicate noise or MLT nonsmoothness; large full-ladder jumps at coarse fd_rel indicate nonlinearity."
+      },
+      "live_jv_stable": true,
+      "lagged_jv_stable": true,
+      "live_jv_stable_full_ladder": true,
+      "lagged_jv_stable_full_ladder": true,
+      "live_max_pairwise_rel_two_change": 0.00359931842085113,
+      "lagged_max_pairwise_rel_two_change": 0.00359931842085113,
+      "live_max_pairwise_rel_two_change_fine": 3.605408566459766e-06,
+      "lagged_max_pairwise_rel_two_change_fine": 3.605408566459766e-06
+    },
+    "residual_scaled": {
+      "direction_norm_before_unit": 836333.47241106,
+      "live_mlt": {
+        "h_norm": 80908170.43344429,
+        "direction_norm": 1.0,
+        "ladder": [
+          {
+            "fd_rel": 0.001,
+            "eps": 80908.17043344429,
+            "ok": true,
+            "jv_two_norm": 0.07272274968561009,
+            "jv_inf_norm": 0.009877815298913635,
+            "delta_r_inf": 799.1959637145878,
+            "centered_jv_two_norm": 0.036401468789362325,
+            "forward_vs_centered_rel": 0.4994816627407712,
+            "n_branch_crossings_plus": 46,
+            "n_branch_crossings_minus": 260,
+            "n_branch_crossings": 306
+          },
+          {
+            "fd_rel": 0.0001,
+            "eps": 8090.817043344429,
+            "ok": true,
+            "jv_two_norm": 0.025486066429793928,
+            "jv_inf_norm": 0.0033199446250334495,
+            "delta_r_inf": 26.861064555180363,
+            "centered_jv_two_norm": 0.013140744777629625,
+            "forward_vs_centered_rel": 0.4846494453750102,
+            "n_branch_crossings_plus": 22,
+            "n_branch_crossings_minus": 236,
+            "n_branch_crossings": 258
+          },
+          {
+            "fd_rel": 1e-05,
+            "eps": 809.081704334443,
+            "ok": true,
+            "jv_two_norm": 0.013205845910375906,
+            "jv_inf_norm": 0.0015935052803214141,
+            "delta_r_inf": 1.289275968068384,
+            "centered_jv_two_norm": 0.010232492690905518,
+            "forward_vs_centered_rel": 0.23561089872497865,
+            "n_branch_crossings_plus": 1,
+            "n_branch_crossings_minus": 49,
+            "n_branch_crossings": 50
+          },
+          {
+            "fd_rel": 1e-06,
+            "eps": 80.90817043344428,
+            "ok": true,
+            "jv_two_norm": 0.011136555657020843,
+            "jv_inf_norm": 0.001292211064750685,
+            "delta_r_inf": 0.10455043306283092,
+            "centered_jv_two_norm": 0.010870320574879369,
+            "forward_vs_centered_rel": 0.024880222168922692,
+            "n_branch_crossings_plus": 0,
+            "n_branch_crossings_minus": 0,
+            "n_branch_crossings": 0
+          },
+          {
+            "fd_rel": 1e-07,
+            "eps": 8.090817043344428,
+            "ok": true,
+            "jv_two_norm": 0.010901564900280762,
+            "jv_inf_norm": 0.0012575134481553154,
+            "delta_r_inf": 0.010174311238569846,
+            "centered_jv_two_norm": 0.010874983815310307,
+            "forward_vs_centered_rel": 0.0025394285309492176,
+            "n_branch_crossings_plus": 0,
+            "n_branch_crossings_minus": 0,
+            "n_branch_crossings": 0
+          },
+          {
+            "fd_rel": 1e-08,
+            "eps": 0.8090817043344429,
+            "ok": true,
+            "jv_two_norm": 0.010877688413386141,
+            "jv_inf_norm": 0.001253966628726187,
+            "delta_r_inf": 0.001014561457148299,
+            "centered_jv_two_norm": 0.010875030465040483,
+            "forward_vs_centered_rel": 0.00025456138511959186,
+            "n_branch_crossings_plus": 0,
+            "n_branch_crossings_minus": 0,
+            "n_branch_crossings": 0
+          },
+          {
+            "fd_rel": 1.4901161193847656e-08,
+            "eps": 1.2056256895280524,
+            "ok": true,
+            "jv_two_norm": 0.010878990289762006,
+            "jv_inf_norm": 0.0012541688070299242,
+            "delta_r_inf": 0.001512058132760027,
+            "centered_jv_two_norm": 0.010875029692701583,
+            "forward_vs_centered_rel": 0.0003792188291856308,
+            "n_branch_crossings_plus": 0,
+            "n_branch_crossings_minus": 0,
+            "n_branch_crossings": 0
+          }
+        ],
+        "pairwise_rel_two_change": [
+          {
+            "from_fd_rel": 0.001,
+            "to_fd_rel": 0.0001,
+            "rel_two_change": 0.6497634253234795
+          },
+          {
+            "from_fd_rel": 0.0001,
+            "to_fd_rel": 1e-05,
+            "rel_two_change": 0.4848017400403903
+          },
+          {
+            "from_fd_rel": 1e-05,
+            "to_fd_rel": 1e-06,
+            "rel_two_change": 0.16079200582411948
+          },
+          {
+            "from_fd_rel": 1e-06,
+            "to_fd_rel": 1e-07,
+            "rel_two_change": 0.02192571645052611
+          },
+          {
+            "from_fd_rel": 1e-07,
+            "to_fd_rel": 1e-08,
+            "rel_two_change": 0.0022806756046166166
+          },
+          {
+            "from_fd_rel": 1e-08,
+            "to_fd_rel": 1.4901161193847656e-08,
+            "rel_two_change": 0.00012469443784541597
+          }
+        ],
+        "max_pairwise_rel_two_change": 0.6497634253234795,
+        "max_pairwise_rel_two_change_fine": 0.02192571645052611,
+        "fine_fd_rel": 1e-06,
+        "jv_stable": true,
+        "jv_stable_full_ladder": false,
+        "note": "jv_stable uses only rungs with from_fd_rel \u2264 fine_fd_rel (1e-06), the local linear neighbourhood. jv_stable_full_ladder includes fd_rel = 10\u207b\u00b3, which is typically outside that neighbourhood. Larger fine-rung jumps indicate noise or MLT nonsmoothness; large full-ladder jumps at coarse fd_rel indicate nonlinearity."
+      },
+      "lagged_f_conv": {
+        "h_norm": 80908170.43344429,
+        "direction_norm": 1.0,
+        "ladder": [
+          {
+            "fd_rel": 0.001,
+            "eps": 80908.17043344429,
+            "ok": true,
+            "jv_two_norm": 4.180034872180999e-07,
+            "jv_inf_norm": 4.36431276260452e-08,
+            "delta_r_inf": 0.003531085608216626,
+            "centered_jv_two_norm": 4.183762800007353e-07,
+            "forward_vs_centered_rel": 0.001046415680336824,
+            "n_branch_crossings_plus": 46,
+            "n_branch_crossings_minus": 260,
+            "n_branch_crossings": 306
+          },
+          {
+            "fd_rel": 0.0001,
+            "eps": 8090.817043344429,
+            "ok": true,
+            "jv_two_norm": 4.183388346743907e-07,
+            "jv_inf_norm": 4.368727969159523e-08,
+            "delta_r_inf": 0.00035346578710611365,
+            "centered_jv_two_norm": 4.183761195717807e-07,
+            "forward_vs_centered_rel": 0.0001045576749233733,
+            "n_branch_crossings_plus": 22,
+            "n_branch_crossings_minus": 236,
+            "n_branch_crossings": 258
+          },
+          {
+            "fd_rel": 1e-05,
+            "eps": 809.081704334443,
+            "ok": true,
+            "jv_two_norm": 4.183723894124364e-07,
+            "jv_inf_norm": 4.369169689930445e-08,
+            "delta_r_inf": 3.535015259255314e-05,
+            "centered_jv_two_norm": 4.183761179620265e-07,
+            "forward_vs_centered_rel": 1.045492625279399e-05,
+            "n_branch_crossings_plus": 1,
+            "n_branch_crossings_minus": 49,
+            "n_branch_crossings": 50
+          },
+          {
+            "fd_rel": 1e-06,
+            "eps": 80.90817043344428,
+            "ok": true,
+            "jv_two_norm": 4.1837574505395456e-07,
+            "jv_inf_norm": 4.369213862386763e-08,
+            "delta_r_inf": 3.535050998381556e-06,
+            "centered_jv_two_norm": 4.183761178919816e-07,
+            "forward_vs_centered_rel": 1.045465919773492e-06,
+            "n_branch_crossings_plus": 0,
+            "n_branch_crossings_minus": 0,
+            "n_branch_crossings": 0
+          },
+          {
+            "fd_rel": 1e-07,
+            "eps": 8.090817043344428,
+            "ok": true,
+            "jv_two_norm": 4.183760809518456e-07,
+            "jv_inf_norm": 4.369218271702872e-08,
+            "delta_r_inf": 3.535054565878548e-07,
+            "centered_jv_two_norm": 4.183761183810628e-07,
+            "forward_vs_centered_rel": 1.1113043791758973e-07,
+            "n_branch_crossings_plus": 0,
+            "n_branch_crossings_minus": 0,
+            "n_branch_crossings": 0
+          },
+          {
+            "fd_rel": 1e-08,
+            "eps": 0.8090817043344429,
+            "ok": true,
+            "jv_two_norm": 4.183761223752656e-07,
+            "jv_inf_norm": 4.3692185339648586e-08,
+            "delta_r_inf": 3.535054778069924e-08,
+            "centered_jv_two_norm": 4.1837612267646717e-07,
+            "forward_vs_centered_rel": 3.912599454171144e-07,
+            "n_branch_crossings_plus": 0,
+            "n_branch_crossings_minus": 0,
+            "n_branch_crossings": 0
+          },
+          {
+            "fd_rel": 1.4901161193847656e-08,
+            "eps": 1.2056256895280524,
+            "ok": true,
+            "jv_two_norm": 4.1837612004703095e-07,
+            "jv_inf_norm": 4.3692185352946904e-08,
+            "delta_r_inf": 5.2676421093134085e-08,
+            "centered_jv_two_norm": 4.1837611740594987e-07,
+            "forward_vs_centered_rel": 2.755259150449256e-07,
+            "n_branch_crossings_plus": 0,
+            "n_branch_crossings_minus": 0,
+            "n_branch_crossings": 0
+          }
+        ],
+        "pairwise_rel_two_change": [
+          {
+            "from_fd_rel": 0.001,
+            "to_fd_rel": 0.0001,
+            "rel_two_change": 0.0009404965974323031
+          },
+          {
+            "from_fd_rel": 0.0001,
+            "to_fd_rel": 1e-05,
+            "rel_two_change": 9.40891431159938e-05
+          },
+          {
+            "from_fd_rel": 1e-05,
+            "to_fd_rel": 1e-06,
+            "rel_two_change": 9.40932174973493e-06
+          },
+          {
+            "from_fd_rel": 1e-06,
+            "to_fd_rel": 1e-07,
+            "rel_two_change": 9.454719396172474e-07
+          },
+          {
+            "from_fd_rel": 1e-07,
+            "to_fd_rel": 1e-08,
+            "rel_two_change": 5.03886145532591e-07
+          },
+          {
+            "from_fd_rel": 1e-08,
+            "to_fd_rel": 1.4901161193847656e-08,
+            "rel_two_change": 4.58496361285747e-07
+          }
+        ],
+        "max_pairwise_rel_two_change": 0.0009404965974323031,
+        "max_pairwise_rel_two_change_fine": 9.454719396172474e-07,
+        "fine_fd_rel": 1e-06,
+        "jv_stable": true,
+        "jv_stable_full_ladder": true,
+        "note": "jv_stable uses only rungs with from_fd_rel \u2264 fine_fd_rel (1e-06), the local linear neighbourhood. jv_stable_full_ladder includes fd_rel = 10\u207b\u00b3, which is typically outside that neighbourhood. Larger fine-rung jumps indicate noise or MLT nonsmoothness; large full-ladder jumps at coarse fd_rel indicate nonlinearity."
+      },
+      "live_jv_stable": true,
+      "lagged_jv_stable": true,
+      "live_jv_stable_full_ladder": false,
+      "lagged_jv_stable_full_ladder": true,
+      "live_max_pairwise_rel_two_change": 0.6497634253234795,
+      "lagged_max_pairwise_rel_two_change": 0.0009404965974323031,
+      "live_max_pairwise_rel_two_change_fine": 0.02192571645052611,
+      "lagged_max_pairwise_rel_two_change_fine": 9.454719396172474e-07
+    },
+    "random_seeded": {
+      "direction_norm_before_unit": 86117420.03522971,
+      "live_mlt": {
+        "h_norm": 80908170.43344429,
+        "direction_norm": 0.9999999999999999,
+        "ladder": [
+          {
+            "fd_rel": 0.001,
+            "eps": 80908.1704334443,
+            "ok": true,
+            "jv_two_norm": 175.97321146473726,
+            "jv_inf_norm": 65.99804423879677,
+            "delta_r_inf": 5339781.011546565,
+            "centered_jv_two_norm": 129.48853202046132,
+            "forward_vs_centered_rel": 0.735841935463962,
+            "n_branch_crossings_plus": 163,
+            "n_branch_crossings_minus": 150,
+            "n_branch_crossings": 313
+          },
+          {
+            "fd_rel": 0.0001,
+            "eps": 8090.81704334443,
+            "ok": true,
+            "jv_two_norm": 55.67397468521032,
+            "jv_inf_norm": 20.8794716744598,
+            "delta_r_inf": 168931.98527974662,
+            "centered_jv_two_norm": 40.962989989613746,
+            "forward_vs_centered_rel": 0.7357553533356059,
+            "n_branch_crossings_plus": 162,
+            "n_branch_crossings_minus": 149,
+            "n_branch_crossings": 311
+          },
+          {
+            "fd_rel": 1e-05,
+            "eps": 809.0817043344431,
+            "ok": true,
+            "jv_two_norm": 17.686421008228475,
+            "jv_inf_norm": 6.621548985281706,
+            "delta_r_inf": 5357.3741383457245,
+            "centered_jv_two_norm": 13.012327850024102,
+            "forward_vs_centered_rel": 0.7354076903053618,
+            "n_branch_crossings_plus": 159,
+            "n_branch_crossings_minus": 143,
+            "n_branch_crossings": 302
+          },
+          {
+            "fd_rel": 1e-06,
+            "eps": 80.9081704334443,
+            "ok": true,
+            "jv_two_norm": 5.8258636257147245,
+            "jv_inf_norm": 2.149207273891374,
+            "delta_r_inf": 173.8884284128015,
+            "centered_jv_two_norm": 4.304590791332566,
+            "forward_vs_centered_rel": 0.7290597952916051,
+            "n_branch_crossings_plus": 133,
+            "n_branch_crossings_minus": 119,
+            "n_branch_crossings": 252
+          },
+          {
+            "fd_rel": 1e-07,
+            "eps": 8.09081704334443,
+            "ok": true,
+            "jv_two_norm": 2.4606894915600983,
+            "jv_inf_norm": 0.820076602805664,
+            "delta_r_inf": 6.6350897548280665,
+            "centered_jv_two_norm": 2.0547797509403436,
+            "forward_vs_centered_rel": 0.595977438640758,
+            "n_branch_crossings_plus": 43,
+            "n_branch_crossings_minus": 47,
+            "n_branch_crossings": 90
+          },
+          {
+            "fd_rel": 1e-08,
+            "eps": 0.809081704334443,
+            "ok": true,
+            "jv_two_norm": 2.2346447305989163,
+            "jv_inf_norm": 0.5117946825030458,
+            "delta_r_inf": 0.4140837139888695,
+            "centered_jv_two_norm": 2.240025927805235,
+            "forward_vs_centered_rel": 0.08259340502535746,
+            "n_branch_crossings_plus": 0,
+            "n_branch_crossings_minus": 0,
+            "n_branch_crossings": 0
+          },
+          {
+            "fd_rel": 1.4901161193847656e-08,
+            "eps": 1.2056256895280526,
+            "ok": true,
+            "jv_two_norm": 2.224290542312285,
+            "jv_inf_norm": 0.5339996188314878,
+            "delta_r_inf": 0.6438036586614297,
+            "centered_jv_two_norm": 2.226506862835008,
+            "forward_vs_centered_rel": 0.1256197542963435,
+            "n_branch_crossings_plus": 0,
+            "n_branch_crossings_minus": 0,
+            "n_branch_crossings": 0
+          }
+        ],
+        "pairwise_rel_two_change": [
+          {
+            "from_fd_rel": 0.001,
+            "to_fd_rel": 0.0001,
+            "rel_two_change": 0.6836225032276063
+          },
+          {
+            "from_fd_rel": 0.0001,
+            "to_fd_rel": 1e-05,
+            "rel_two_change": 0.68232294767274
+          },
+          {
+            "from_fd_rel": 1e-05,
+            "to_fd_rel": 1e-06,
+            "rel_two_change": 0.6707217144267775
+          },
+          {
+            "from_fd_rel": 1e-06,
+            "to_fd_rel": 1e-07,
+            "rel_two_change": 0.5953130138230446
+          },
+          {
+            "from_fd_rel": 1e-07,
+            "to_fd_rel": 1e-08,
+            "rel_two_change": 0.5242646750600829
+          },
+          {
+            "from_fd_rel": 1e-08,
+            "to_fd_rel": 1.4901161193847656e-08,
+            "rel_two_change": 0.04489774128626129
+          }
+        ],
+        "max_pairwise_rel_two_change": 0.6836225032276063,
+        "max_pairwise_rel_two_change_fine": 0.5953130138230446,
+        "fine_fd_rel": 1e-06,
+        "jv_stable": false,
+        "jv_stable_full_ladder": false,
+        "note": "jv_stable uses only rungs with from_fd_rel \u2264 fine_fd_rel (1e-06), the local linear neighbourhood. jv_stable_full_ladder includes fd_rel = 10\u207b\u00b3, which is typically outside that neighbourhood. Larger fine-rung jumps indicate noise or MLT nonsmoothness; large full-ladder jumps at coarse fd_rel indicate nonlinearity."
+      },
+      "lagged_f_conv": {
+        "h_norm": 80908170.43344429,
+        "direction_norm": 0.9999999999999999,
+        "ladder": [
+          {
+            "fd_rel": 0.001,
+            "eps": 80908.1704334443,
+            "ok": true,
+            "jv_two_norm": 1.0813357562640374e-05,
+            "jv_inf_norm": 2.5694336060764757e-06,
+            "delta_r_inf": 0.2078881721178549,
+            "centered_jv_two_norm": 1.0811110906257414e-05,
+            "forward_vs_centered_rel": 0.0012588977136665227,
+            "n_branch_crossings_plus": 163,
+            "n_branch_crossings_minus": 150,
+            "n_branch_crossings": 313
+          },
+          {
+            "fd_rel": 0.0001,
+            "eps": 8090.81704334443,
+            "ok": true,
+            "jv_two_norm": 1.0811323545955961e-05,
+            "jv_inf_norm": 2.5654220142552767e-06,
+            "delta_r_inf": 0.02075636015630759,
+            "centered_jv_two_norm": 1.0811099630537063e-05,
+            "forward_vs_centered_rel": 0.0001259134063685543,
+            "n_branch_crossings_plus": 162,
+            "n_branch_crossings_minus": 149,
+            "n_branch_crossings": 311
+          },
+          {
+            "fd_rel": 1e-05,
+            "eps": 809.0817043344431,
+            "ok": true,
+            "jv_two_norm": 1.0811121901822424e-05,
+            "jv_inf_norm": 2.5650212827761637e-06,
+            "delta_r_inf": 0.002075311791122658,
+            "centered_jv_two_norm": 1.081109951778972e-05,
+            "forward_vs_centered_rel": 1.259157516607167e-05,
+            "n_branch_crossings_plus": 159,
+            "n_branch_crossings_minus": 143,
+            "n_branch_crossings": 302
+          },
+          {
+            "fd_rel": 1e-06,
+            "eps": 80.9081704334443,
+            "ok": true,
+            "jv_two_norm": 1.081110175489038e-05,
+            "jv_inf_norm": 2.5649812138192993e-06,
+            "delta_r_inf": 0.0002075279372062747,
+            "centered_jv_two_norm": 1.0811099516713182e-05,
+            "forward_vs_centered_rel": 1.2591552406056396e-06,
+            "n_branch_crossings_plus": 133,
+            "n_branch_crossings_minus": 119,
+            "n_branch_crossings": 252
+          },
+          {
+            "fd_rel": 1e-07,
+            "eps": 8.09081704334443,
+            "ok": true,
+            "jv_two_norm": 1.081109974342004e-05,
+            "jv_inf_norm": 2.5649772084748817e-06,
+            "delta_r_inf": 2.0752761314118593e-05,
+            "centered_jv_two_norm": 1.0811099518906998e-05,
+            "forward_vs_centered_rel": 1.2587807868917272e-07,
+            "n_branch_crossings_plus": 43,
+            "n_branch_crossings_minus": 47,
+            "n_branch_crossings": 90
+          },
+          {
+            "fd_rel": 1e-08,
+            "eps": 0.809081704334443,
+            "ok": true,
+            "jv_two_norm": 1.0811099522732137e-05,
+            "jv_inf_norm": 2.564976821781929e-06,
+            "delta_r_inf": 2.075275818545666e-06,
+            "centered_jv_two_norm": 1.0811099516668998e-05,
+            "forward_vs_centered_rel": 2.019939935943695e-08,
+            "n_branch_crossings_plus": 0,
+            "n_branch_crossings_minus": 0,
+            "n_branch_crossings": 0
+          },
+          {
+            "fd_rel": 1.4901161193847656e-08,
+            "eps": 1.2056256895280526,
+            "ok": true,
+            "jv_two_norm": 1.0811099535243485e-05,
+            "jv_inf_norm": 2.5649768360356595e-06,
+            "delta_r_inf": 3.092401966568975e-06,
+            "centered_jv_two_norm": 1.0811099509078524e-05,
+            "forward_vs_centered_rel": 2.1334904422797787e-08,
+            "n_branch_crossings_plus": 0,
+            "n_branch_crossings_minus": 0,
+            "n_branch_crossings": 0
+          }
+        ],
+        "pairwise_rel_two_change": [
+          {
+            "from_fd_rel": 0.001,
+            "to_fd_rel": 0.0001,
+            "rel_two_change": 0.0011330861116849338
+          },
+          {
+            "from_fd_rel": 0.0001,
+            "to_fd_rel": 1e-05,
+            "rel_two_change": 0.0001133228392071892
+          },
+          {
+            "from_fd_rel": 1e-05,
+            "to_fd_rel": 1e-06,
+            "rel_two_change": 1.1332440105178137e-05
+          },
+          {
+            "from_fd_rel": 1e-06,
+            "to_fd_rel": 1e-07,
+            "rel_two_change": 1.1331751791148698e-06
+          },
+          {
+            "from_fd_rel": 1e-07,
+            "to_fd_rel": 1e-08,
+            "rel_two_change": 1.1516699688078928e-07
+          },
+          {
+            "from_fd_rel": 1e-08,
+            "to_fd_rel": 1.4901161193847656e-08,
+            "rel_two_change": 1.9916316272402993e-08
+          }
+        ],
+        "max_pairwise_rel_two_change": 0.0011330861116849338,
+        "max_pairwise_rel_two_change_fine": 1.1331751791148698e-06,
+        "fine_fd_rel": 1e-06,
+        "jv_stable": true,
+        "jv_stable_full_ladder": true,
+        "note": "jv_stable uses only rungs with from_fd_rel \u2264 fine_fd_rel (1e-06), the local linear neighbourhood. jv_stable_full_ladder includes fd_rel = 10\u207b\u00b3, which is typically outside that neighbourhood. Larger fine-rung jumps indicate noise or MLT nonsmoothness; large full-ladder jumps at coarse fd_rel indicate nonlinearity."
+      },
+      "live_jv_stable": false,
+      "lagged_jv_stable": true,
+      "live_jv_stable_full_ladder": false,
+      "lagged_jv_stable_full_ladder": true,
+      "live_max_pairwise_rel_two_change": 0.6836225032276063,
+      "lagged_max_pairwise_rel_two_change": 0.0011330861116849338,
+      "live_max_pairwise_rel_two_change_fine": 0.5953130138230446,
+      "lagged_max_pairwise_rel_two_change_fine": 1.1331751791148698e-06
+    }
+  },
+  "summary": {
+    "any_live_unstable_fine": true,
+    "any_lagged_unstable_fine": false,
+    "max_live_pairwise_rel_full": 0.6836225032276063,
+    "max_lagged_pairwise_rel_full": 0.00359931842085113,
+    "max_live_pairwise_rel_fine": 0.5953130138230446,
+    "max_lagged_pairwise_rel_fine": 3.605408566459766e-06
+  }
+}

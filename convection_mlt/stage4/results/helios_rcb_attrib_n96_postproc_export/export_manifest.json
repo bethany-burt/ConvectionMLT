@@ -1,0 +1,18 @@
+{
+  "n_layers": 96,
+  "tp_source": "/Users/burt/Desktop/USM/Exo/ConvectionMLT/convection_mlt/stage4/results/helios_coupled_n96_job16015698_debug/iterative/final_tp.dat",
+  "cases": {
+    "iso_no": {
+      "param": "stage4/results/helios_rcb_attrib_n96_postproc_export/iso_no/param.dat",
+      "case_dir": "stage4/results/helios_rcb_attrib_n96_postproc_export/iso_no",
+      "case_name": "stage4_rcb_attrib_n96_iso_no"
+    },
+    "iso_yes": {
+      "param": "stage4/results/helios_rcb_attrib_n96_postproc_export/iso_yes/param.dat",
+      "case_dir": "stage4/results/helios_rcb_attrib_n96_postproc_export/iso_yes",
+      "case_name": "stage4_rcb_attrib_n96_iso_yes"
+    }
+  },
+  "helios_parity_headline": false,
+  "full_stage4_claim": false
+}

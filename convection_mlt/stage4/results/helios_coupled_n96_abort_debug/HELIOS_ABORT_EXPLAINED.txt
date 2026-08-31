@@ -1,0 +1,187 @@
+HELIOS N=96 coupled pilot abort — debugging note
+================================================
+Date: 2026-08-25
+SLURM job: 16015061 (FAILED, exit 1, ~32 s on th-cl-naples13)
+Staging tree:
+  /project/ls-heng/Bethany.Burt/convection_mlt_coupled_n96_20260825T135020Z
+Case output:
+  /project/ls-heng/Bethany.Burt/helios_stage4_coupled_20260825T135235Z/stage4_coupled_n96
+Debug bundle (this package):
+  /project/ls-heng/Bethany.Burt/helios_coupled_n96_abort_debug_20260825
+
+
+1. What failed
+--------------
+HELIOS iterative RCE with convective adjustment aborted:
+
+  Starting with an isothermal TP-profile at 500 K.
+  Layers (& surface/BOA) converged: 0 out of 97.   (every checkpoint through step 1000)
+  Run exceeds allowed maximum allowed number of iteration steps. Aborting...
+
+ABORT file contents:
+  The run exceeded the maximum number of iteration steps and was aborted. Sorry.
+
+No integrated_flux.dat / final tp.dat were produced under the HELIOS case
+subdirectory (only the ABORT marker). The MLT seed tp.dat we exported was
+present in the case directory but was never used as the starting profile.
+
+
+2. Why HELIOS ignored the MLT temperature seed
+----------------------------------------------
+We exported a matched F_irr=0 MLT column as stage4_coupled_n96_tp.dat
+(BOA ~682 K, deep CZ, RCB log10 P ~ 5.028). That file is correct as a seed.
+
+But for run type = iterative, HELIOS b0800f9 only starts from a provided TP
+file when BOTH of these are true (host_functions.initial_temp):
+
+  force_start_tp_from_file == 1
+  AND physical_tstep != 0
+
+Otherwise (our case: physical timestep = no, start from provided TP = no):
+
+  T_lay[:] = max(T_eff, 500 K)
+
+With T_star = 0 and no irradiation, T_eff = 0, so the start is isothermal 500 K.
+
+Relevant HELIOS source (bundled):
+  helios_host_functions_initial_temp.py.txt
+  helios_read_physical_timestep_and_start_from_tp.py.txt
+
+Relevant param lines (our live param.dat):
+  run type = iterative
+  post-proc. --> path to temperature file = ./output/0/0_tp.dat
+      (placeholder; used for post-processing, not for iterative start)
+  isothermal layers = yes
+  physical timestep [s] = no
+  number --> start from provided TP profile = no
+  maximum number of iterations = 1000
+  manual --> temperature star [K] = 0
+  internal temperature [K] = 269.698   (F_int = sigma T^4 = 300 W m^-2)
+  direct irradiation beam = no
+  convective adjustment = yes
+  diffusivity factor = 2
+  number of layers = 96
+
+Our exporter (write_param_dat) also replaces the TP path with
+"./output/0/0_tp.dat" whenever post_processing=False, so even the param
+line that could point at the seed does not, for iterative runs.
+
+
+3. Why 1000 iterations produced 0/97 converged layers
+-----------------------------------------------------
+From an isothermal 500 K start on a column whose RCE structure has:
+  - F_irr = 0
+  - F_int = 300 W m^-2 (T_int ~ 270 K)
+  - a deep bottom-connected convective zone in the MLT reference
+  - HELIOS convective adjustment enabled
+
+the radiative+convective iteration never marked any layer converged within
+the 1000-step ceiling. That is not a scorer issue; HELIOS itself wrote ABORT.
+
+Possible contributors (to investigate, not yet decided):
+  A. Starting state too far from the gated RCE (500 K isothermal vs ~680 K
+     deep BOA / structured profile). HELIOS never saw the MLT seed.
+  B. Iteration budget too small for this column from a cold isothermal start.
+  C. Interaction of convective adjustment with the analytic κ(P) opacity on
+     the HELIOS geometric grid (related to the failed MLT-on-log-P diagnostic).
+  D. T_star = 0 / "Using blackbody flux for the stellar irradiation" with
+     direct irradiation = no may still leave a degenerate irradiation path.
+
+Do NOT loosen the coupled physics gates until a converged HELIOS column exists.
+
+
+4. How to get HELIOS not to abort (candidate fixes)
+--------------------------------------------------
+Preferred for a matched-forcing benchmark (use the MLT seed):
+
+  Option 1 — Start from the provided TP under physical timestepping
+  (the only path HELIOS b0800f9 documents for iterative+file start):
+    physical timestep [s] = <positive number>
+    number --> runtime limit [s] = <large enough>
+    number --> start from provided TP profile = yes
+    post-proc. --> path to temperature file = <absolute path to our tp.dat>
+    AND/OR -path_to_temperature_file on the CLI
+
+  Caveat: physical timestepping changes the HELIOS advance (needs c_p from
+  convective adjustment; stops on runtime limit). Confirm this still yields
+  a standard RCE-like end state before scoring as the coupled pilot.
+
+  Option 2 — Keep pure iterative RCE, but do not expect the TP file to be
+  read. Then either:
+    - raise maximum number of iterations substantially and prove that an
+      isothermal 500 K start can reach layer convergence, or
+    - find another HELIOS-supported restart mechanism for iterative mode
+      without physical timestep (none obvious in b0800f9 initial_temp).
+
+  Option 3 — Two-stage HELIOS workflow (if supported operationally):
+    post-process once with the MLT seed to validate I/O, then an iterative
+    continuation that HELIOS will actually restart from. Only valid if
+    HELIOS writes/reads a restart TP that iterative mode loads.
+
+Also fix the exporter:
+  - For iterative + seed, write the real tp path into the temperature-file
+    field HELIOS reads (temp_path), not ./output/0/0_tp.dat.
+  - Set isothermal layers consistently with the intended start.
+  - Refuse to score if ABORT.dat exists; return INFRASTRUCTURE_FAIL.
+
+
+5. Secondary SLURM failure (not the abort cause)
+----------------------------------------------
+After HELIOS aborted (apparently with exit 0), the wrapper still called the
+scorer, which crashed:
+
+  FileNotFoundError: .../stage4/results/nested_rce_family.json
+
+because staging rsync excludes results/, and score_structural_irradiated()
+unconditionally loads the irradiated nested family. That must be made
+optional; it did not cause the HELIOS abort.
+
+
+6. Files in this bundle
+-----------------------
+Live HELIOS case
+  param.dat
+  param_copied_into_helios_root.dat
+  helios_runtime_config.json
+  helios_stdout.log
+  stage4_coupled_n96_tp.dat          # MLT seed that was NOT used
+  stage4_coupled_n96_ABORT.dat
+
+SLURM
+  slurm-helios-coupled-n96-16015061.out
+  slurm-helios-coupled-n96-16015061.err
+
+Frozen inputs / pins
+  coupled_input_manifest.json
+  coupled_rce_benchmark_tolerances.json
+  helios_coupled_n96_runtime_config.json
+  helios_param_template.dat
+  analytic_grey_nested.json          # sidecar; HDF5 digest 9505247e1104...
+  mlt_nested_tau_n96_firr0.json      # gated F_irr=0 MLT reference
+
+HELIOS source excerpts (b0800f9)
+  helios_host_functions_initial_temp.py.txt
+  helios_read_physical_timestep_and_start_from_tp.py.txt
+  param_template_physical_timestep_lines.txt
+
+Opacity HDF5 is NOT copied here (8.5 MB on cluster fixtures). Path:
+  .../stage4/fixtures/helios/analytic_grey_nested.h5
+  sha256: 9505247e1104c9d11500944975a2d26b82d55c4e3c7c66f579a5a9c08334cd3c
+
+
+7. Recommended next experiment
+------------------------------
+Before another full GPU pilot claim:
+
+  1. Patch exporter so iterative runs point temp_path at stage4_coupled_n96_tp.dat.
+  2. Enable:
+       physical timestep [s] = <trial value>
+       start from provided TP profile = yes
+     OR demonstrate isothermal start can converge with a higher iteration ceiling.
+  3. Confirm stdout says "Starting with chosen temperature profile."
+  4. Confirm no ABORT.dat and that integrated_flux.dat has 97 interfaces with
+     finite F_net_conv.
+  5. Only then run the coupled scorer.
+
+Until step 4 succeeds, treat outcomes as infrastructure / HELIOS-start
+configuration, not as a convection-closure disagreement.

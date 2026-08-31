@@ -1,0 +1,341 @@
+{
+  "gates": {
+    "max_rel_T": 0.02,
+    "rcb_dex": 0.05
+  },
+  "n192": {
+    "status": "converged",
+    "steps_accepted": 81348,
+    "flux_flatness": 0.0009993962280939665,
+    "primary_rcb_log10p": 5.028268331954913,
+    "profile_checksum_sha256": "4b7d67555f64b74d5d820d488f29b5d4024e802fd12ab2a4614df9160de8713f"
+  },
+  "n384_latest": {
+    "status": "max_steps",
+    "steps_accepted": 9500,
+    "flux_flatness": 0.025797668499781518,
+    "tendency_norm": 0.00011948398217176267,
+    "primary_rcb_log10p": 5.001105581475151,
+    "last_accepted_dt": 18414.881006562857,
+    "energy_gate_ratio": 0.357737466968855,
+    "profile_checksum_sha256": "1e23c0a90bf8125db3a61720e8f05b5f5d7cf80680597dde9fa289b5cbf70511"
+  },
+  "comparisons": {
+    "step0_interpolated_seed": {
+      "coarse_n": 192,
+      "fine_n": 384,
+      "fine_status": "interpolated_seed",
+      "fine_steps_accepted": 0,
+      "fine_flux_flatness": null,
+      "fine_tendency_norm": null,
+      "max_rel_T_on_coarse_P": 0.0011871182696644958,
+      "max_rel_T_layer_index": 158,
+      "max_rel_T_pressure_Pa": 71282.17738977022,
+      "max_rel_T_log10p": 4.852980957217362,
+      "max_rel_T_T_coarse_K": 336.64270000202214,
+      "max_rel_T_T_fine_on_coarse_K": 337.0423347015437,
+      "median_rel_T_on_coarse_P": 9.635426479022226e-07,
+      "coarse_rcb_log10p": 5.028268331954913,
+      "fine_rcb_log10p": 5.028268331954913,
+      "delta_log10_P_rcb": 0.0,
+      "abs_delta_log10_P_rcb": 0.0,
+      "column_enthalpy_coarse": 243627988762.65912,
+      "column_enthalpy_fine": 243676018107.10803,
+      "column_enthalpy_rel": 0.00019710328830062476,
+      "coarse_topology": {
+        "n_convective_regions": 1,
+        "convective_regions": [
+          [
+            0,
+            155
+          ]
+        ],
+        "detached_convective_regions": [],
+        "n_detached": 0,
+        "bottom_connected": true,
+        "top_convective_layer": 155,
+        "convective_fraction_of_layers": 0.8125
+      },
+      "fine_topology": {
+        "n_convective_regions": 0,
+        "convective_regions": [],
+        "detached_convective_regions": [],
+        "n_detached": 0,
+        "bottom_connected": false,
+        "top_convective_layer": null,
+        "convective_fraction_of_layers": null
+      },
+      "same_single_bottom_connected_zone": false,
+      "within_T_gate": true,
+      "within_rcb_gate": true,
+      "formal_spatial_pass": false,
+      "note": "Informal 192\u2192384 comparison. Formal spatial PASS still requires physically gated N=384 (flatness and tendency \u2264 1e-3)."
+    },
+    "step00500": {
+      "coarse_n": 192,
+      "fine_n": 384,
+      "fine_status": "max_steps",
+      "fine_steps_accepted": 500,
+      "fine_flux_flatness": 0.047996922926145845,
+      "fine_tendency_norm": 0.002874309935105922,
+      "max_rel_T_on_coarse_P": 0.0049787595819958475,
+      "max_rel_T_layer_index": 159,
+      "max_rel_T_pressure_Pa": 54499.59612387636,
+      "max_rel_T_log10p": 4.736393283894591,
+      "max_rel_T_T_coarse_K": 318.981845486889,
+      "max_rel_T_T_fine_on_coarse_K": 317.3937115671884,
+      "median_rel_T_on_coarse_P": 0.0002910392724831259,
+      "coarse_rcb_log10p": 5.028268331954913,
+      "fine_rcb_log10p": 5.027882492465859,
+      "delta_log10_P_rcb": -0.0003858394890539074,
+      "abs_delta_log10_P_rcb": 0.0003858394890539074,
+      "column_enthalpy_coarse": 243627988762.65912,
+      "column_enthalpy_fine": 243709190046.1156,
+      "column_enthalpy_rel": 0.00033318925495225154,
+      "coarse_topology": {
+        "n_convective_regions": 1,
+        "convective_regions": [
+          [
+            0,
+            155
+          ]
+        ],
+        "detached_convective_regions": [],
+        "n_detached": 0,
+        "bottom_connected": true,
+        "top_convective_layer": 155,
+        "convective_fraction_of_layers": 0.8125
+      },
+      "fine_topology": {
+        "n_convective_regions": 1,
+        "convective_regions": [
+          [
+            0,
+            311
+          ]
+        ],
+        "detached_convective_regions": [],
+        "n_detached": 0,
+        "bottom_connected": true,
+        "top_convective_layer": 311,
+        "convective_fraction_of_layers": 0.8125
+      },
+      "same_single_bottom_connected_zone": true,
+      "within_T_gate": true,
+      "within_rcb_gate": true,
+      "formal_spatial_pass": false,
+      "note": "Informal 192\u2192384 comparison. Formal spatial PASS still requires physically gated N=384 (flatness and tendency \u2264 1e-3)."
+    },
+    "step09500": {
+      "coarse_n": 192,
+      "fine_n": 384,
+      "fine_status": "max_steps",
+      "fine_steps_accepted": 9500,
+      "fine_flux_flatness": 0.025797668499781518,
+      "fine_tendency_norm": 0.00011948398217176267,
+      "max_rel_T_on_coarse_P": 0.004789002205481124,
+      "max_rel_T_layer_index": 160,
+      "max_rel_T_pressure_Pa": 42105.48344742552,
+      "max_rel_T_log10p": 4.6243386582082024,
+      "max_rel_T_T_coarse_K": 304.1921706596683,
+      "max_rel_T_T_fine_on_coarse_K": 302.73539368348906,
+      "median_rel_T_on_coarse_P": 0.003370134330723007,
+      "coarse_rcb_log10p": 5.028268331954913,
+      "fine_rcb_log10p": 5.001105581475151,
+      "delta_log10_P_rcb": -0.027162750479762465,
+      "abs_delta_log10_P_rcb": 0.027162750479762465,
+      "column_enthalpy_coarse": 243627988762.65912,
+      "column_enthalpy_fine": 245258603118.3523,
+      "column_enthalpy_rel": 0.006648551100596071,
+      "coarse_topology": {
+        "n_convective_regions": 1,
+        "convective_regions": [
+          [
+            0,
+            155
+          ]
+        ],
+        "detached_convective_regions": [],
+        "n_detached": 0,
+        "bottom_connected": true,
+        "top_convective_layer": 155,
+        "convective_fraction_of_layers": 0.8125
+      },
+      "fine_topology": {
+        "n_convective_regions": 1,
+        "convective_regions": [
+          [
+            0,
+            312
+          ]
+        ],
+        "detached_convective_regions": [],
+        "n_detached": 0,
+        "bottom_connected": true,
+        "top_convective_layer": 312,
+        "convective_fraction_of_layers": 0.8151041666666666
+      },
+      "same_single_bottom_connected_zone": true,
+      "within_T_gate": true,
+      "within_rcb_gate": true,
+      "formal_spatial_pass": false,
+      "note": "Informal 192\u2192384 comparison. Formal spatial PASS still requires physically gated N=384 (flatness and tendency \u2264 1e-3)."
+    },
+    "step09500_latest": {
+      "coarse_n": 192,
+      "fine_n": 384,
+      "fine_status": "max_steps",
+      "fine_steps_accepted": 9500,
+      "fine_flux_flatness": 0.025797668499781518,
+      "fine_tendency_norm": 0.00011948398217176267,
+      "max_rel_T_on_coarse_P": 0.004789002205481124,
+      "max_rel_T_layer_index": 160,
+      "max_rel_T_pressure_Pa": 42105.48344742552,
+      "max_rel_T_log10p": 4.6243386582082024,
+      "max_rel_T_T_coarse_K": 304.1921706596683,
+      "max_rel_T_T_fine_on_coarse_K": 302.73539368348906,
+      "median_rel_T_on_coarse_P": 0.003370134330723007,
+      "coarse_rcb_log10p": 5.028268331954913,
+      "fine_rcb_log10p": 5.001105581475151,
+      "delta_log10_P_rcb": -0.027162750479762465,
+      "abs_delta_log10_P_rcb": 0.027162750479762465,
+      "column_enthalpy_coarse": 243627988762.65912,
+      "column_enthalpy_fine": 245258603118.3523,
+      "column_enthalpy_rel": 0.006648551100596071,
+      "coarse_topology": {
+        "n_convective_regions": 1,
+        "convective_regions": [
+          [
+            0,
+            155
+          ]
+        ],
+        "detached_convective_regions": [],
+        "n_detached": 0,
+        "bottom_connected": true,
+        "top_convective_layer": 155,
+        "convective_fraction_of_layers": 0.8125
+      },
+      "fine_topology": {
+        "n_convective_regions": 1,
+        "convective_regions": [
+          [
+            0,
+            312
+          ]
+        ],
+        "detached_convective_regions": [],
+        "n_detached": 0,
+        "bottom_connected": true,
+        "top_convective_layer": 312,
+        "convective_fraction_of_layers": 0.8151041666666666
+      },
+      "same_single_bottom_connected_zone": true,
+      "within_T_gate": true,
+      "within_rcb_gate": true,
+      "formal_spatial_pass": false,
+      "note": "Informal 192\u2192384 comparison. Formal spatial PASS still requires physically gated N=384 (flatness and tendency \u2264 1e-3)."
+    }
+  },
+  "evolution": [
+    {
+      "snapshot": "step0_interpolated_seed",
+      "steps_accepted": 0,
+      "flux_flatness": null,
+      "max_rel_T_on_coarse_P": 0.0011871182696644958,
+      "abs_delta_log10_P_rcb": 0.0,
+      "column_enthalpy_rel": 0.00019710328830062476,
+      "max_rel_T_log10p": 4.852980957217362,
+      "n_convective_regions": 0,
+      "n_detached": 0
+    },
+    {
+      "snapshot": "step00500",
+      "steps_accepted": 500,
+      "flux_flatness": 0.047996922926145845,
+      "max_rel_T_on_coarse_P": 0.0049787595819958475,
+      "abs_delta_log10_P_rcb": 0.0003858394890539074,
+      "column_enthalpy_rel": 0.00033318925495225154,
+      "max_rel_T_log10p": 4.736393283894591,
+      "n_convective_regions": 1,
+      "n_detached": 0
+    },
+    {
+      "snapshot": "step09500",
+      "steps_accepted": 9500,
+      "flux_flatness": 0.025797668499781518,
+      "max_rel_T_on_coarse_P": 0.004789002205481124,
+      "abs_delta_log10_P_rcb": 0.027162750479762465,
+      "column_enthalpy_rel": 0.006648551100596071,
+      "max_rel_T_log10p": 4.6243386582082024,
+      "n_convective_regions": 1,
+      "n_detached": 0
+    },
+    {
+      "snapshot": "step09500_latest",
+      "steps_accepted": 9500,
+      "flux_flatness": 0.025797668499781518,
+      "max_rel_T_on_coarse_P": 0.004789002205481124,
+      "abs_delta_log10_P_rcb": 0.027162750479762465,
+      "column_enthalpy_rel": 0.006648551100596071,
+      "max_rel_T_log10p": 4.6243386582082024,
+      "n_convective_regions": 1,
+      "n_detached": 0
+    }
+  ],
+  "latest_comparison": {
+    "coarse_n": 192,
+    "fine_n": 384,
+    "fine_status": "max_steps",
+    "fine_steps_accepted": 9500,
+    "fine_flux_flatness": 0.025797668499781518,
+    "fine_tendency_norm": 0.00011948398217176267,
+    "max_rel_T_on_coarse_P": 0.004789002205481124,
+    "max_rel_T_layer_index": 160,
+    "max_rel_T_pressure_Pa": 42105.48344742552,
+    "max_rel_T_log10p": 4.6243386582082024,
+    "max_rel_T_T_coarse_K": 304.1921706596683,
+    "max_rel_T_T_fine_on_coarse_K": 302.73539368348906,
+    "median_rel_T_on_coarse_P": 0.003370134330723007,
+    "coarse_rcb_log10p": 5.028268331954913,
+    "fine_rcb_log10p": 5.001105581475151,
+    "delta_log10_P_rcb": -0.027162750479762465,
+    "abs_delta_log10_P_rcb": 0.027162750479762465,
+    "column_enthalpy_coarse": 243627988762.65912,
+    "column_enthalpy_fine": 245258603118.3523,
+    "column_enthalpy_rel": 0.006648551100596071,
+    "coarse_topology": {
+      "n_convective_regions": 1,
+      "convective_regions": [
+        [
+          0,
+          155
+        ]
+      ],
+      "detached_convective_regions": [],
+      "n_detached": 0,
+      "bottom_connected": true,
+      "top_convective_layer": 155,
+      "convective_fraction_of_layers": 0.8125
+    },
+    "fine_topology": {
+      "n_convective_regions": 1,
+      "convective_regions": [
+        [
+          0,
+          312
+        ]
+      ],
+      "detached_convective_regions": [],
+      "n_detached": 0,
+      "bottom_connected": true,
+      "top_convective_layer": 312,
+      "convective_fraction_of_layers": 0.8151041666666666
+    },
+    "same_single_bottom_connected_zone": true,
+    "within_T_gate": true,
+    "within_rcb_gate": true,
+    "formal_spatial_pass": false,
+    "note": "Informal 192\u2192384 comparison. Formal spatial PASS still requires physically gated N=384 (flatness and tendency \u2264 1e-3)."
+  }
+}

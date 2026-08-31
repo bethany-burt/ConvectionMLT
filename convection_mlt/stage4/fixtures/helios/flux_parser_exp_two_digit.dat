@@ -1,0 +1,5 @@
+This file contains the integrated total and net fluxes at each interface resp. layer.
+Fluxes given in [erg s^-1 cm^-2].
+interface press.[10^-6bar] F_down F_up F_net F_dir delta_F_net F_net_conv F_add_heat F_intern
+0 1.00e+07 1.14e+07 1.23e+07 9.19e+05 0.00e+00 not_avail. 0.00e+00 0.00e+00 3.00e+05
+1 8.66e+06 9.68e+06 1.14e+07 1.73e+06 0.00e+00 not_avail. 0.00e+00 0.00e+00

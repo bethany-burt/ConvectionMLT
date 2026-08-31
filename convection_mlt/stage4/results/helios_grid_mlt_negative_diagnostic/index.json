@@ -1,0 +1,58 @@
+{
+  "purpose": "Negative grid-sampling diagnostic: MLT RCE on HELIOS geometric (log-P) interfaces does not retain a deep bottom-connected CZ for this analytic opacity. The live coupled benchmark therefore compares independently discretized RCE solutions (nested-\u03c4 MLT vs HELIOS geometric grid) with matched forcing, not grid-level parity.",
+  "status": "DIAGNOSTIC_NOT_SCORED",
+  "n_layers": 96,
+  "f_irr": 0.0,
+  "f_int": 300.0,
+  "diffusivity_factor": 2.0,
+  "mlt_grid": "helios_geometric_interfaces",
+  "live_benchmark_reference": "fixtures/helios/mlt_nested_tau_n96_firr0.json",
+  "runs": {
+    "rc_seed": {
+      "file": "mlt_helios_grid_n96_firr0_rc_seed.json",
+      "file_sha256": "52969c7e9a0f7062801e240ede322495d7c40226bfd3acfbdb590c668f3208a3",
+      "status": "max_steps",
+      "steps_accepted": 20000,
+      "flux_flatness": 0.003163210434362327,
+      "tendency_norm": 0.00022113332049229938,
+      "primary_rcb_log10p": null,
+      "convective_regions": [
+        [
+          14,
+          18
+        ]
+      ],
+      "detached_convective_regions": [
+        [
+          14,
+          18
+        ]
+      ],
+      "profile_checksum_sha256": "f9b38ceba6b127fbdea6310f6f8398c1bce151830dc3ff5653d547242ed14903",
+      "seed": null
+    },
+    "nested_seed_failed": {
+      "file": "mlt_helios_grid_n96_firr0_nested_seed_failed.json",
+      "file_sha256": "1ad524a4706e56085fae9cfa46e53423ca1e1b384ccfe897c0c5524f4992eccb",
+      "status": "max_steps",
+      "steps_accepted": 8000,
+      "flux_flatness": 1.1163254723174,
+      "tendency_norm": 0.3922900932217241,
+      "primary_rcb_log10p": null,
+      "convective_regions": [
+        [
+          9,
+          21
+        ]
+      ],
+      "detached_convective_regions": [
+        [
+          9,
+          21
+        ]
+      ],
+      "profile_checksum_sha256": "aa008d5a9ff1091e4e9b408c077ad077041aad2ee51e2415ca1f162b9383bc1b",
+      "seed": "nested"
+    }
+  }
+}

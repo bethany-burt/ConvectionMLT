@@ -1,0 +1,47 @@
+{
+  "purpose": "Steady Newton\u2013Krylov diagnostic bundle for the N=384 1e-5 line-search factors. Not a coupled-HELIOS claim and not a gated N=384 spatial claim.",
+  "live_n384_checksum": "1e23c0a90bf8125db3a61720e8f05b5f5d7cf80680597dde9fa289b5cbf70511",
+  "live_n384_file": "n384_implicit_rce.json",
+  "stale_checkpoint_excluded": "n384_implicit_rce.checkpoint.json",
+  "n192_implicit_record_excluded": true,
+  "coupled_helios_rce_status": "NOT_RUN",
+  "five_check_polish": "NOT_RUN",
+  "files": {
+    "jv_epsilon_ladder.json": {
+      "bytes": 44861,
+      "sha256": "1794365276633c010789c337fe48cdf55848994472acb042460c57ffcb5fda05"
+    },
+    "n192_steady_rce.json": {
+      "bytes": 45272,
+      "sha256": "8a0f402417a290ac87fdc0d1cfaf00ab9c5e7bce65dd2f4d632697e2f195507f"
+    },
+    "n384_implicit_rce.json": {
+      "bytes": 2419748,
+      "sha256": "b14b9215b7ed743029e57fa9659bc09c87ee164c412af556ff4b6543509785f2"
+    },
+    "n384_steady_rce.json": {
+      "bytes": 382291,
+      "sha256": "beaa9ae37def4c3fd36b07dae0131df6e6773f1707034615d7e93bec680e8fbf"
+    },
+    "n96_steady_rce.json": {
+      "bytes": 23932,
+      "sha256": "1a0da2516b34e2c44882bac482c5aa2c6c3deebbc834716db97340c8feeac68a"
+    },
+    "solve_steady_rce.py": {
+      "bytes": 20767,
+      "sha256": "ed076e2f560a6f8e98b8e48a2abb56ea4492755f3595fdb34e6ff7ca66e87d03"
+    },
+    "solver_settings.json": {
+      "bytes": 3728,
+      "sha256": "9fd6c416286a887278832f36dd6cae1e7ef0ee9003b6f40c727e3a9d266b0a03"
+    },
+    "steady_newton_diagnostics.py": {
+      "bytes": 19125,
+      "sha256": "85c00b3a4223317b6e158ad5966c9e0564a20718316399995d1e697ef6d9711c"
+    },
+    "steady_rce.py": {
+      "bytes": 53822,
+      "sha256": "d05eaf70b63804f5151b177e25c9f305c459dbb5ae1d9923f04158ca35c16cd1"
+    }
+  }
+}

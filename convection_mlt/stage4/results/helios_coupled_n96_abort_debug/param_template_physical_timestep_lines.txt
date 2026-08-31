@@ -1,0 +1,5 @@
+number of prerun timesteps =                     0                          [number >= 0]                                                  (CL: Y)
+physical timestep [s] =                          no                         [no, number > 0]                                               (CL: Y)
+  number --> runtime limit [s] =                 86400                      [number > timestep]                                            (CL: Y)
+  number --> start from provided TP profile =    no                         [yes, no]                                                      (CL: Y)
+include additional heating =                     no                         [yes, no]                                                      (CL: Y)

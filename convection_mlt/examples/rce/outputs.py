@@ -7,7 +7,7 @@ import json
 import shutil
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, TextIO
+from typing import Any, Callable, TextIO
 
 import numpy as np
 
@@ -16,8 +16,8 @@ from convection_mlt.production_rce import (
     PHYSICAL_GATE,
     ProductionRCERun,
     evaluate_physical_gates,
+    production_thermo,
 )
-from convection_mlt.thermodynamics import ConstantH2Thermo
 
 # serialize via stage4 experiments helper
 import sys
@@ -28,7 +28,7 @@ if str(_EXP) not in sys.path:
     sys.path.insert(0, str(_EXP))
 from rce_record import dumps, serialize_rce_result  # noqa: E402
 
-from config import ValidatedConfig
+from load_cfg import ValidatedConfig, _scalar_thermo
 
 
 class OutputDirError(RuntimeError):
@@ -96,11 +96,10 @@ def write_profiles(
 
     interfaces = out_dir / "profiles_interfaces.csv"
     n_edge = p_e.size
-    # fluxes and gradients are edge-length arrays
-    if fr.size != n_edge or nabla.size != n_edge:
+    if fr.size != n_edge or nabla.size != n_edge or nabla_ad.size != n_edge:
         raise RuntimeError(
             f"interface length mismatch: P_edges={n_edge}, "
-            f"flux={fr.size}, nabla={nabla.size}"
+            f"flux={fr.size}, nabla={nabla.size}, nabla_ad={nabla_ad.size}"
         )
     with interfaces.open("w", newline="") as fh:
         w = csv.writer(fh)
@@ -173,42 +172,32 @@ def write_convergence_csv(out_dir: Path, run: ProductionRCERun) -> Path:
     return path
 
 
-def write_four_panel_figure(
-    out_dir: Path,
-    run: ProductionRCERun,
-    *,
-    gate: float = PHYSICAL_GATE,
-) -> Path:
-    import matplotlib
-
-    matplotlib.use("Agg")
-    import matplotlib.pyplot as plt
-
-    p_c_bar = _pa_to_bar(run.pressure_centres)
-    p_e_bar = _pa_to_bar(run.pressure_edges)
+def _plot_temperature(ax, run: ProductionRCERun, *, p_c_bar: np.ndarray) -> None:
     t0 = run.temperature_initial
     t = np.asarray(run.result.final_state.temperature, dtype=np.float64)
-    fr = np.asarray(run.result.final_flux_rad, dtype=np.float64)
-    fc = np.asarray(run.result.final_flux_conv, dtype=np.float64)
-    ft = np.asarray(run.result.final_flux_total, dtype=np.float64)
-    f_int = float(run.spec.f_int)
-    f_irr = float(run.spec.f_irr)
     rcb = run.result.primary_rcb_log10p
-
-    fig, axes = plt.subplots(2, 2, figsize=(10.5, 9.0))
-
-    ax = axes[0, 0]
     ax.semilogy(t0, p_c_bar, label="initial", color="0.55")
     ax.semilogy(t, p_c_bar, label="final", color="C0")
     if rcb is not None:
-        ax.axhline(10 ** (float(rcb) - 5.0), color="C3", ls="--", label=f"RCB log10P={rcb:.3f}")
+        ax.axhline(
+            10 ** (float(rcb) - 5.0),
+            color="C3",
+            ls="--",
+            label=f"RCB log10P={rcb:.3f}",
+        )
     ax.invert_yaxis()
     ax.set_xlabel("T [K]")
     ax.set_ylabel("P [bar]")
     ax.set_title("Temperature")
     ax.legend(fontsize=8)
 
-    ax = axes[0, 1]
+
+def _plot_fluxes(ax, run: ProductionRCERun, *, p_e_bar: np.ndarray) -> None:
+    fr = np.asarray(run.result.final_flux_rad, dtype=np.float64)
+    fc = np.asarray(run.result.final_flux_conv, dtype=np.float64)
+    ft = np.asarray(run.result.final_flux_total, dtype=np.float64)
+    f_int = float(run.spec.f_int)
+    f_irr = float(run.spec.f_irr)
     ax.semilogy(fr, p_e_bar, label=r"$F_{\rm rad}$")
     ax.semilogy(fc, p_e_bar, label=r"$F_{\rm conv}$")
     ax.semilogy(ft, p_e_bar, label=r"$F_{\rm total}$")
@@ -221,7 +210,8 @@ def write_four_panel_figure(
     ax.set_title("Fluxes (positive = upward)")
     ax.legend(fontsize=8)
 
-    ax = axes[1, 0]
+
+def _plot_gradients(ax, run: ProductionRCERun, *, p_e_bar: np.ndarray) -> None:
     ax.semilogy(run.nabla, p_e_bar, label=r"$\nabla$")
     ax.semilogy(run.nabla_ad, p_e_bar, label=r"$\nabla_{\rm ad}$")
     ax.semilogy(np.maximum(run.delta_nabla, 0.0), p_e_bar, label=r"$\Delta\nabla$")
@@ -231,7 +221,8 @@ def write_four_panel_figure(
     ax.set_title("Thermal gradients")
     ax.legend(fontsize=8)
 
-    ax = axes[1, 1]
+
+def _plot_convergence(ax, run: ProductionRCERun, *, gate: float) -> None:
     if run.convergence_log:
         steps = [r.step for r in run.convergence_log]
         flat = [max(r.flux_flatness, 1e-16) for r in run.convergence_log]
@@ -245,18 +236,67 @@ def write_four_panel_figure(
     ax.set_title("Convergence history")
     ax.legend(fontsize=8)
 
+
+def write_summary_figure(
+    out_dir: Path,
+    run: ProductionRCERun,
+    cfg: ValidatedConfig,
+    *,
+    gate: float = PHYSICAL_GATE,
+) -> Path | None:
+    panels: list[tuple[str, Callable[..., None]]] = []
+    if cfg.plot_temperature:
+        panels.append(("temperature", _plot_temperature))
+    if cfg.plot_fluxes:
+        panels.append(("fluxes", _plot_fluxes))
+    if cfg.plot_gradients:
+        panels.append(("gradients", _plot_gradients))
+    if cfg.plot_convergence:
+        panels.append(("convergence", _plot_convergence))
+
+    if not panels:
+        return None
+
+    import matplotlib
+
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+
+    p_c_bar = _pa_to_bar(run.pressure_centres)
+    p_e_bar = _pa_to_bar(run.pressure_edges)
+
+    n = len(panels)
+    ncols = 2 if n > 1 else 1
+    nrows = (n + ncols - 1) // ncols
+    fig, axes = plt.subplots(nrows, ncols, figsize=(5.25 * ncols, 4.5 * nrows))
+    axes_flat = np.atleast_1d(axes).ravel()
+
+    for ax, (name, plot_fn) in zip(axes_flat, panels):
+        if name == "temperature":
+            plot_fn(ax, run, p_c_bar=p_c_bar)
+        elif name in {"fluxes", "gradients"}:
+            plot_fn(ax, run, p_e_bar=p_e_bar)
+        else:
+            plot_fn(ax, run, gate=gate)
+
+    for ax in axes_flat[len(panels) :]:
+        ax.set_visible(False)
+
     fig.suptitle(
         f"N={run.spec.n_layers}  α={run.spec.alpha}  procedure={run.procedure}",
         fontsize=11,
     )
     fig.tight_layout()
     path = out_dir / "figure_summary.png"
-    fig.savefig(path, dpi=150)
+    fig.savefig(path, dpi=cfg.figure_dpi)
     plt.close(fig)
     return path
 
 
 def build_result_record(run: ProductionRCERun, cfg: ValidatedConfig) -> dict[str, Any]:
+    thermo = production_thermo(cfg.x_he)
+    t_ref = 1500.0
+    eos = "ConstantH2Thermo" if cfg.x_he == 0.0 else "h2_he_mixture"
     extra = {
         "temperature_initial": run.temperature_initial.tolist(),
         "nabla": run.nabla.tolist(),
@@ -272,8 +312,9 @@ def build_result_record(run: ProductionRCERun, cfg: ValidatedConfig) -> dict[str
             else "adaptive_only"
         ),
         "time_base": "physical" if run.prescribed_dt is not None else "pseudo-time",
-        "eos": "ConstantH2Thermo",
-        "nabla_ad_scalar": float(ConstantH2Thermo().nabla_ad),
+        "eos": eos,
+        "x_he": cfg.x_he,
+        "nabla_ad_scalar": _scalar_thermo(thermo.nabla_ad_at(t_ref)),
     }
     return serialize_rce_result(
         run.result,
@@ -297,7 +338,7 @@ def write_status(
     ended_utc: str,
     wall_s: float,
 ) -> Path:
-    require_topo = abs(cfg.f_irr_W_m2) <= 1.0e-15
+    require_topo = abs(cfg.f_irr) <= 1.0e-15
     status = {
         "verdict": verdict,
         "convergence": gates.convergence_ok,
@@ -313,6 +354,7 @@ def write_status(
         "validation_envelope": cfg.envelope_status,
         "validation_envelope_warnings": list(cfg.envelope_warnings),
         "config_checksum_sha256": cfg.config_checksum_sha256,
+        "config_path": cfg.config_path,
         "profile_checksum_sha256": record.get("profile_checksum_sha256"),
         "code_git_commit": git_commit(),
         "code_git_dirty": git_dirty(),
@@ -323,6 +365,7 @@ def write_status(
         "n_layers": cfg.n_layers,
         "alpha": cfg.alpha,
         "seed": cfg.seed,
+        "x_he": cfg.x_he,
     }
     path = out_dir / "status.json"
     path.write_text(json.dumps(status, indent=2) + "\n")
@@ -339,10 +382,10 @@ def write_run_artifacts(
     wall_s: float,
 ) -> tuple[str, dict[str, Any]]:
     snapshot = cfg.to_snapshot()
-    (out_dir / "input.json").write_text(json.dumps(snapshot, indent=2) + "\n")
+    (out_dir / "input_resolved.json").write_text(json.dumps(snapshot, indent=2) + "\n")
 
     record = build_result_record(run, cfg)
-    require_topo = abs(cfg.f_irr_W_m2) <= 1.0e-15
+    require_topo = abs(cfg.f_irr) <= 1.0e-15
     gates = evaluate_physical_gates(
         record, gate=cfg.gate, require_bottom_connected_cz=require_topo
     )
@@ -351,18 +394,23 @@ def write_run_artifacts(
     else:
         verdict = "NOT CONVERGED"
 
-    (out_dir / "result.json").write_text(dumps(record))
-    write_profiles(out_dir, run)
-    write_convergence_csv(out_dir, run)
-    write_four_panel_figure(out_dir, run, gate=cfg.gate)
-    write_status(
-        out_dir,
-        cfg=cfg,
-        record=record,
-        gates=gates,
-        verdict=verdict,
-        started_utc=started_utc,
-        ended_utc=ended_utc,
-        wall_s=wall_s,
-    )
+    if cfg.write_result_json:
+        (out_dir / "result.json").write_text(dumps(record))
+    if cfg.write_profiles:
+        write_profiles(out_dir, run)
+    if cfg.write_convergence:
+        write_convergence_csv(out_dir, run)
+    if cfg.write_figure:
+        write_summary_figure(out_dir, run, cfg, gate=cfg.gate)
+    if cfg.write_status:
+        write_status(
+            out_dir,
+            cfg=cfg,
+            record=record,
+            gates=gates,
+            verdict=verdict,
+            started_utc=started_utc,
+            ended_utc=ended_utc,
+            wall_s=wall_s,
+        )
     return verdict, record

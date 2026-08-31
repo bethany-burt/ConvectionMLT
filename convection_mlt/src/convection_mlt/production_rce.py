@@ -20,15 +20,15 @@ from .rce import (
     RCEConfig,
     RCEResult,
     RCERoute,
+    build_analytic_opacity_spec,
     grey_radiative_equilibrium_temperature,
-    nested_analytic_opacity_spec,
     radiative_convective_initial_temperature,
     solve_adaptive_rce,
     _primary_rcb_log10p,
 )
 from .radiation import LowerNetInternalFlux, TopIrradiation
 from .reduced_rce import ReducedRCEConfig, solve_reduced_radiative_matching
-from .thermodynamics import ConstantH2Thermo
+from .thermodynamics import ConstantH2Thermo, ThermoProvider, h2_he_mixture
 
 PHYSICAL_GATE = 1.0e-3
 ALGEBRAIC_GATE = 1.0e-12
@@ -40,10 +40,12 @@ DEFAULT_P_TOP = 1.0
 DEFAULT_F_INT = 300.0
 DEFAULT_F_IRR = 0.0
 DEFAULT_ALPHA = 1.0
+DEFAULT_X_HE = 0.0
 
 ENVELOPE_N_LAYERS = frozenset({96, 192, 384})
 ENVELOPE_ALPHA_MIN = 0.5
 ENVELOPE_ALPHA_MAX = 4.0
+ENVELOPE_X_HE = frozenset({0.0, 0.10, 0.25})
 
 PhaseName = Literal[
     "reduced_rz", "live_polish", "continuation", "repolish", "adaptive_only"
@@ -262,6 +264,16 @@ def evaluate_physical_gates(
     )
 
 
+def production_thermo(x_he: float = DEFAULT_X_HE) -> ThermoProvider:
+    """EOS for the production RCE path (pure H2 or fixed H2/He mixture)."""
+    fraction = float(x_he)
+    if fraction < 0.0 or fraction > 1.0:
+        raise ValueError(f"x_he must lie in [0, 1]; got {fraction}")
+    if fraction == 0.0:
+        return ConstantH2Thermo()
+    return h2_he_mixture(fraction)
+
+
 def validation_envelope(
     *,
     n_layers: int,
@@ -273,6 +285,7 @@ def validation_envelope(
     p_top: float,
     composition: str,
     opacity_model: str,
+    x_he: float = DEFAULT_X_HE,
 ) -> tuple[str, list[str]]:
     warnings: list[str] = []
     if int(n_layers) not in ENVELOPE_N_LAYERS:
@@ -286,6 +299,11 @@ def validation_envelope(
         )
     if composition != "constant_h2":
         warnings.append(f"composition={composition!r} is not the validated constant_h2 EOS")
+    x_he_f = float(x_he)
+    if x_he_f not in ENVELOPE_X_HE:
+        warnings.append(
+            f"x_he={x_he_f} outside demonstrated set {sorted(ENVELOPE_X_HE)}"
+        )
     if opacity_model != "analytic_grey_powerlaw":
         warnings.append(
             f"opacity_model={opacity_model!r} is not the validated grey power law"
@@ -302,7 +320,11 @@ def validation_envelope(
         )
     if abs(float(p_top) - DEFAULT_P_TOP) > 1.0e-12 * DEFAULT_P_TOP:
         warnings.append(f"p_top={p_top} differs from validated default {DEFAULT_P_TOP}")
-    return ("INSIDE" if not warnings else "OUTSIDE"), warnings
+    if not warnings:
+        return "INSIDE_VALIDATED_ENVELOPE", warnings
+    if x_he_f > 0.0 or abs(float(f_irr)) > 1.0e-15:
+        return "EXPERIMENTAL_OUTSIDE_VALIDATED_ENVELOPE", warnings
+    return "OUTSIDE", warnings
 
 
 @dataclass
@@ -358,7 +380,7 @@ def build_spec(
     p_bottom: float = DEFAULT_P_BOTTOM,
     p_top: float = DEFAULT_P_TOP,
 ) -> AnalyticOpacityRCESpec:
-    return nested_analytic_opacity_spec(
+    return build_analytic_opacity_spec(
         int(n_layers),
         alpha=float(alpha),
         f_int=float(f_int),
@@ -372,13 +394,16 @@ def build_spec(
 def build_seed_temperature(
     spec: AnalyticOpacityRCESpec,
     seed: str,
+    *,
+    thermo: ThermoProvider | None = None,
+    x_he: float = DEFAULT_X_HE,
 ) -> NDArray[np.float64]:
     grid = spec.grid()
-    thermo = ConstantH2Thermo()
+    provider = production_thermo(x_he) if thermo is None else thermo
     opac = spec.opacity()
     if seed == "radiative_convective":
         return radiative_convective_initial_temperature(
-            grid, opac, thermo, spec.f_int, spec.f_irr
+            grid, opac, provider, spec.f_int, spec.f_irr
         )
     if seed == "radiative_equilibrium":
         return grey_radiative_equilibrium_temperature(
@@ -391,11 +416,20 @@ def build_seed_temperature(
 
 
 def _closure_gradients(
-    result: RCEResult, thermo: ConstantH2Thermo
+    result: RCEResult, thermo: ThermoProvider
 ) -> tuple[NDArray[np.float64], NDArray[np.float64], NDArray[np.float64]]:
     closure = result.final_closure
     nabla = np.asarray(closure.gradient, dtype=np.float64).copy()
-    nabla_ad = np.full_like(nabla, float(thermo.nabla_ad))
+    t = np.asarray(result.final_state.temperature, dtype=np.float64)
+    nabla_ad_centres = np.asarray(thermo.nabla_ad_at(t), dtype=np.float64)
+    nabla_ad = np.zeros_like(nabla)
+    if nabla.size >= 3 and nabla_ad_centres.size >= 2:
+        # Match interface staggering used for nabla / flux (N+1 edges).
+        nabla_ad[1:-1] = 0.5 * (nabla_ad_centres[:-1] + nabla_ad_centres[1:])
+        nabla_ad[0] = nabla_ad_centres[0]
+        nabla_ad[-1] = nabla_ad_centres[-1]
+    elif nabla_ad_centres.size:
+        nabla_ad[:] = nabla_ad_centres.ravel()[0]
     delta = np.asarray(closure.superadiabaticity, dtype=np.float64).copy()
     return nabla, nabla_ad, delta
 
@@ -475,7 +509,7 @@ def _live_solve(
     t0: NDArray[np.float64],
     spec: AnalyticOpacityRCESpec,
     solver: SolverConfig,
-    thermo: ConstantH2Thermo,
+    thermo: ThermoProvider,
     max_steps: int,
     dt_accuracy: float,
     dt_hold_init: float | None,
@@ -516,7 +550,7 @@ def _reduced(
     t0: NDArray[np.float64],
     spec: AnalyticOpacityRCESpec,
     solver: SolverConfig,
-    thermo: ConstantH2Thermo,
+    thermo: ThermoProvider,
     log: Callable[[str], None] | None,
     label: str,
 ):
@@ -551,6 +585,7 @@ def run_production_rce(
     p_bottom: float = DEFAULT_P_BOTTOM,
     p_top: float = DEFAULT_P_TOP,
     seed: str = "radiative_convective",
+    x_he: float = DEFAULT_X_HE,
     procedure: str = "production",
     controls: ProductionControls | None = None,
     temperature_initial: NDArray[np.float64] | None = None,
@@ -570,12 +605,12 @@ def run_production_rce(
         p_top=p_top,
     )
     grid = spec.grid()
-    thermo = ConstantH2Thermo()
+    thermo = production_thermo(x_he)
     solver = production_solver_config()
     t0 = (
         np.asarray(temperature_initial, dtype=np.float64).copy()
         if temperature_initial is not None
-        else build_seed_temperature(spec, seed)
+        else build_seed_temperature(spec, seed, thermo=thermo)
     )
     require_topo = abs(float(f_irr)) <= 1.0e-15
     time_physical = ctrl.prescribed_dt_s is not None

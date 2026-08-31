@@ -973,7 +973,7 @@ def _write_status_report(audit: dict, n192: dict | None, n384: dict | None) -> N
         "five-check polish. Prior dt_hold_init ladder SUPERSEDED (adaptive grew\n"
         "Δt). Exact HELIOS RCB agreement is neither expected nor required; keep\n"
         "the 0.15-dex HELIOS row FAIL. User-facing runner:\n"
-        "examples/rce/run_rce.py + example_config.json "
+        "examples/rce/run_rce.py + cfg_demo.py "
         "(production discrete-RZ + five-check; frozen 1e-3 gate).\n"
     )
 

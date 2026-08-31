@@ -1,0 +1,154 @@
+
+### Welcome to HELIOS! This run has the name: stage4_coupled_n96. Enjoy the ride! ###
+
+Reading opacity file: /project/ls-heng/Bethany.Burt/convection_mlt_coupled_n96_20260825T150702Z/stage4/fixtures/helios/analytic_grey_nested.h5
+
+Using blackbody flux for the stellar irradiation.
+
+Using manual input for the planetary and orbital parameters.
+
+Starting with an isothermal TP-profile at 500 K.
+
+We are running "stage4_coupled_n96" at iteration step nr. : 0
+Layers (& surface/BOA) converged: 0 out of 97.
+
+We are running "stage4_coupled_n96" at iteration step nr. : 100
+Time for the last 100 steps [s]: 0.20
+Layers (& surface/BOA) converged: 0 out of 97.
+
+We are running "stage4_coupled_n96" at iteration step nr. : 200
+Time for the last 100 steps [s]: 0.20
+Layers (& surface/BOA) converged: 0 out of 97.
+
+We are running "stage4_coupled_n96" at iteration step nr. : 300
+Time for the last 100 steps [s]: 0.20
+Layers (& surface/BOA) converged: 0 out of 97.
+
+We are running "stage4_coupled_n96" at iteration step nr. : 400
+Time for the last 100 steps [s]: 0.20
+Layers (& surface/BOA) converged: 0 out of 97.
+
+We are running "stage4_coupled_n96" at iteration step nr. : 500
+Time for the last 100 steps [s]: 0.20
+Layers (& surface/BOA) converged: 0 out of 97.
+
+We are running "stage4_coupled_n96" at iteration step nr. : 600
+Time for the last 100 steps [s]: 0.20
+Layers (& surface/BOA) converged: 0 out of 97.
+
+We are running "stage4_coupled_n96" at iteration step nr. : 700
+Time for the last 100 steps [s]: 0.20
+Layers (& surface/BOA) converged: 0 out of 97.
+
+We are running "stage4_coupled_n96" at iteration step nr. : 800
+Time for the last 100 steps [s]: 0.20
+Layers (& surface/BOA) converged: 0 out of 97.
+
+We are running "stage4_coupled_n96" at iteration step nr. : 900
+Time for the last 100 steps [s]: 0.20
+Layers (& surface/BOA) converged: 0 out of 97.
+
+We are running "stage4_coupled_n96" at iteration step nr. : 1000
+Time for the last 100 steps [s]: 0.21
+Layers (& surface/BOA) converged: 0 out of 97.
+
+We are running "stage4_coupled_n96" at iteration step nr. : 1100
+Time for the last 100 steps [s]: 0.20
+Layers (& surface/BOA) converged: 0 out of 97.
+
+We are running "stage4_coupled_n96" at iteration step nr. : 1200
+Time for the last 100 steps [s]: 0.20
+Layers (& surface/BOA) converged: 0 out of 97.
+
+We are running "stage4_coupled_n96" at iteration step nr. : 1300
+Time for the last 100 steps [s]: 0.20
+Layers (& surface/BOA) converged: 0 out of 97.
+
+We are running "stage4_coupled_n96" at iteration step nr. : 1400
+Time for the last 100 steps [s]: 0.20
+Layers (& surface/BOA) converged: 0 out of 97.
+
+We are running "stage4_coupled_n96" at iteration step nr. : 1500
+Time for the last 100 steps [s]: 0.20
+Layers (& surface/BOA) converged: 1 out of 97.
+
+We are running "stage4_coupled_n96" at iteration step nr. : 1600
+Time for the last 100 steps [s]: 0.20
+Layers (& surface/BOA) converged: 4 out of 97.
+
+We are running "stage4_coupled_n96" at iteration step nr. : 1700
+Time for the last 100 steps [s]: 0.20
+Layers (& surface/BOA) converged: 6 out of 97.
+
+We are running "stage4_coupled_n96" at iteration step nr. : 1800
+Time for the last 100 steps [s]: 0.20
+Layers (& surface/BOA) converged: 12 out of 97.
+
+Time for radiative iteration [s]: 3.81
+Total number of iterative steps: 1848
+
+Convectively unstable layers found. Starting convective adjustment
+
+We are running "stage4_coupled_n96" at iteration step nr. : 0
+Number of radiative layers converged: 0 out of 75.
+Radiative energy imbalance in intermediate rad. layers is 3.066e+00 and should be less than 1.0e-08
+Global energy imbalance is 3.804e-01 and should be less than 1.0e-08
+
+We are running "stage4_coupled_n96" at iteration step nr. : 100
+Time for the last 100 steps [s]: 0.69
+Number of radiative layers converged: 0 out of 75.
+Global energy imbalance is 3.881e-02 and should be less than 1.0e-08
+
+We are running "stage4_coupled_n96" at iteration step nr. : 200
+Time for the last 100 steps [s]: 0.66
+Number of radiative layers converged: 0 out of 75.
+Global energy imbalance is 5.062e-03 and should be less than 1.0e-08
+
+We are running "stage4_coupled_n96" at iteration step nr. : 300
+Time for the last 100 steps [s]: 0.63
+Number of radiative layers converged: 0 out of 75.
+Global energy imbalance is 6.839e-04 and should be less than 1.0e-08
+
+We are running "stage4_coupled_n96" at iteration step nr. : 400
+Time for the last 100 steps [s]: 0.62
+Number of radiative layers converged: 0 out of 75.
+Global energy imbalance is 9.160e-05 and should be less than 1.0e-08
+
+We are running "stage4_coupled_n96" at iteration step nr. : 500
+Time for the last 100 steps [s]: 0.61
+Number of radiative layers converged: 0 out of 75.
+Global energy imbalance is 1.193e-05 and should be less than 1.0e-08
+
+We are running "stage4_coupled_n96" at iteration step nr. : 600
+Time for the last 100 steps [s]: 0.56
+Number of radiative layers converged: 0 out of 75.
+Global energy imbalance is 1.562e-06 and should be less than 1.0e-08
+
+We are running "stage4_coupled_n96" at iteration step nr. : 700
+Time for the last 100 steps [s]: 0.56
+Number of radiative layers converged: 0 out of 75.
+Global energy imbalance is 2.055e-07 and should be less than 1.0e-08
+
+We are running "stage4_coupled_n96" at iteration step nr. : 800
+Time for the last 100 steps [s]: 0.45
+Number of radiative layers converged: 0 out of 75.
+Global energy imbalance is 2.721e-08 and should be less than 1.0e-08
+
+Time for rad.-conv. iteration [s]: 4.98
+Total number of iterative steps: 843
+
+Done! Everything appears to have worked fine :-)
+
+This has been an iterative run with name stage4_coupled_n96.
+
+
+Final Check for numerical energy balance:
+  --> Theoretical effective temperature of planet: 
+	global (f=0.25): 1.16919 K, 
+	day-side (f=2/3): 1.49428 K, 
+	used in model (f=0.000): 0 K.
+  --> Incident TOA brightness temperature: 0 K 
+      Interior temperature: 269.698 K 
+      Outgoing (planetary) brightness temperature: 269.698 K
+  --> Global energy imbalance: 0.010ppm (positive: too much uptake, negative: too much loss). 
+

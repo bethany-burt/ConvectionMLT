@@ -1,0 +1,179 @@
+
+### Welcome to HELIOS! This run has the name: stage4_coupled_n96. Enjoy the ride! ###
+
+Reading opacity file: /project/ls-heng/Bethany.Burt/convection_mlt_coupled_n96_20260825T145530Z/stage4/fixtures/helios/analytic_grey_nested.h5
+
+Using blackbody flux for the stellar irradiation.
+
+Using manual input for the planetary and orbital parameters.
+
+Starting with an isothermal TP-profile at 500 K.
+
+We are running "stage4_coupled_n96" at iteration step nr. : 0
+Layers (& surface/BOA) converged: 0 out of 97.
+
+We are running "stage4_coupled_n96" at iteration step nr. : 100
+Time for the last 100 steps [s]: 0.16
+Layers (& surface/BOA) converged: 0 out of 97.
+
+We are running "stage4_coupled_n96" at iteration step nr. : 200
+Time for the last 100 steps [s]: 0.15
+Layers (& surface/BOA) converged: 0 out of 97.
+
+We are running "stage4_coupled_n96" at iteration step nr. : 300
+Time for the last 100 steps [s]: 0.14
+Layers (& surface/BOA) converged: 0 out of 97.
+
+We are running "stage4_coupled_n96" at iteration step nr. : 400
+Time for the last 100 steps [s]: 0.13
+Layers (& surface/BOA) converged: 0 out of 97.
+
+We are running "stage4_coupled_n96" at iteration step nr. : 500
+Time for the last 100 steps [s]: 0.13
+Layers (& surface/BOA) converged: 0 out of 97.
+
+We are running "stage4_coupled_n96" at iteration step nr. : 600
+Time for the last 100 steps [s]: 0.13
+Layers (& surface/BOA) converged: 0 out of 97.
+
+We are running "stage4_coupled_n96" at iteration step nr. : 700
+Time for the last 100 steps [s]: 0.13
+Layers (& surface/BOA) converged: 0 out of 97.
+
+We are running "stage4_coupled_n96" at iteration step nr. : 800
+Time for the last 100 steps [s]: 0.13
+Layers (& surface/BOA) converged: 0 out of 97.
+
+We are running "stage4_coupled_n96" at iteration step nr. : 900
+Time for the last 100 steps [s]: 0.13
+Layers (& surface/BOA) converged: 0 out of 97.
+
+We are running "stage4_coupled_n96" at iteration step nr. : 1000
+Time for the last 100 steps [s]: 0.13
+Layers (& surface/BOA) converged: 0 out of 97.
+
+We are running "stage4_coupled_n96" at iteration step nr. : 1100
+Time for the last 100 steps [s]: 0.13
+Layers (& surface/BOA) converged: 0 out of 97.
+
+We are running "stage4_coupled_n96" at iteration step nr. : 1200
+Time for the last 100 steps [s]: 0.13
+Layers (& surface/BOA) converged: 0 out of 97.
+
+We are running "stage4_coupled_n96" at iteration step nr. : 1300
+Time for the last 100 steps [s]: 0.13
+Layers (& surface/BOA) converged: 0 out of 97.
+
+We are running "stage4_coupled_n96" at iteration step nr. : 1400
+Time for the last 100 steps [s]: 0.13
+Layers (& surface/BOA) converged: 0 out of 97.
+
+We are running "stage4_coupled_n96" at iteration step nr. : 1500
+Time for the last 100 steps [s]: 0.13
+Layers (& surface/BOA) converged: 0 out of 97.
+
+We are running "stage4_coupled_n96" at iteration step nr. : 1600
+Time for the last 100 steps [s]: 0.13
+Layers (& surface/BOA) converged: 0 out of 97.
+
+We are running "stage4_coupled_n96" at iteration step nr. : 1700
+Time for the last 100 steps [s]: 0.13
+Layers (& surface/BOA) converged: 0 out of 97.
+
+We are running "stage4_coupled_n96" at iteration step nr. : 1800
+Time for the last 100 steps [s]: 0.13
+Layers (& surface/BOA) converged: 0 out of 97.
+
+We are running "stage4_coupled_n96" at iteration step nr. : 1900
+Time for the last 100 steps [s]: 0.13
+Layers (& surface/BOA) converged: 0 out of 97.
+
+We are running "stage4_coupled_n96" at iteration step nr. : 2000
+Time for the last 100 steps [s]: 0.13
+Layers (& surface/BOA) converged: 0 out of 97.
+
+We are running "stage4_coupled_n96" at iteration step nr. : 2100
+Time for the last 100 steps [s]: 0.13
+Layers (& surface/BOA) converged: 0 out of 97.
+
+We are running "stage4_coupled_n96" at iteration step nr. : 2200
+Time for the last 100 steps [s]: 0.13
+Layers (& surface/BOA) converged: 0 out of 97.
+
+We are running "stage4_coupled_n96" at iteration step nr. : 2300
+Time for the last 100 steps [s]: 0.13
+Layers (& surface/BOA) converged: 0 out of 97.
+
+We are running "stage4_coupled_n96" at iteration step nr. : 2400
+Time for the last 100 steps [s]: 0.13
+Layers (& surface/BOA) converged: 0 out of 97.
+
+We are running "stage4_coupled_n96" at iteration step nr. : 2500
+Time for the last 100 steps [s]: 0.13
+Layers (& surface/BOA) converged: 0 out of 97.
+
+We are running "stage4_coupled_n96" at iteration step nr. : 2600
+Time for the last 100 steps [s]: 0.13
+Layers (& surface/BOA) converged: 1 out of 97.
+
+We are running "stage4_coupled_n96" at iteration step nr. : 2700
+Time for the last 100 steps [s]: 0.13
+Layers (& surface/BOA) converged: 0 out of 97.
+
+We are running "stage4_coupled_n96" at iteration step nr. : 2800
+Time for the last 100 steps [s]: 0.13
+Layers (& surface/BOA) converged: 1 out of 97.
+
+We are running "stage4_coupled_n96" at iteration step nr. : 2900
+Time for the last 100 steps [s]: 0.13
+Layers (& surface/BOA) converged: 2 out of 97.
+
+We are running "stage4_coupled_n96" at iteration step nr. : 3000
+Time for the last 100 steps [s]: 0.13
+Layers (& surface/BOA) converged: 2 out of 97.
+
+We are running "stage4_coupled_n96" at iteration step nr. : 3100
+Time for the last 100 steps [s]: 0.13
+Layers (& surface/BOA) converged: 0 out of 97.
+
+We are running "stage4_coupled_n96" at iteration step nr. : 3200
+Time for the last 100 steps [s]: 0.13
+Layers (& surface/BOA) converged: 0 out of 97.
+
+We are running "stage4_coupled_n96" at iteration step nr. : 3300
+Time for the last 100 steps [s]: 0.13
+Layers (& surface/BOA) converged: 1 out of 97.
+
+We are running "stage4_coupled_n96" at iteration step nr. : 3400
+Time for the last 100 steps [s]: 0.13
+Layers (& surface/BOA) converged: 2 out of 97.
+
+We are running "stage4_coupled_n96" at iteration step nr. : 3500
+Time for the last 100 steps [s]: 0.13
+Layers (& surface/BOA) converged: 3 out of 97.
+
+We are running "stage4_coupled_n96" at iteration step nr. : 3600
+Time for the last 100 steps [s]: 0.13
+Layers (& surface/BOA) converged: 3 out of 97.
+
+We are running "stage4_coupled_n96" at iteration step nr. : 3700
+Time for the last 100 steps [s]: 0.13
+Layers (& surface/BOA) converged: 4 out of 97.
+
+We are running "stage4_coupled_n96" at iteration step nr. : 3800
+Time for the last 100 steps [s]: 0.13
+Layers (& surface/BOA) converged: 13 out of 97.
+
+Time for radiative iteration [s]: 4.98
+Total number of iterative steps: 3872
+Traceback (most recent call last):
+  File "/project/ls-heng/Bethany.Burt/HELIOS/helios.py", line 147, in <module>
+    main()
+  File "/project/ls-heng/Bethany.Burt/HELIOS/helios.py", line 145, in main
+    run_helios()
+  File "/project/ls-heng/Bethany.Burt/HELIOS/helios.py", line 87, in run_helios
+    computer.convection_loop(keeper, writer, reader, plotter)
+  File "/project/ls-heng/Bethany.Burt/HELIOS/source/computation.py", line 1009, in convection_loop
+    condition = sum(quant.conv_unstable) > 0
+                ^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: 'NoneType' object is not iterable

@@ -1,0 +1,65 @@
+{
+  "purpose": "Compact HELIOS radiation-only N=192 verification bundle. Not a coupled-RCE claim.",
+  "helios_radiation_only_parity_status": "PASS",
+  "helios_coupled_rce_status": "NOT_RUN",
+  "helios_parity_headline": false,
+  "helios_parity_headline_means": "coupled_helios_rce_parity",
+  "full_stage4_claim": false,
+  "cluster_job": "15980323",
+  "files": {
+    "exit_gate_audit.json": {
+      "bytes": 18295,
+      "sha256": "7afb3f205d8d760bec2121dc15425093cc23406d8db7c4017b11c0e90d0d9186"
+    },
+    "frozen_input_manifest.json": {
+      "bytes": 745,
+      "sha256": "036d0943074511a300f69de7b154b52023e26f6fcee44a364090f1e2e364808c"
+    },
+    "helios_frozen_rad_n192_thermal.json": {
+      "bytes": 5754,
+      "sha256": "95251b769bfce395ddf41ddf22ef20d1db8a052c0aed007e0a88b7b0c0cafb52"
+    },
+    "helios_grid_n192_thermal_reference.json": {
+      "bytes": 77527,
+      "sha256": "66289007762f527e8b031e978c09d310c73f70209cbecb9567b90ca023230cf5"
+    },
+    "helios_layer_opacity_n192_analytic.json": {
+      "bytes": 19486,
+      "sha256": "3f1a02227b2b500d7edbc96991c1ebe8f72eaf31586f76a9957c357379dfe0fc"
+    },
+    "helios_layer_opacity_n192_tagged.json": {
+      "bytes": 18836,
+      "sha256": "284926b7cd08a38d897f2acc5e02ec88aade7b93c37daa0b4687a0e79e43f814"
+    },
+    "helios_runtime_config.json": {
+      "bytes": 748,
+      "sha256": "4f629118dfbd4c3ad51ec0bf1f71546efe98697a75a8e88750cb44ef4ac4129d"
+    },
+    "helios_write_integrated_flux_b0800f9.patch": {
+      "bytes": 3259,
+      "sha256": "fe5323668e80b0698d7d55e10ec7c9126a270e981dede64570b47840763ab9c2"
+    },
+    "helios_write_integrated_flux_b0800f9.patch.json": {
+      "bytes": 396,
+      "sha256": "9ae8a0bb720703a7d689a46fe0cceeb95e4d878ce56c4a7bd8d10350c7b1e493"
+    },
+    "radiation_only_tolerances.json": {
+      "bytes": 1967,
+      "sha256": "c05a5e7548379ff2fa35d3fcd07d52a9a919681ed56d1ee5df1b3a2a31029439"
+    },
+    "slurm-helios-gated-n192-15980323.err": {
+      "bytes": 177,
+      "sha256": "237d500dc5f34749481c9264bab8cf34c21e496600049ce88edc55b77713db45"
+    },
+    "slurm-helios-gated-n192-15980323.out": {
+      "bytes": 14860,
+      "sha256": "4bddf98a3c1d0f289937f790d1676cb12547b8a0ef95b0ee50eee3a3abd43d48"
+    },
+    "stage4_frozen_n192_thermal_integrated_flux.dat": {
+      "bytes": 35434,
+      "sha256": "dac809e372aeb9fb8842af0f590ed65bec81207bf41a7655c082d4e765874140"
+    }
+  },
+  "includes_raw_flux": true,
+  "includes_slurm_logs": true
+}

@@ -1,0 +1,55 @@
+--- a/source/write.py b0800f9ea4366263241c13bb926e8ca68f266cc5
++++ b/source/write.py space-delimited-.17e
+@@ -238,29 +238,36 @@
+             with open(read.output_path + quant.name+"/" + quant.name + "_integrated_flux.dat", "w") as file:
+                 file.writelines("This file contains the integrated total and net fluxes at each interface resp. "
+                                 "layer. \nFluxes given in [erg s^-1 cm^-2].")
+-                file.writelines(
+-                    "\n{:<20}{:<24}{:<25}{:<25}{:<23}{:<25}{:<34}{:<24}{:<24}{:<12}".format(
+-                        "interface", "press.[10^-6bar]", "F_down", "F_up", "F_net", "F_dir", "delta_F_net (layer quantity)", "F_net_conv", "F_add_heat", "F_intern")
++                # space-delimited HELIOS flux writer
++                file.writelines(
++                    "\n" + " ".join(
++                        ["interface", "press.[10^-6bar]", "F_down", "F_up", "F_net", "F_dir",
++                         "delta_F_net", "F_net_conv", "F_add_heat", "F_intern"]
++                    )
+                 )
+                 for i in range(quant.ninterface):
+-                    file.writelines(
+-                        "\n{:<20g}".format(i)
+-                        + "{:<24g}".format(quant.p_int[i])
+-                        + "{:<25g}".format(quant.F_down_tot[i])
+-                        + "{:<25g}".format(quant.F_up_tot[i])
+-                        + "{:<23g}".format(quant.F_net[i])
+-                        + "{:<25g}".format(quant.F_dir_tot[i]))
+                     if quant.singlewalk == 0 and i < quant.nlayer:
+-                        file.writelines("{:<34g}".format(quant.F_net_diff[i]))
++                        delta_f_net_text = "{:.17e}".format(quant.F_net_diff[i])
+                     else:
+-                        file.writelines("{:<34}".format("not_avail."))
+-                    file.writelines("{:<24g}".format(quant.F_net_conv[i]))
++                        delta_f_net_text = "not_avail."
+                     if i < quant.nlayer:
+-                        file.writelines("{:<24g}".format(quant.F_add_heat_lay[i]))
++                        f_add_heat_text = "{:.17e}".format(quant.F_add_heat_lay[i])
+                     else:
+-                        file.writelines("{:<24}".format("not_avail."))
++                        f_add_heat_text = "not_avail."
++                    fields = [
++                        str(i),
++                        "{:.17e}".format(quant.p_int[i]),
++                        "{:.17e}".format(quant.F_down_tot[i]),
++                        "{:.17e}".format(quant.F_up_tot[i]),
++                        "{:.17e}".format(quant.F_net[i]),
++                        "{:.17e}".format(quant.F_dir_tot[i]),
++                        delta_f_net_text,
++                        "{:.17e}".format(quant.F_net_conv[i]),
++                        f_add_heat_text,
++                    ]
+                     if i == 0:
+-                        file.writelines("{:<12g}".format(quant.F_intern))
++                        fields.append("{:.17e}".format(quant.F_intern))
++                    file.writelines("\n" + " ".join(fields))
+ 
+         except TypeError:
+             print("Integrated flux-file generation corrupted. You might want to look into it!")

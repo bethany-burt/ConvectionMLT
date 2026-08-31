@@ -1,0 +1,20 @@
+Radiation scope (isothermal cell-centred source)
+--------------------------------------------------------------------
+Radiation uses a piecewise-isothermal, cell-centred source
+representation. This is a consistent finite-volume discretization
+whose adequacy is established through optical-depth-adapted grids
+and demonstrated spatial convergence. It is not equivalent at finite
+resolution to HELIOS non-isothermal within-layer source reconstruction.
+The HELIOS N=96 iso=yes vs iso=no+adj counterfactual (different CZ
+topology, ~145 K deep-T shift) warns that the radiative-convective
+transition is sensitive to within-layer source treatment on a coarse
+geometric grid; that result does not transfer directly to the nested-τ
+internal track.
+
+Stage-5 radiation source sensitivity (future requirement)
+--------------------------------------------------------------------
+Implement or construct a linear-in-optical-depth source diagnostic;
+compare it with the constant-source calculation on the same frozen
+T(P); repeat at N=96, 192 and 384; measure changes in flux, T(P), and
+RCB. Adequacy criterion: whether the two reconstructions converge as
+max Δτ decreases. If the RCB difference falls below the sp

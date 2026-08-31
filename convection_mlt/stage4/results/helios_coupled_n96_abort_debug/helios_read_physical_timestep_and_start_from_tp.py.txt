@@ -1,0 +1,21 @@
+                        quant.crit_relaxation_numbers = []
+                        i = 5
+                        while column[i] != "[two":
+                            quant.crit_relaxation_numbers.append(npy.int32(float(column[i])))
+                            i += 1
+
+                    elif column[0] == "number" and column[2] == "prerun":
+                        quant.foreplay = npy.int32(column[5])
+
+                    elif column[0] == "physical" and column[1] == "timestep":
+                        quant.physical_tstep = self.read_physical_timestep(column[4])
+
+                    elif column[2] == "runtime" and column[3] == "limit":
+                        quant.runtime_limit = npy.float64(column[6])
+
+                    elif column[2] == "start" and column[5] == "TP":
+                        quant.force_start_tp_from_file = self.__read_yes_no__(column[8])
+
+                    elif column[0] == "include" and column[1] == "additional" and column[2] == "heating":
+                        quant.add_heating = self.__read_yes_no__(column[4])
+

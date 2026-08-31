@@ -1,0 +1,44 @@
+Starting with an isothermal TP-profile at 500 K.
+Layers (& surface/BOA) converged: 0 out of 97.
+Layers (& surface/BOA) converged: 0 out of 97.
+Layers (& surface/BOA) converged: 0 out of 97.
+Layers (& surface/BOA) converged: 0 out of 97.
+Layers (& surface/BOA) converged: 0 out of 97.
+Layers (& surface/BOA) converged: 0 out of 97.
+Layers (& surface/BOA) converged: 0 out of 97.
+Layers (& surface/BOA) converged: 0 out of 97.
+Layers (& surface/BOA) converged: 0 out of 97.
+Layers (& surface/BOA) converged: 0 out of 97.
+Layers (& surface/BOA) converged: 0 out of 97.
+Layers (& surface/BOA) converged: 0 out of 97.
+Layers (& surface/BOA) converged: 0 out of 97.
+Layers (& surface/BOA) converged: 0 out of 97.
+Layers (& surface/BOA) converged: 0 out of 97.
+Layers (& surface/BOA) converged: 1 out of 97.
+Layers (& surface/BOA) converged: 4 out of 97.
+Layers (& surface/BOA) converged: 6 out of 97.
+Layers (& surface/BOA) converged: 12 out of 97.
+Total number of iterative steps: 1848
+Convectively unstable layers found. Starting convective adjustment
+Number of radiative layers converged: 0 out of 75.
+Radiative energy imbalance in intermediate rad. layers is 3.066e+00 and should be less than 1.0e-08
+Global energy imbalance is 3.804e-01 and should be less than 1.0e-08
+Number of radiative layers converged: 0 out of 75.
+Global energy imbalance is 3.881e-02 and should be less than 1.0e-08
+Number of radiative layers converged: 0 out of 75.
+Global energy imbalance is 5.062e-03 and should be less than 1.0e-08
+Number of radiative layers converged: 0 out of 75.
+Global energy imbalance is 6.839e-04 and should be less than 1.0e-08
+Number of radiative layers converged: 0 out of 75.
+Global energy imbalance is 9.160e-05 and should be less than 1.0e-08
+Number of radiative layers converged: 0 out of 75.
+Global energy imbalance is 1.193e-05 and should be less than 1.0e-08
+Number of radiative layers converged: 0 out of 75.
+Global energy imbalance is 1.562e-06 and should be less than 1.0e-08
+Number of radiative layers converged: 0 out of 75.
+Global energy imbalance is 2.055e-07 and should be less than 1.0e-08
+Number of radiative layers converged: 0 out of 75.
+Global energy imbalance is 2.721e-08 and should be less than 1.0e-08
+Total number of iterative steps: 843
+Done! Everything appears to have worked fine :-)
+  --> Global energy imbalance: 0.010ppm (positive: too much uptake, negative: too much loss). 

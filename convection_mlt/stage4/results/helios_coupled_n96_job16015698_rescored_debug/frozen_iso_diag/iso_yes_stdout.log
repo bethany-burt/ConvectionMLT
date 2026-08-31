@@ -1,0 +1,29 @@
+
+### Welcome to HELIOS! This run has the name: stage4_coupled_n96_frozen_iso_yes. Enjoy the ride! ###
+
+Reading opacity file: /project/ls-heng/Bethany.Burt/convection_mlt_coupled_n96_20260825T150702Z/stage4/fixtures/helios/analytic_grey_nested.h5
+
+Using blackbody flux for the stellar irradiation.
+
+Using manual input for the planetary and orbital parameters.
+
+Starting with chosen temperature profile.
+
+Time for radiative iteration [s]: 0.00
+Total number of iterative steps: 0
+
+Done! Everything appears to have worked fine :-)
+
+This has been a post-processing run with name stage4_coupled_n96_frozen_iso_yes.
+
+
+Final Check for numerical energy balance:
+  --> Theoretical effective temperature of planet: 
+	global (f=0.25): 1.16919 K, 
+	day-side (f=2/3): 1.49428 K, 
+	used in model (f=0.000): 0 K.
+  --> Incident TOA brightness temperature: 0 K 
+      Interior temperature: 269.698 K 
+      Outgoing (planetary) brightness temperature: 269.198 K
+  --> Global energy imbalance: 7393.190ppm (positive: too much uptake, negative: too much loss). 
+

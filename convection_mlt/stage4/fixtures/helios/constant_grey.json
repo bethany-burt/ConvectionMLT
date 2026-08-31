@@ -1,0 +1,38 @@
+{
+  "out": "/Users/burt/Desktop/USM/Exo/ConvectionMLT/convection_mlt/stage4/fixtures/helios/constant_grey.h5",
+  "checksum_sha256": "66fa42e1147dc97267ced7307b09bc901d709c88042313895d1cb95d67d3b915",
+  "kappa_si": 0.00225,
+  "flatten": "helios",
+  "metadata": {
+    "kpoints_logical_axes": [
+      "y",
+      "wavelength",
+      "pressure",
+      "temperature"
+    ],
+    "linear_index_order": "y_fastest",
+    "linear_index_formula": "y + ny*x + ny*nx*p + ny*nx*npress*t",
+    "meanmolmass_logical_axes": [
+      "pressure",
+      "temperature"
+    ],
+    "meanmolmass_linear_index_formula": "p + npress*t",
+    "rayleigh_logical_axes": [
+      "wavelength",
+      "pressure",
+      "temperature"
+    ],
+    "rayleigh_linear_index_formula": "x + nx*p + nx*npress*t",
+    "hdf5_pressure_unit": "microbar",
+    "hdf5_pressure_note": "dyne cm^-2 = microbar; must match HELIOS p_lay",
+    "schema_version": "stage4_analytic_grey_v3",
+    "helios_commit": "b0800f9ea4366263241c13bb926e8ca68f266cc5",
+    "opacity_model": "ConstantGreyOpacity",
+    "kappa_si": 0.00225,
+    "kappa_cgs": 0.0225,
+    "pressure_unit": "microbar",
+    "opacity_unit": "cm^2 g^-1",
+    "temperature_unit": "K",
+    "diagnostic": "constant_opacity_control"
+  }
+}

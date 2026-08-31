@@ -1,0 +1,38 @@
+{
+  "0.5": {
+    "physically_gated": true,
+    "flux_flatness": 5.3604450355730177e-05,
+    "primary_rcb_log10p": 5.027685864180511,
+    "convective_regions": [
+      [
+        0,
+        155
+      ]
+    ],
+    "profile_checksum_sha256": "18b555632b00fbddb9826c5ca7956cb1af41d18c8e653993a5c9728e01cf3e90"
+  },
+  "1.0": {
+    "physically_gated": true,
+    "flux_flatness": 4.710671953110553e-05,
+    "primary_rcb_log10p": 5.028265629135254,
+    "convective_regions": [
+      [
+        0,
+        155
+      ]
+    ],
+    "profile_checksum_sha256": "206d47ee95758caed6b339592d819e01cbfadfd2d4ea9eea6d836ae2bc92e771"
+  },
+  "2.0": {
+    "physically_gated": true,
+    "flux_flatness": 4.455609508890272e-05,
+    "primary_rcb_log10p": 5.029726559440198,
+    "convective_regions": [
+      [
+        0,
+        155
+      ]
+    ],
+    "profile_checksum_sha256": "7f46fcd4177dbed4dc627a13dbcae069faef38c60f00f7c9ea47ab187fed371d"
+  }
+}

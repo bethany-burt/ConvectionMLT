@@ -1,0 +1,5 @@
+{
+  "n_layers": 8,
+  "grid_checksum_sha256": "smoke_manufactured",
+  "reference_grid": "helios_geometric"
+}

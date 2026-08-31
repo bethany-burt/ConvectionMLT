@@ -1,0 +1,29 @@
+{
+  "job_id": "16015568",
+  "date": "2026-08-25",
+  "elapsed_s": 33,
+  "exit_code": 3,
+  "classification": "HELIOS_RUNTIME_BUG_ISO1",
+  "not": "physical_nonconvergence",
+  "details": {
+    "manifest": "PASS",
+    "helios_launch_gpu_infrastructure": "PASS",
+    "initialization": "stock_isothermal_500K",
+    "maximum_iterations_param": 50000,
+    "radiative_steps_completed": 3872,
+    "layers_converged_peak": "13/97",
+    "failure": "TypeError in convection_loop: sum(quant.conv_unstable) with conv_unstable=None because isothermal_layers=yes (iso==1) skips conv_check",
+    "coupled_n96_physical_benchmark": "NOT_RUN",
+    "full_stage4_claim": false
+  },
+  "follow_up": {
+    "isothermal_layers": false,
+    "frozen_T_iso_no_preflight": true,
+    "max_iterations": 50000,
+    "planck_table": "unchanged 8000 2 — do not enlarge"
+  },
+  "artifacts": {
+    "case": "/project/ls-heng/Bethany.Burt/helios_stage4_coupled_20260825T145530Z/stage4_coupled_n96",
+    "local": "convection_mlt/stage4/results/helios_coupled_n96_job16015568/"
+  }
+}

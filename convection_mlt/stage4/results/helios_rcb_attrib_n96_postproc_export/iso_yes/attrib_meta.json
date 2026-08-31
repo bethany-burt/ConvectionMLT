@@ -1,0 +1,9 @@
+{
+  "case_name": "stage4_rcb_attrib_n96_iso_yes",
+  "isothermal_layers": true,
+  "run_type": "post-processing",
+  "temperature_source": "/project/ls-heng/Bethany.Burt/convection_mlt_rcb_attrib_20260825T193038Z/stage4/results/helios_coupled_n96_job16015698_debug/iterative/final_tp.dat",
+  "purpose": "rcb_attribution_radiation_source",
+  "helios_commit": "b0800f9ea4366263241c13bb926e8ca68f266cc5",
+  "note": "Frozen final HELIOS coupled T(P); only isothermal_layers changes. Not radiation-only parity and not iterative coupled scoring."
+}

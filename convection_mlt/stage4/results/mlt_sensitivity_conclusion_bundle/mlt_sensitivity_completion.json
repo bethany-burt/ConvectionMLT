@@ -1,0 +1,222 @@
+{
+  "prescribed_dt": {
+    "status": "PASS",
+    "method": "prescribed_dt_fixed_ladder",
+    "dt_values_s": [
+      2500.0,
+      5000.0,
+      10000.0
+    ],
+    "t_final": 100000.0,
+    "arms": {
+      "10000.0": {
+        "status": "max_steps",
+        "reason": "reached t_final",
+        "simulated_time": 100000.0,
+        "steps_accepted": 10,
+        "flux_flatness": 0.11507617065991704,
+        "primary_rcb_log10p": 5.117145626419348,
+        "accepted_dt_constant": true,
+        "accepted_dt_unique": [
+          10000.0
+        ],
+        "energy_gate_ratio": 0.01574550088407636,
+        "convective_regions": [
+          [
+            0,
+            76
+          ]
+        ],
+        "record": "/Users/burt/Desktop/USM/Exo/ConvectionMLT/convection_mlt/stage4/results/mlt_sensitivity/prescribed_dt_n96_alpha1_dt10000.json"
+      },
+      "5000.0": {
+        "status": "max_steps",
+        "reason": "reached t_final",
+        "simulated_time": 100000.0,
+        "steps_accepted": 20,
+        "flux_flatness": 0.11507606278639174,
+        "primary_rcb_log10p": 5.117145664429576,
+        "accepted_dt_constant": true,
+        "accepted_dt_unique": [
+          5000.0
+        ],
+        "energy_gate_ratio": 0.013401210878241315,
+        "convective_regions": [
+          [
+            0,
+            76
+          ]
+        ],
+        "record": "/Users/burt/Desktop/USM/Exo/ConvectionMLT/convection_mlt/stage4/results/mlt_sensitivity/prescribed_dt_n96_alpha1_dt5000.json"
+      },
+      "2500.0": {
+        "status": "max_steps",
+        "reason": "reached t_final",
+        "simulated_time": 100000.0,
+        "steps_accepted": 40,
+        "flux_flatness": 0.11507600896350557,
+        "primary_rcb_log10p": 5.1171456776694715,
+        "accepted_dt_constant": true,
+        "accepted_dt_unique": [
+          2500.0
+        ],
+        "energy_gate_ratio": 0.013517997769006493,
+        "convective_regions": [
+          [
+            0,
+            76
+          ]
+        ],
+        "record": "/Users/burt/Desktop/USM/Exo/ConvectionMLT/convection_mlt/stage4/results/mlt_sensitivity/prescribed_dt_n96_alpha1_dt2500.json"
+      }
+    },
+    "equal_time_max_rel_T_vs_finest": {
+      "5000.0": 1.7017826236051706e-08,
+      "10000.0": 5.114091529177437e-08
+    },
+    "observed_temporal_order": 1.5874312145404403,
+    "errors_monotone_with_coarser_dt": true,
+    "constant_timestep_histories": true,
+    "identical_final_physical_time": true,
+    "equilibrium_independence": {
+      "2500.0": {
+        "physically_gated": true,
+        "primary_rcb_log10p": 5.117068375323815,
+        "flux_flatness": 0.0005959269497839159,
+        "topo_ok": true
+      },
+      "10000.0": {
+        "physically_gated": true,
+        "primary_rcb_log10p": 5.117067719598951,
+        "flux_flatness": 0.000588760577221971,
+        "topo_ok": true
+      }
+    },
+    "equilibrium_max_rel_T": 5.294947894200789e-07,
+    "prior_dt_hold_flaw_note": "Earlier campaign used dt_hold_init only; adaptive growth erased the held \u0394t. This phase uses RCEConfig.prescribed_dt."
+  },
+  "broad_ic": {
+    "status": "PASS",
+    "reference": "radiative_convective_gated",
+    "tolerances": {
+      "max_rel_T": 0.001,
+      "rcb_dex": 0.05
+    },
+    "cases": {
+      "radiative_convective": {
+        "physically_gated": true,
+        "topo_ok": true,
+        "max_rel_T": 0.0,
+        "rcb_dex": 0.0,
+        "energy_gate_ratio": 0.0009012608717031105,
+        "primary_rcb_log10p": 5.117068251694552,
+        "flux_flatness": 0.0009980851465752495,
+        "record": "/Users/burt/Desktop/USM/Exo/ConvectionMLT/convection_mlt/stage4/results/mlt_sensitivity/broad_ic_n96_alpha1_radiative_convective.json",
+        "pass": true,
+        "procedure": "adaptive_pseudotime"
+      },
+      "radiative_equilibrium": {
+        "physically_gated": true,
+        "topo_ok": true,
+        "max_rel_T": 0.0002516240893255823,
+        "rcb_dex": 8.045703677606042e-05,
+        "energy_gate_ratio": 0.010686933128529143,
+        "primary_rcb_log10p": 5.116987794657776,
+        "flux_flatness": 0.000999458572630374,
+        "record": "/Users/burt/Desktop/USM/Exo/ConvectionMLT/convection_mlt/stage4/results/mlt_sensitivity/broad_ic_n96_alpha1_radiative_equilibrium.json",
+        "pass": true,
+        "procedure": "discrete_rz_plus_five_check"
+      },
+      "hot_5pct_from_rc": {
+        "physically_gated": true,
+        "topo_ok": true,
+        "max_rel_T": 8.356395220454668e-05,
+        "rcb_dex": 5.031526203413961e-05,
+        "energy_gate_ratio": 0.053984513173059426,
+        "primary_rcb_log10p": 5.117017936432518,
+        "flux_flatness": 6.247173620806735e-05,
+        "record": "/Users/burt/Desktop/USM/Exo/ConvectionMLT/convection_mlt/stage4/results/mlt_sensitivity/broad_ic_n96_alpha1_hot_5pct_from_rc.json",
+        "pass": true,
+        "procedure": "discrete_rz_plus_five_check"
+      },
+      "cold_5pct_from_rc": {
+        "physically_gated": true,
+        "topo_ok": true,
+        "max_rel_T": 0.00019156226514791306,
+        "rcb_dex": 4.454078250759608e-05,
+        "energy_gate_ratio": 0.1114630888592834,
+        "primary_rcb_log10p": 5.117023710912044,
+        "flux_flatness": 0.000992808938283171,
+        "record": "/Users/burt/Desktop/USM/Exo/ConvectionMLT/convection_mlt/stage4/results/mlt_sensitivity/broad_ic_n96_alpha1_cold_5pct_from_rc.json",
+        "pass": true,
+        "procedure": "discrete_rz_plus_five_check"
+      }
+    },
+    "note": "RC seed uses adaptive pseudo-time; RE and \u00b15% use the complete discrete-RZ + five-check procedure (allowed for user-facing solver)."
+  },
+  "polish_n192": {
+    "status": "PASS",
+    "members": {
+      "0.5": {
+        "physically_gated": true,
+        "status": "converged",
+        "flux_flatness": 5.3604450355730177e-05,
+        "tendency_norm": 3.647480684776383e-07,
+        "primary_rcb_log10p": 5.027685864180511,
+        "convective_regions": [
+          [
+            0,
+            155
+          ]
+        ],
+        "detached_convective_regions": [],
+        "topo_ok": true,
+        "pre_polish_flatness": 0.001261496209432759,
+        "record": "/Users/burt/Desktop/USM/Exo/ConvectionMLT/convection_mlt/stage4/results/mlt_sensitivity/n192_polished_alpha0.5.json",
+        "integrator": "discrete_rz_t_rcb_finite_mlt_then_five_check_pseudotime",
+        "delta_nabla_rms_active": 4.623867377393112e-05
+      },
+      "1.0": {
+        "physically_gated": true,
+        "status": "converged",
+        "flux_flatness": 4.710671953110553e-05,
+        "tendency_norm": 3.990115889488758e-07,
+        "primary_rcb_log10p": 5.028265629135254,
+        "convective_regions": [
+          [
+            0,
+            155
+          ]
+        ],
+        "detached_convective_regions": [],
+        "topo_ok": true,
+        "pre_polish_flatness": 0.0011110173041388785,
+        "record": "/Users/burt/Desktop/USM/Exo/ConvectionMLT/convection_mlt/stage4/results/mlt_sensitivity/n192_polished_alpha1.0.json",
+        "integrator": "discrete_rz_t_rcb_finite_mlt_then_five_check_pseudotime",
+        "delta_nabla_rms_active": 1.8355765058223858e-05
+      },
+      "2.0": {
+        "physically_gated": true,
+        "status": "converged",
+        "flux_flatness": 4.455609508890272e-05,
+        "tendency_norm": 3.9472218759328826e-07,
+        "primary_rcb_log10p": 5.029726559440198,
+        "convective_regions": [
+          [
+            0,
+            155
+          ]
+        ],
+        "detached_convective_regions": [],
+        "topo_ok": true,
+        "pre_polish_flatness": 0.0010512585250050204,
+        "record": "/Users/burt/Desktop/USM/Exo/ConvectionMLT/convection_mlt/stage4/results/mlt_sensitivity/n192_polished_alpha2.0.json",
+        "integrator": "discrete_rz_t_rcb_finite_mlt_then_five_check_pseudotime",
+        "delta_nabla_rms_active": 7.2854181070047445e-06
+      }
+    },
+    "alpha_delta_scaling_slope": -1.3330081716825297,
+    "expected_slope": -1.3333333333333333,
+    "note": "Formal gate via five-check and/or discrete-RZ + five-check polish."
+  }
+}

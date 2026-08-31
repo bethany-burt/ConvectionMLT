@@ -1,0 +1,16 @@
+{
+  "purpose": "Checksums for coupled-HELIOS N=96 pilot inputs. Live wrappers must verify this manifest, never rebuild the opacity table.",
+  "helios_commit": "b0800f9ea4366263241c13bb926e8ca68f266cc5",
+  "opacity_table_note": "analytic_grey_nested.h5 lives on the cluster fixtures directory. checksum_sha256 in analytic_grey_nested.json is the HDF5 file digest 9505247e1104..., not the kpoints table checksum. Do not regenerate the table in a live job.",
+  "files": {
+    "coupled_rce_benchmark_tolerances.json": "f3c6ff38f950f108cd818e1d2b545cd373cd4e6289c0a1ac02cda2c24b8e5549",
+    "helios_coupled_n96_runtime_config.json": "4de9e3bacf8739508110701612381ef6f7b991498609dcf6f234d7df403a3518",
+    "helios_param_template.dat": "2f9a1d2de869d035b05eb72310df4b5dc453030466155935319741226f670fcd",
+    "beam_contract.json": "657278e9156e3d1ffa482af68815398e8d0b2e87d0cebd824af196b26526d3f2",
+    "analytic_grey_nested.json": "be529759360e58b98da296e1ba4f83f8b668be3e7983c9ae4240ebd2f59f7d0c",
+    "helios_write_integrated_flux_b0800f9.patch": "fe5323668e80b0698d7d55e10ec7c9126a270e981dede64570b47840763ab9c2",
+    "helios_write_integrated_flux_b0800f9.patch.json": "9ae8a0bb720703a7d689a46fe0cceeb95e4d878ce56c4a7bd8d10350c7b1e493",
+    "analytic_grey_nested.h5": "9505247e1104c9d11500944975a2d26b82d55c4e3c7c66f579a5a9c08334cd3c",
+    "mlt_nested_tau_n96_firr0.json": "cab84d966521438bb08ec1571dbb2e97abe2f749f34fa1b7aceadb3b0a5e1215"
+  }
+}

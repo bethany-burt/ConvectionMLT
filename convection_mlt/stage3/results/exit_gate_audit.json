@@ -1008,8 +1008,8 @@
     "jax_version": "0.11.1",
     "x64_enabled": true,
     "default_backend": "cpu",
-    "compile_time_s": 0.00022975006140768528,
-    "exec_time_s": 0.00012191699352115393
+    "compile_time_s": 0.0003059169976040721,
+    "exec_time_s": 0.00011833303142338991
   },
   "invalid_input_contracts": {
     "negative_opacity_rejected": true,
@@ -1020,7 +1020,7 @@
   },
   "stage0_2_regression": {
     "status": "PASS (verified separately)",
-    "commit": "5ab382ffd06291233a42f1628af45576e2e13821",
+    "commit": "1bc1f24371cf1fbbee4dd64634dc9f1f9646538c",
     "collected_tests": 83
   },
   "audit_summary": {
@@ -1032,9 +1032,9 @@
     "point_34_jax_parity": "PASS",
     "stage_0_2_regression": {
       "status": "PASS (verified separately)",
-      "commit": "5ab382ffd06291233a42f1628af45576e2e13821",
+      "commit": "1bc1f24371cf1fbbee4dd64634dc9f1f9646538c",
       "collected_tests": 83
     }
   },
-  "timestamp": "2026-08-19T14:57:26Z"
+  "timestamp": "2026-08-20T08:38:20Z"
 }

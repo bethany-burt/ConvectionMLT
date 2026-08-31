@@ -1,0 +1,52 @@
+{
+  "frozen_before_live": true,
+  "helios_commit": "b0800f9ea4366263241c13bb926e8ca68f266cc5",
+  "derivation": {
+    "adapter_roundoff_rel": 1e-15,
+    "opacity_interpolation_rel": 0.005278229379031692,
+    "kappa_si_cgs_rel": 3.139931900036863e-16,
+    "delta_tau_si_cgs_rel": 3.3445950472517837e-16,
+    "planck_bolometric_rel": 0.002780024016249397,
+    "closure_remainder": "configured_in_reference_not_subtracted",
+    "closure_note": "Parity reference uses HELIOS-equivalent diffusivity; D=1.66 archived as sensitivity only.",
+    "parity_diffusivity": 2.0,
+    "sensitivity_diffusivity": 1.66,
+    "helios_text_serialization_rel": 0.0001
+  },
+  "gates": {
+    "pressure_grid_rel": 1e-06,
+    "f_intern_parameter_rel": 0.0001,
+    "flux_decomposition_rel": 0.0001,
+    "rocky_surface_up_rel": 0.0001,
+    "rocky_surface_net_rel": 0.0001,
+    "toa_flux_down_rel": 0.0001,
+    "flux_up_rel": 0.005278229379031692,
+    "flux_down_rel": 0.005278229379031692,
+    "flux_net_rel": 0.005278229379031692,
+    "heating_from_flux_rel": 0.005278229379031692,
+    "reference_column_energy_identity_rel": 1e-12,
+    "helios_column_energy_closure_rel": 0.0001,
+    "column_energy_closure_rel": 1e-12
+  },
+  "comparison_order": [
+    "pressure_grid",
+    "f_intern_parameter",
+    "flux_decomposition",
+    "rocky_surface_up",
+    "rocky_surface_net",
+    "toa_flux_down",
+    "flux_up",
+    "flux_down",
+    "flux_net",
+    "heating_from_flux",
+    "reference_column_energy_identity",
+    "helios_column_energy_closure"
+  ],
+  "offline_blocking_gates": {
+    "kappa_si_cgs": 3.139931900036863e-16,
+    "delta_tau_si_cgs": 3.3445950472517837e-16,
+    "planck_bolometric": 0.002780024016249397,
+    "opacity_interpolation": 0.005278229379031692
+  },
+  "note": "Parity flux/heating gates unchanged. Text-file contracts use HELIOS %g serialization tolerances. column_energy_closure_rel is the reference reconstruction identity; helios_column_energy_closure_rel scores HELIOS."
+}

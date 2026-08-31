@@ -1,0 +1,30 @@
+{
+  "result": "NEGATIVE",
+  "solver": "live_mlt_five_mode_subspace_newton",
+  "claim": "A live-MLT Newton solve restricted to the present smooth five-mode subspace does not efficiently reach the N=384 physical gate.",
+  "does_not_claim": [
+    "these reduced degrees of freedom cannot help",
+    "live MLT has no usable Jacobian because of physical nonsmoothness"
+  ],
+  "caveat": {
+    "l2_merit": "decreased (0.05182 → 0.04948)",
+    "flux_flatness": "worsened 0.02580 → 0.02685",
+    "tendency_norm": "worsened 1.19e-4 → 2.00e-3 (tendency cap)",
+    "interpretation": "The subspace successfully optimized its stated L2 objective, but that objective was not aligned with the physical exit gates. The defensible conclusion is that this subspace/globalization combination failed."
+  },
+  "live_n384_checksum": "1e23c0a90bf8125db3a61720e8f05b5f5d7cf80680597dde9fa289b5cbf70511",
+  "live_record_unchanged": true,
+  "status": "newton_limit",
+  "reason": "inner Newton did not reach the flux-flatness gate; mask unchanged",
+  "newton_iterations": 8,
+  "direction": "subspace",
+  "gmres_used": false,
+  "mask": [[0, 312]],
+  "max_rel_T": 0.00022596997167955823,
+  "bundle": "convection_mlt/stage4/results/steady_newton_diagnostic_bundle",
+  "n96_n192_gate_invariance": "PASS",
+  "n384_physical_gate": "FAIL",
+  "coupled_helios_rce_status": "NOT_RUN",
+  "spatial_headline": "WITHHELD",
+  "next": "reduced radiative-matching solve that inverts the finite-efficiency MLT excess rather than enforcing a pure adiabat, then live-MLT five-check polish"
+}

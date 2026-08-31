@@ -1,0 +1,151 @@
+{
+  "status": "PASS",
+  "files": {
+    "coupled_rce_benchmark_tolerances.json": {
+      "status": "PASS",
+      "expected": "f3c6ff38f950f108cd818e1d2b545cd373cd4e6289c0a1ac02cda2c24b8e5549",
+      "observed": "f3c6ff38f950f108cd818e1d2b545cd373cd4e6289c0a1ac02cda2c24b8e5549",
+      "path": "/project/ls-heng/Bethany.Burt/convection_mlt_coupled_n96_20260825T135020Z/stage4/fixtures/helios/coupled_rce_benchmark_tolerances.json"
+    },
+    "helios_coupled_n96_runtime_config.json": {
+      "status": "PASS",
+      "expected": "31f0146bd964996594b113150077dbe02e7c0cd92f4e927afda683faa28c7e8f",
+      "observed": "31f0146bd964996594b113150077dbe02e7c0cd92f4e927afda683faa28c7e8f",
+      "path": "/project/ls-heng/Bethany.Burt/convection_mlt_coupled_n96_20260825T135020Z/stage4/fixtures/helios/helios_coupled_n96_runtime_config.json"
+    },
+    "helios_param_template.dat": {
+      "status": "PASS",
+      "expected": "2f9a1d2de869d035b05eb72310df4b5dc453030466155935319741226f670fcd",
+      "observed": "2f9a1d2de869d035b05eb72310df4b5dc453030466155935319741226f670fcd",
+      "path": "/project/ls-heng/Bethany.Burt/convection_mlt_coupled_n96_20260825T135020Z/stage4/fixtures/helios/helios_param_template.dat"
+    },
+    "beam_contract.json": {
+      "status": "PASS",
+      "expected": "657278e9156e3d1ffa482af68815398e8d0b2e87d0cebd824af196b26526d3f2",
+      "observed": "657278e9156e3d1ffa482af68815398e8d0b2e87d0cebd824af196b26526d3f2",
+      "path": "/project/ls-heng/Bethany.Burt/convection_mlt_coupled_n96_20260825T135020Z/stage4/fixtures/helios/beam_contract.json"
+    },
+    "analytic_grey_nested.json": {
+      "status": "PASS",
+      "expected": "be529759360e58b98da296e1ba4f83f8b668be3e7983c9ae4240ebd2f59f7d0c",
+      "observed": "be529759360e58b98da296e1ba4f83f8b668be3e7983c9ae4240ebd2f59f7d0c",
+      "path": "/project/ls-heng/Bethany.Burt/convection_mlt_coupled_n96_20260825T135020Z/stage4/fixtures/helios/analytic_grey_nested.json"
+    },
+    "helios_write_integrated_flux_b0800f9.patch": {
+      "status": "PASS",
+      "expected": "fe5323668e80b0698d7d55e10ec7c9126a270e981dede64570b47840763ab9c2",
+      "observed": "fe5323668e80b0698d7d55e10ec7c9126a270e981dede64570b47840763ab9c2",
+      "path": "/project/ls-heng/Bethany.Burt/convection_mlt_coupled_n96_20260825T135020Z/stage4/fixtures/helios/helios_write_integrated_flux_b0800f9.patch"
+    },
+    "helios_write_integrated_flux_b0800f9.patch.json": {
+      "status": "PASS",
+      "expected": "9ae8a0bb720703a7d689a46fe0cceeb95e4d878ce56c4a7bd8d10350c7b1e493",
+      "observed": "9ae8a0bb720703a7d689a46fe0cceeb95e4d878ce56c4a7bd8d10350c7b1e493",
+      "path": "/project/ls-heng/Bethany.Burt/convection_mlt_coupled_n96_20260825T135020Z/stage4/fixtures/helios/helios_write_integrated_flux_b0800f9.patch.json"
+    },
+    "analytic_grey_nested.h5": {
+      "status": "PASS",
+      "expected": "9505247e1104c9d11500944975a2d26b82d55c4e3c7c66f579a5a9c08334cd3c",
+      "observed": "9505247e1104c9d11500944975a2d26b82d55c4e3c7c66f579a5a9c08334cd3c",
+      "path": "/project/ls-heng/Bethany.Burt/convection_mlt_coupled_n96_20260825T135020Z/stage4/fixtures/helios/analytic_grey_nested.h5"
+    },
+    "mlt_nested_tau_n96_firr0.json": {
+      "status": "PASS",
+      "expected": "cab84d966521438bb08ec1571dbb2e97abe2f749f34fa1b7aceadb3b0a5e1215",
+      "observed": "cab84d966521438bb08ec1571dbb2e97abe2f749f34fa1b7aceadb3b0a5e1215",
+      "path": "/project/ls-heng/Bethany.Burt/convection_mlt_coupled_n96_20260825T135020Z/stage4/fixtures/helios/mlt_nested_tau_n96_firr0.json"
+    }
+  }
+}
+{
+  "purpose": "Declared N=96 coupled-HELIOS runtime. Not a live HELIOS result.",
+  "comparison_type": "benchmark_not_solver_identity",
+  "forcing": "F_int=300, F_irr=0",
+  "f_irr": 0.0,
+  "mlt_grid": "nested_tau",
+  "helios_commit": "b0800f9ea4366263241c13bb926e8ca68f266cc5",
+  "n_layers": 96,
+  "run_type": "iterative",
+  "convective_adjustment": "yes",
+  "kappa_nabla_ad": 0.2857142857142857,
+  "scattering": "no",
+  "direct_irradiation": "no",
+  "diffusivity_factor": 2.0,
+  "internal_flux_temperature_k": 269.6977849204774,
+  "f_int": 300.0,
+  "gravity_si": 15.0,
+  "planet_type": "rocky",
+  "precision": "double",
+  "opacity_path": "/project/ls-heng/Bethany.Burt/convection_mlt_coupled_n96_20260825T135020Z/stage4/fixtures/helios/analytic_grey_nested.h5",
+  "mlt_reference": "/project/ls-heng/Bethany.Burt/convection_mlt_coupled_n96_20260825T135020Z/stage4/fixtures/helios/mlt_nested_tau_n96_firr0.json",
+  "mlt_profile_checksum_sha256": "b5eb35083b2049ecfae3d63874867e76c2b07ef896fdea609d0fee6ae51826ca",
+  "source_status": "converged",
+  "source_rcb_log10p": 5.028032313236911,
+  "p_boa_microbar": 10000000.0,
+  "p_toa_microbar": 10.746078283213178,
+  "tolerances": "/project/ls-heng/Bethany.Burt/convection_mlt_coupled_n96_20260825T135020Z/stage4/fixtures/helios/coupled_rce_benchmark_tolerances.json",
+  "param_dat": "/project/ls-heng/Bethany.Burt/helios_stage4_coupled_20260825T135235Z/stage4_coupled_n96/param.dat",
+  "tp_seed": "/project/ls-heng/Bethany.Burt/helios_stage4_coupled_20260825T135235Z/stage4_coupled_n96/stage4_coupled_n96_tp.dat",
+  "helios_coupled_rce_status": "NOT_RUN",
+  "helios_parity_headline": false,
+  "full_stage4_claim": false,
+  "irradiated_nested_mlt": "structural_diagnostic_only"
+}
+M	source/write.py
+{"status": "patched", "helios_commit": "b0800f9ea4366263241c13bb926e8ca68f266cc5", "patch_file": "helios_write_integrated_flux_b0800f9.patch", "sha256": "fe5323668e80b0698d7d55e10ec7c9126a270e981dede64570b47840763ab9c2", "applies_to": "source/write.py write_integrated_flux", "format": "unified_diff", "purpose": "space-delimited {:.17e} integrated-flux writer after git checkout of the pinned commit"}
+
+### Welcome to HELIOS! This run has the name: stage4_coupled_n96. Enjoy the ride! ###
+
+Reading opacity file: /project/ls-heng/Bethany.Burt/convection_mlt_coupled_n96_20260825T135020Z/stage4/fixtures/helios/analytic_grey_nested.h5
+
+Using blackbody flux for the stellar irradiation.
+
+Using manual input for the planetary and orbital parameters.
+
+Starting with an isothermal TP-profile at 500 K.
+
+We are running "stage4_coupled_n96" at iteration step nr. : 0
+Layers (& surface/BOA) converged: 0 out of 97.
+
+We are running "stage4_coupled_n96" at iteration step nr. : 100
+Time for the last 100 steps [s]: 0.15
+Layers (& surface/BOA) converged: 0 out of 97.
+
+We are running "stage4_coupled_n96" at iteration step nr. : 200
+Time for the last 100 steps [s]: 0.14
+Layers (& surface/BOA) converged: 0 out of 97.
+
+We are running "stage4_coupled_n96" at iteration step nr. : 300
+Time for the last 100 steps [s]: 0.14
+Layers (& surface/BOA) converged: 0 out of 97.
+
+We are running "stage4_coupled_n96" at iteration step nr. : 400
+Time for the last 100 steps [s]: 0.13
+Layers (& surface/BOA) converged: 0 out of 97.
+
+We are running "stage4_coupled_n96" at iteration step nr. : 500
+Time for the last 100 steps [s]: 0.13
+Layers (& surface/BOA) converged: 0 out of 97.
+
+We are running "stage4_coupled_n96" at iteration step nr. : 600
+Time for the last 100 steps [s]: 0.13
+Layers (& surface/BOA) converged: 0 out of 97.
+
+We are running "stage4_coupled_n96" at iteration step nr. : 700
+Time for the last 100 steps [s]: 0.13
+Layers (& surface/BOA) converged: 0 out of 97.
+
+We are running "stage4_coupled_n96" at iteration step nr. : 800
+Time for the last 100 steps [s]: 0.13
+Layers (& surface/BOA) converged: 0 out of 97.
+
+We are running "stage4_coupled_n96" at iteration step nr. : 900
+Time for the last 100 steps [s]: 0.13
+Layers (& surface/BOA) converged: 0 out of 97.
+
+We are running "stage4_coupled_n96" at iteration step nr. : 1000
+Time for the last 100 steps [s]: 0.12
+Layers (& surface/BOA) converged: 0 out of 97.
+
+Run exceeds allowed maximum allowed number of iteration steps. Aborting...
+exported case preflight PASS {'n_layers': 96, 'T_int': 269.698, 'F_int': 300.0009569812963}

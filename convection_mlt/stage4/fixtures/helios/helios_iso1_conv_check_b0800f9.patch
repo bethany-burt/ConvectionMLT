@@ -1,0 +1,30 @@
+--- a/source/computation.py b0800f9ea4366263241c13bb926e8ca68f266cc5
++++ b/source/computation.py iso1-conv-check-minimal
+@@ -1001,12 +1001,29 @@
+             quant.T_lay = quant.dev_T_lay.get()
+             quant.p_lay = quant.dev_p_lay.get()
+             quant.p_int = quant.dev_p_int.get()
+             quant.kappa_lay = quant.dev_kappa_lay.get()
+             if quant.iso == 0:
+                 quant.kappa_int = quant.dev_kappa_int.get()
+-                hsfunc.conv_check(quant)
+-                hsfunc.mark_convective_layers(quant, stitching=0)
++            else:
++                # Minimal ISO1 fix: stock HELIOS skips conv_check when iso==1,
++                # leaving conv_unstable=None and crashing on sum(...).
++                # Constant-κ cases never allocate kappa_int under iso==1 in read.py;
++                # build interfaces from layer κ so convective adjustment can run
++                # with isothermal radiation kernels. Radiation path unchanged.
++                if quant.kappa_int is None:
++                    import numpy as np
++                    quant.kappa_int = (
++                        np.ones(quant.ninterface, dtype=quant.kappa_lay.dtype)
++                        * float(quant.kappa_lay[0])
++                    )
++            hsfunc.conv_check(quant)
++            hsfunc.mark_convective_layers(quant, stitching=0)
+ 
+             condition = sum(quant.conv_unstable) > 0
+ 
+             start_total = cuda.Event()
+             end_total = cuda.Event()

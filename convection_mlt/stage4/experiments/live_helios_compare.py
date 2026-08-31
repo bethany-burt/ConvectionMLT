@@ -89,7 +89,7 @@ def main() -> None:
 
     tp = load_tp_profile(tp_file)
     flux = load_integrated_flux(flux_file)
-    adapter = HeliosAdapter(helios_top_to_bottom=True)
+    adapter = HeliosAdapter(legacy_reverse=True)
 
     helios_t_layers = tp.temperature_k[tp.layer_index >= 0]
     helios_t_canonical = adapter.to_canonical_layers(helios_t_layers)

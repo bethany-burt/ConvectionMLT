@@ -1,0 +1,33 @@
+{
+  "frozen_before_live": true,
+  "frozen_date": "2026-08-24",
+  "comparison_type": "benchmark_not_solver_identity",
+  "helios_commit": "b0800f9ea4366263241c13bb926e8ca68f266cc5",
+  "pilot_resolution": 96,
+  "headline_resolution": 192,
+  "sequence": [
+    "freeze_this_file",
+    "n96_coupled_pilot",
+    "n192_coupled_headline_if_pilot_behaves"
+  ],
+  "blocking": {
+    "internal_spatial_must_pass": true,
+    "helios_radiation_only_must_pass": true
+  },
+  "note": "HELIOS convective adjustment and the finite mixing-length closure are different convection models. These gates score a matched-column RCE benchmark, not bit-identity of the two solvers. Frozen before any live coupled HELIOS RCE run.",
+  "gates": {
+    "toa_flux_rel": 0.05,
+    "max_rel_T": 0.10,
+    "rcb_dex": 0.15,
+    "topology_single_bottom_cz": true,
+    "no_detached_convective_regions": true,
+    "energy_closure_rel": 0.05
+  },
+  "norms": {
+    "toa_flux_rel": "|F_top - F_int| / F_int on each solver, and |F_top,HELIOS - F_top,MLT| / F_int",
+    "max_rel_T": "max |T_HELIOS - T_MLT| / max(|T_MLT|, 1 K) interpolated onto the MLT pressure centres",
+    "rcb_dex": "|log10 P_RCB,HELIOS - log10 P_RCB,MLT|",
+    "topology": "single bottom-connected convective zone; no detached convective cells",
+    "energy_closure_rel": "|F_bot - F_int| / F_int and |column energy residual| / F_int"
+  }
+}

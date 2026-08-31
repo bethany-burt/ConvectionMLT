@@ -1,0 +1,12 @@
+{
+  "n_layers": 96,
+  "alpha": 1.0,
+  "f_int": 300.0,
+  "f_irr": 0.0,
+  "max_steps": 20000,
+  "dt_accuracy": 2500.0,
+  "gate": 0.001,
+  "seed": "radiative_convective",
+  "output": "rce_result.json",
+  "notes": "Piecewise-isothermal cell-centred radiation on nested-\u03c4 grids; finite MLT. Not equivalent at finite resolution to HELIOS non-isothermal within-layer source + convective adjustment."
+}

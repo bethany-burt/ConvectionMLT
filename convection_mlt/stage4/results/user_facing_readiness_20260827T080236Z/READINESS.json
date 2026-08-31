@@ -1,0 +1,160 @@
+{
+  "purpose": "Decide whether Stage-4 MLT evidence is sufficient to build the user-facing input + run script (simple-solver demonstration).",
+  "stamped_utc": "20260827T080236Z",
+  "verdict": "READY_TO_BUILD_USER_FACING",
+  "gates_for_user_facing": {
+    "mlt_closure_local": "PASS",
+    "n96_alpha_sweep_and_delta_scaling": "PASS",
+    "prescribed_dt_ladder": "PASS",
+    "broad_ic_basin": "PASS",
+    "n192_alpha_formal_gate": "PASS",
+    "spatial_convergence_alpha1_already_shown": true,
+    "helios_exact_parity_required": false,
+    "helios_0.15dex_row": "FAIL_KEEP"
+  },
+  "success_criteria": {
+    "local_analytical_scalings": "PASS",
+    "stable_layers_zero_flux": "PASS",
+    "finite_mlt_superadiabatic_scaling": "PASS",
+    "equilibria_timestep_independent": "PASS",
+    "equilibria_ic_independent_broad": "PASS",
+    "prescribed_dt_temporal_ladder": "PASS",
+    "efficiency_reduces_superadiabaticity": "PASS",
+    "energy_flux_identities": "PASS",
+    "n192_formal_gate_alpha_0.5_1_2": "PASS",
+    "helios_exact_parity_not_required": true
+  },
+  "helios_defensible_statement": "The model solves the same class of one-dimensional radiative\u2013convective equilibrium problems as HELIOS. Its radiative kernel agrees with HELIOS to approximately 1e-5 when the pressure grid, opacity, boundaries, and piecewise-isothermal source treatment are matched. Native coupled equilibria are qualitatively comparable but not identical because HELIOS uses non-isothermal within-layer radiation and convective adjustment, whereas this solver uses a piecewise-isothermal radiation discretization and finite MLT. Keep the original 0.15-dex HELIOS RCB row marked FAIL.",
+  "prescribed_dt_headline": {
+    "status": "PASS",
+    "dt_values_s": [
+      2500.0,
+      5000.0,
+      10000.0
+    ],
+    "observed_temporal_order": 1.5874312145404403,
+    "constant_timestep_histories": true,
+    "equilibrium_max_rel_T": 5.294947894200789e-07,
+    "equal_time_max_rel_T_vs_finest": {
+      "5000.0": 1.7017826236051706e-08,
+      "10000.0": 5.114091529177437e-08
+    },
+    "note": "Equal-time arms are transient (flat~0.115) and nearly identical; gated equilibria at different prescribed \u0394t agree to ~5e-7 rel T."
+  },
+  "broad_ic_headline": {
+    "status": "PASS",
+    "cases": {
+      "radiative_convective": {
+        "physically_gated": true,
+        "flux_flatness": 0.0009980851465752495,
+        "primary_rcb_log10p": 5.117068251694552,
+        "topo_ok": true,
+        "max_rel_T": 0.0,
+        "rcb_dex": 0.0,
+        "pass": true,
+        "energy_gate_ratio": 0.0009012608717031105,
+        "procedure": "adaptive_pseudotime"
+      },
+      "radiative_equilibrium": {
+        "physically_gated": true,
+        "flux_flatness": 0.000999458572630374,
+        "primary_rcb_log10p": 5.116987794657776,
+        "topo_ok": true,
+        "max_rel_T": 0.0002516240893255823,
+        "rcb_dex": 8.045703677606042e-05,
+        "pass": true,
+        "energy_gate_ratio": 0.010686933128529143,
+        "procedure": "discrete_rz_plus_five_check"
+      },
+      "hot_5pct_from_rc": {
+        "physically_gated": true,
+        "flux_flatness": 6.247173620806735e-05,
+        "primary_rcb_log10p": 5.117017936432518,
+        "topo_ok": true,
+        "max_rel_T": 8.356395220454668e-05,
+        "rcb_dex": 5.031526203413961e-05,
+        "pass": true,
+        "energy_gate_ratio": 0.053984513173059426,
+        "procedure": "discrete_rz_plus_five_check"
+      },
+      "cold_5pct_from_rc": {
+        "physically_gated": true,
+        "flux_flatness": 0.000992808938283171,
+        "primary_rcb_log10p": 5.117023710912044,
+        "topo_ok": true,
+        "max_rel_T": 0.00019156226514791306,
+        "rcb_dex": 4.454078250759608e-05,
+        "pass": true,
+        "energy_gate_ratio": 0.1114630888592834,
+        "procedure": "discrete_rz_plus_five_check"
+      }
+    }
+  },
+  "n192_polish_headline": {
+    "status": "PASS",
+    "members": {
+      "0.5": {
+        "status": "converged",
+        "physically_gated": true,
+        "flux_flatness": 5.3604450355730177e-05,
+        "tendency_norm": 3.647480684776383e-07,
+        "primary_rcb_log10p": 5.027685864180511,
+        "topo_ok": true,
+        "convective_regions": [
+          [
+            0,
+            155
+          ]
+        ]
+      },
+      "1.0": {
+        "status": "converged",
+        "physically_gated": true,
+        "flux_flatness": 4.710671953110553e-05,
+        "tendency_norm": 3.990115889488758e-07,
+        "primary_rcb_log10p": 5.028265629135254,
+        "topo_ok": true,
+        "convective_regions": [
+          [
+            0,
+            155
+          ]
+        ]
+      },
+      "2.0": {
+        "status": "converged",
+        "physically_gated": true,
+        "flux_flatness": 4.455609508890272e-05,
+        "tendency_norm": 3.9472218759328826e-07,
+        "primary_rcb_log10p": 5.029726559440198,
+        "topo_ok": true,
+        "convective_regions": [
+          [
+            0,
+            155
+          ]
+        ]
+      }
+    }
+  },
+  "existing_scaffold": {
+    "run_script": "stage4/user/run_rce.py",
+    "example_config": "stage4/user/example_config.json",
+    "maturity": "minimal_scaffold",
+    "has": [
+      "JSON config load",
+      "nested-\u03c4 RCE solve via production adaptive path",
+      "JSON result dump",
+      "TP + flux PNG plots"
+    ],
+    "still_needed_for_user_facing": [
+      "Documented input schema (required/optional keys, units)",
+      "Stable CLI entrypoint / package module path",
+      "Gate/status summary printed clearly for non-experts",
+      "Optional polish path (discrete-RZ + five-check) as production default",
+      "Plot set matching validation narrative (\u03b1, IC, RCB markers)",
+      "Short usage example in lab/meeting materials (not necessarily markdown in-repo)"
+    ]
+  },
+  "recommendation": "Physics/numerics evidence is sufficient for the simple-solver demonstration. Build/finish the user-facing input + run script on top of stage4/user/run_rce.py; do not block on HELIOS RCB parity or further N=384 \u03b1 sweeps."
+}

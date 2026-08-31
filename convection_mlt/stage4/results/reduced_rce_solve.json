@@ -1,0 +1,92 @@
+{
+  "physical_gate": 0.001,
+  "n384_source_checksum": "1e23c0a90bf8125db3a61720e8f05b5f5d7cf80680597dde9fa289b5cbf70511",
+  "subspace_newton": "NEGATIVE",
+  "subspace_newton_record": "/Users/burt/Desktop/USM/Exo/ConvectionMLT/convection_mlt/stage4/results/subspace_newton_negative_result.json",
+  "lagged_picard_archive": "/Users/burt/Desktop/USM/Exo/ConvectionMLT/convection_mlt/stage4/results/n384_reduced_rce.json",
+  "t_rcb_live_scale_archive": "/Users/burt/Desktop/USM/Exo/ConvectionMLT/convection_mlt/stage4/results/n384_coupled_rce.json",
+  "coupled_snapshot": "/Users/burt/Desktop/USM/Exo/ConvectionMLT/convection_mlt/stage4/results/n384_discrete_rz_rce.json",
+  "flux_profiles": "/Users/burt/Desktop/USM/Exo/ConvectionMLT/convection_mlt/stage4/results/n384_discrete_rz_flux_profiles.json",
+  "reduced_config": {
+    "flux_flatness_tolerance": 0.001,
+    "tendency_tolerance": 0.001,
+    "flux_scale_floor": 1e-30,
+    "max_picard": 24,
+    "damping_init": 1.0,
+    "damping_min": 0.001,
+    "damping_cut": 0.5,
+    "max_consecutive_reject": 5,
+    "logt_shift_max": 0.02,
+    "n_logt_shifts": 9,
+    "radiation_route": "THOMAS",
+    "diffusivity_factor": null,
+    "match_rz_to_grey_re": false,
+    "rz_blend": 0.0,
+    "coupling": "consistent",
+    "max_secant": 16,
+    "t_rcb_rel_bracket": 0.03,
+    "f_top_tolerance": 0.001,
+    "max_inner_picard": 8,
+    "inner_damping": 0.5,
+    "inner_delta_atol": 1e-12,
+    "max_rcb_outer": 4,
+    "rz_mode": "discrete",
+    "max_rz_kappa_picard": 4
+  },
+  "reduced": {
+    "solver": "discrete_rz_t_rcb_finite_mlt",
+    "status": "converged",
+    "reason": "coupled T_RCB matching reached the physical gates",
+    "flux_flatness": 0.0009042279124635873,
+    "tendency_norm": 0.0008509628285942957,
+    "worst_gate": 0.9042279124635872,
+    "improved": true,
+    "n_picard": 4,
+    "n_evals": 39,
+    "n_inner_picard": 33,
+    "n_rcb_outer": 1,
+    "inner_converged": true,
+    "inner_delta_abs_mismatch": 2.2709166938531367e-08,
+    "inner_delta_rel_mismatch": 0.0009123101600811138,
+    "max_cz_mlt_flux_mismatch": 0.10068922237687161,
+    "rz_max_flux_divergence": 1.1863221516250633e-10,
+    "t_rcb": 371.85234518817845,
+    "f_top": 299.7287316264302,
+    "f_top_defect": -0.2712683735697965,
+    "f_top_before": 292.26081700719317,
+    "f_top_defect_before": -7.739182992806832,
+    "max_rel_T": 0.005529757510336567,
+    "convective_regions": [
+      [
+        0,
+        312
+      ]
+    ],
+    "min_superadiabatic_excess_active": 4.083736312707028e-06,
+    "exactly_adiabatic_cz": false,
+    "wall_time_s": 0.8465512089896947
+  },
+  "coupled_helios_rce_status": "NOT_RUN",
+  "n384_live_overwritten": true,
+  "spatial_headline": "WITHHELD",
+  "polish_initial": "reduced",
+  "n384_polish": {
+    "status": "converged",
+    "reason": "converged for 5 consecutive accepted steps",
+    "steps_accepted": 5,
+    "flux_flatness": 0.0009042133436567686,
+    "tendency_norm": 4.441790670739465e-06,
+    "primary_rcb_log10p": 5.001033159946048,
+    "convective_regions": [
+      [
+        0,
+        312
+      ]
+    ],
+    "detached_convective_regions": [],
+    "profile_checksum_sha256": "5e0bd359a7e352863c767faf5441d93968370d358a5b0270c8f6ebf293d875ec",
+    "wall_time_s": 5.312942415941507,
+    "gated": true
+  },
+  "n384_physically_gated": true
+}

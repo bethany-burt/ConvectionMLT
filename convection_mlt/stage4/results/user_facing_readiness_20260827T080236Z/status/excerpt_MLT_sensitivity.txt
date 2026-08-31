@@ -1,0 +1,11 @@
+MLT sensitivity campaign (internal track evidence)
+--------------------------------------------------------------------
+See stage4/results/mlt_sensitivity/mlt_sensitivity_summary.json and
+mlt_sensitivity_completion.json.
+Local closure PASS; N=96 α-sweep PASS with Δ∇∝α^{-4/3}; prescribed-Δt
+ladder PASS (order ~1.59, constant histories); broad IC basin PASS
+(RC / RE / ±5%); N=192 α=0.5,1,2 formally gated after discrete-RZ +
+five-check polish. Prior dt_hold_init ladder SUPERSEDED (adaptive grew
+Δt). Exact HELIOS RCB agreement is neither expected nor required; keep
+the 0.15-dex HELIOS row FAIL. User-facing scaffolding:
+stage4/user/run_rce.py + example_config.json.

@@ -1,0 +1,52 @@
+{
+  "out": "/Users/burt/Desktop/USM/Exo/ConvectionMLT/convection_mlt/stage4/fixtures/helios/analytic_grey_nested.h5",
+  "checksum_sha256": "bf4826e7889d9bad68f5ff7f6decf78290a39fa7b955d9c63af5bf08eedf35b9",
+  "schema_version": "stage4_analytic_grey_v3",
+  "kpoints_flatten": "helios",
+  "layers_used_for_hull": [
+    96,
+    192
+  ],
+  "temperature_range_K": [
+    236.3875672945915,
+    775.2466310171145
+  ],
+  "pressure_range_bar": [
+    5.373039141606589e-06,
+    19.958664634901364
+  ],
+  "metadata": {
+    "kpoints_logical_axes": [
+      "y",
+      "wavelength",
+      "pressure",
+      "temperature"
+    ],
+    "linear_index_order": "y_fastest",
+    "linear_index_formula": "y + ny*x + ny*nx*p + ny*nx*npress*t",
+    "meanmolmass_logical_axes": [
+      "pressure",
+      "temperature"
+    ],
+    "meanmolmass_linear_index_formula": "p + npress*t",
+    "rayleigh_logical_axes": [
+      "wavelength",
+      "pressure",
+      "temperature"
+    ],
+    "rayleigh_linear_index_formula": "x + nx*p + nx*npress*t",
+    "hdf5_pressure_unit": "microbar",
+    "hdf5_pressure_note": "dyne cm^-2 = microbar; must match HELIOS p_lay",
+    "schema_version": "stage4_analytic_grey_v3",
+    "helios_commit": "b0800f9ea4366263241c13bb926e8ca68f266cc5",
+    "opacity_model": "AnalyticGreyOpacity",
+    "kappa0_si": 0.00225,
+    "P0_Pa": 1000000.0,
+    "T0_K": 1.0,
+    "a": 0.5,
+    "b": 0.0,
+    "pressure_unit": "microbar",
+    "opacity_unit": "cm^2 g^-1",
+    "temperature_unit": "K"
+  }
+}

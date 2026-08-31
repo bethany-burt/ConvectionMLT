@@ -1,0 +1,274 @@
+{
+  "job_id_pilot": "16015698",
+  "helios_tp": "stage4/results/helios_coupled_n96_job16015698_debug/iterative/final_tp.dat",
+  "helios_iterative_flux": "stage4/results/helios_coupled_n96_job16015698_debug/iterative/final_integrated_flux.dat",
+  "radiation_source": {
+    "gate_rel": 0.005278229379031692,
+    "pairs": {
+      "stage3_vs_iso_yes": {
+        "flux_up_rel": 9.030087217352301e-06,
+        "flux_down_rel": 9.030087217106675e-06,
+        "flux_net_rel": 9.529868009925923e-06,
+        "agree_at_gate": true
+      },
+      "stage3_vs_iso_no": {
+        "flux_up_rel": 0.06806735955961996,
+        "flux_down_rel": 0.07275017450203841,
+        "flux_net_rel": 0.13166126371552417,
+        "agree_at_gate": false
+      },
+      "iso_yes_vs_iso_no": {
+        "flux_up_rel": 0.0680757218027208,
+        "flux_down_rel": 0.07274181225893755,
+        "flux_net_rel": 0.13166059587140785,
+        "agree_at_gate": false
+      }
+    },
+    "stage3_approx_helios_iso_yes": true,
+    "interpretation": "If Stage-3\u2248HELIOS iso=yes and both disagree with iso=no, the radiation discrepancy is HELIOS non-isothermal within-layer source treatment.",
+    "stage3_column": {
+      "f_up_boa": 14811.043247836697,
+      "f_down_boa": 13641.818546640645,
+      "f_net_boa": 1169.2247011960517,
+      "f_net_toa": 300.19691511914334
+    },
+    "available_fields": [
+      "helios_iterative_iso_no",
+      "iso_no",
+      "iso_yes",
+      "stage3"
+    ],
+    "pending_helios_postproc": [],
+    "radiation_source_rcb_shift": "NOT_YET_QUANTIFIED"
+  },
+  "frozen_profile_gradient_diagnostics": {
+    "stage3": {
+      "actual_radiative_flux_gradient_diagnostic": {
+        "label": "actual_radiative_flux_gradient_diagnostic",
+        "bottom_crossing_log10p": 5.34375,
+        "n_layers_above_nabla_ad": 11,
+        "n_bottom_connected": 11,
+        "nabla_ad": 0.2857142857142857,
+        "max_gradient": 2.240895090239156,
+        "note": "Frozen-profile gradient diagnostic only. Not a predicted RCB and not a counterfactual without convection."
+      },
+      "required_total_flux_gradient_diagnostic": {
+        "label": "required_total_flux_gradient_diagnostic",
+        "bottom_crossing_log10p": 5.65625,
+        "n_layers_above_nabla_ad": 6,
+        "n_bottom_connected": 6,
+        "nabla_ad": 0.2857142857142857,
+        "max_gradient": 0.3701478730824785,
+        "note": "Frozen-profile gradient diagnostic only. Not a predicted RCB and not a counterfactual without convection."
+      },
+      "interpretation": "actual_* uses that column's F_rad (final flux partition; not a counterfactual without convection). required_* uses F_int on the shared T (identical across fields when T,\u03ba match; structure only)."
+    },
+    "helios_iterative_iso_no": {
+      "actual_radiative_flux_gradient_diagnostic": {
+        "label": "actual_radiative_flux_gradient_diagnostic",
+        "bottom_crossing_log10p": null,
+        "n_layers_above_nabla_ad": 0,
+        "n_bottom_connected": 0,
+        "nabla_ad": 0.2857142857142857,
+        "max_gradient": 0.1438190316792202,
+        "note": "Frozen-profile gradient diagnostic only. Not a predicted RCB and not a counterfactual without convection."
+      },
+      "required_total_flux_gradient_diagnostic": {
+        "label": "required_total_flux_gradient_diagnostic",
+        "bottom_crossing_log10p": 5.65625,
+        "n_layers_above_nabla_ad": 6,
+        "n_bottom_connected": 6,
+        "nabla_ad": 0.2857142857142857,
+        "max_gradient": 0.3701478730824785,
+        "note": "Frozen-profile gradient diagnostic only. Not a predicted RCB and not a counterfactual without convection."
+      },
+      "interpretation": "actual_* uses that column's F_rad (final flux partition; not a counterfactual without convection). required_* uses F_int on the shared T (identical across fields when T,\u03ba match; structure only)."
+    },
+    "iso_yes": {
+      "actual_radiative_flux_gradient_diagnostic": {
+        "label": "actual_radiative_flux_gradient_diagnostic",
+        "bottom_crossing_log10p": 5.34375,
+        "n_layers_above_nabla_ad": 11,
+        "n_bottom_connected": 11,
+        "nabla_ad": 0.2857142857142857,
+        "max_gradient": 2.240972007204966,
+        "note": "Frozen-profile gradient diagnostic only. Not a predicted RCB and not a counterfactual without convection."
+      },
+      "required_total_flux_gradient_diagnostic": {
+        "label": "required_total_flux_gradient_diagnostic",
+        "bottom_crossing_log10p": 5.65625,
+        "n_layers_above_nabla_ad": 6,
+        "n_bottom_connected": 6,
+        "nabla_ad": 0.2857142857142857,
+        "max_gradient": 0.3701478730824785,
+        "note": "Frozen-profile gradient diagnostic only. Not a predicted RCB and not a counterfactual without convection."
+      },
+      "interpretation": "actual_* uses that column's F_rad (final flux partition; not a counterfactual without convection). required_* uses F_int on the shared T (identical across fields when T,\u03ba match; structure only)."
+    },
+    "iso_no": {
+      "actual_radiative_flux_gradient_diagnostic": {
+        "label": "actual_radiative_flux_gradient_diagnostic",
+        "bottom_crossing_log10p": null,
+        "n_layers_above_nabla_ad": 0,
+        "n_bottom_connected": 0,
+        "nabla_ad": 0.2857142857142857,
+        "max_gradient": 0.14381626026210184,
+        "note": "Frozen-profile gradient diagnostic only. Not a predicted RCB and not a counterfactual without convection."
+      },
+      "required_total_flux_gradient_diagnostic": {
+        "label": "required_total_flux_gradient_diagnostic",
+        "bottom_crossing_log10p": 5.65625,
+        "n_layers_above_nabla_ad": 6,
+        "n_bottom_connected": 6,
+        "nabla_ad": 0.2857142857142857,
+        "max_gradient": 0.3701478730824785,
+        "note": "Frozen-profile gradient diagnostic only. Not a predicted RCB and not a counterfactual without convection."
+      },
+      "interpretation": "actual_* uses that column's F_rad (final flux partition; not a counterfactual without convection). required_* uses F_int on the shared T (identical across fields when T,\u03ba match; structure only)."
+    }
+  },
+  "convection_closure": {
+    "finite_mlt": {
+      "purpose": "finite_mlt_nested_tau_reference",
+      "n_layers": 96,
+      "record_rcb_log10p": 5.028032313236911,
+      "recomputed_rcb_log10p": 5.0280323132371745,
+      "alpha": 1.0,
+      "f_int": 300.0,
+      "f_irr": 0.0
+    },
+    "exact_adjustment": {
+      "purpose": "exact_convective_adjustment_nested_tau_stage3",
+      "status": "COMPLETE",
+      "n_layers": 96,
+      "f_int": 300.0,
+      "f_irr": 0.0,
+      "diffusivity_factor": 2.0,
+      "lower_bc": "LowerNetInternalFlux with F_conv(0) from LowerTemperature free solve",
+      "instability_criterion": "temperature_lapse_gt_nabla_ad",
+      "iterations": 2,
+      "history_tail": [
+        {
+          "iter": 0,
+          "n_cz": 77,
+          "adjusted": true,
+          "max_abs_dT": 94.3594003641565,
+          "f_rad_boa": 68.97811247787831,
+          "f_conv_boa": 231.0218875221217,
+          "f_rad_toa": 299.9989259666341,
+          "toa_flux_rel": 3.5801112197001807e-06
+        },
+        {
+          "iter": 1,
+          "n_cz": 77,
+          "adjusted": false,
+          "max_abs_dT": 0.0,
+          "f_rad_boa": 68.97811247787831,
+          "f_conv_boa": 231.0218875221217,
+          "f_rad_toa": 299.9989259666341,
+          "toa_flux_rel": 3.5801112197001807e-06
+        }
+      ],
+      "gates": {
+        "adjusted_at_least_once": true,
+        "no_remaining_superadiabatic": true,
+        "single_bottom_connected_cz": true,
+        "toa_flux_rel_le_gate": true,
+        "boa_f_conv_nonnegative": true
+      },
+      "flux_gate_rel": 0.001,
+      "toa_flux_rel": 3.5801112197001807e-06,
+      "rz_flux_rel": 0.04142167087377099,
+      "f_rad_boa": 68.97811247787831,
+      "f_conv_boa": 231.0218875221217,
+      "f_rad_toa": 299.9989259666341,
+      "rcb_log10p": 5.149256115152421,
+      "near_adiabat": {
+        "rcb_log10p": 5.149256115152421,
+        "n_near_adiabatic_interfaces": 77,
+        "n_bottom_connected_cz_layers": 77,
+        "max_lapse": 0.28571428571437957,
+        "mean_lapse_in_cz": 0.2857142857142854
+      },
+      "dex_vs_mlt_ref": 0.12122380191551052,
+      "note": "One-shot exact-adiabat adjustment from grey RE using temperature-lapse Schwarzschild (not the frozen F_rad \u2207 diagnostic). Stage-3 operator; nested-\u03c4; TOA/BOA flux gates. RZ is not fully re-equilibrated (rz_flux_rel=0.04142167087377099). Indicative closure \u0394RCB vs finite MLT only; do not treat as a linear share of the HELIOS pilot 0.309-dex gap. An earlier 0.121-dex claim from an unadjusted profile was invalid; this COMPLETE run yields the same join RCB after a real adjustment."
+    },
+    "rcb_dex_mlt_vs_exact_adj": 0.12122380191551052,
+    "indicative_only": true,
+    "prior_invalid_unadjusted_0p121_claim": "withdrawn"
+  },
+  "resolution": {
+    "n96": {
+      "rcb_log10p": 4.7187499048239445,
+      "source": "helios_coupled_n96 job 16015698 lapse flags"
+    },
+    "n192": {
+      "rcb_log10p": 4.737679161708228,
+      "status": "COMPLETE",
+      "rcb_dex_vs_n96": 0.018929256884283596,
+      "n_cz_layers": 41,
+      "job_id": "16018512",
+      "note": "Labelled resolution test; not headline."
+    }
+  },
+  "helios_parity_headline": false,
+  "full_stage4_claim": false,
+  "attribution_table": {
+    "mlt_reference_rcb_log10p": 5.028032313236911,
+    "helios_n96_pilot_rcb_log10p": 4.7187499048239445,
+    "pilot_dex": 0.30928240841296617,
+    "rows": [
+      {
+        "test": "HELIOS iso=yes vs iso=no",
+        "isolates": "Layer-source treatment",
+        "metric": "flux_net_rel (radiation field mismatch)",
+        "value": {
+          "flux_net_rel": 0.13166059587140785,
+          "note": "Source treatments produce substantially different F_rad partitions on the same T(P). Capable of affecting coupled RCB; frozen-profile \u2207 diagnostics do not quantify an RCB displacement."
+        },
+        "status": "COMPLETE"
+      },
+      {
+        "test": "Stage-3 vs HELIOS iso=yes",
+        "isolates": "Remaining radiation implementation",
+        "metric": "agree_at_opacity_gate",
+        "value": {
+          "agree": true,
+          "flux_net_rel": 9.529868009925923e-06
+        },
+        "status": "COMPLETE"
+      },
+      {
+        "test": "Finite MLT vs exact adjustment",
+        "isolates": "Convection closure",
+        "metric": "\u0394RCB dex on nested-\u03c4 + Stage-3 (valid equilibria only)",
+        "value": {
+          "mlt_rcb": 5.028032313236911,
+          "exact_adj_status": "COMPLETE",
+          "exact_adj_rcb": 5.149256115152421,
+          "rcb_dex": 0.12122380191551052,
+          "rz_flux_rel": 0.04142167087377099,
+          "indicative_only": true,
+          "note": "\u0394RCB is indicative of closure on nested-\u03c4 with Stage-3. Do not divide by the 0.309-dex HELIOS pilot gap (nonlinear)."
+        },
+        "status": "COMPLETE"
+      },
+      {
+        "test": "HELIOS N=96 vs N=192",
+        "isolates": "HELIOS grid resolution",
+        "metric": "\u0394RCB dex (HELIOS lapse flags)",
+        "value": {
+          "n96_rcb": 4.7187499048239445,
+          "n192_rcb": 4.737679161708228,
+          "rcb_dex": 0.018929256884283596
+        },
+        "status": "COMPLETE"
+      }
+    ],
+    "frozen_profile_gradient_diagnostics_present": true,
+    "helios_parity_headline": false,
+    "full_stage4_claim": false,
+    "defensible_conclusion": "HELIOS non-isothermal source treatment is definitively responsible for the radiation-field mismatch. Exact-adjustment vs finite-MLT gives an indicative nested-\u03c4 closure \u0394RCB; HELIOS N=96\u2192N=192 moves RCB by only ~0.019 dex. Radiation-source contribution to the coupled RCB shift is not yet separately quantified. Effects need not add linearly.",
+    "note": "Do not interpret actual_radiative_flux_gradient_diagnostic or required_total_flux_gradient_diagnostic as predicted RCBs."
+  }
+}

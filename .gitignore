@@ -57,3 +57,4 @@ Background/
 # User-facing example run outputs (keep directory via .gitkeep)
 convection_mlt/examples/rce/runs/*
 !convection_mlt/examples/rce/runs/.gitkeep
+convection_mlt/external/HELIOS/

@@ -3,14 +3,18 @@
   "helios_config": {
     "case": "stage4_orientation_fixture",
     "convection": 0,
-    "lower_bc": "flux",
-    "top_irradiation": "enabled"
+    "lower_bc": "LowerNetInternalFlux",
+    "top_irradiation": "disabled_for_n96a",
+    "post_processing": true
   },
   "units": {
     "temperature": "K",
-    "pressure": "microbar",
-    "flux": "erg s^-1 cm^-2"
+    "tp_pressure": "microbar",
+    "hdf5_pressure": "microbar",
+    "flux": "erg s^-1 cm^-2",
+    "opacity": "cm^2 g^-1",
+    "gravity": "cm s^-2"
   },
-  "orientation": "helios_top_to_bottom",
-  "checksum_sha256": "pending_generated_by_test"
+  "orientation": "helios_bottom_first_same_as_canonical",
+  "checksum_sha256": "d87bbef52572939b28a16347d72352113ca63edbf738a97d0e3d12e71236b3d0"
 }

@@ -1,0 +1,16 @@
+{
+  "purpose": "labelled_helios_n192_resolution_rcb",
+  "n_layers": 192,
+  "helios_process_returncode": 0,
+  "helios_tp": "/project/ls-heng/Bethany.Burt/helios_stage4_rcb_attrib/stage4_coupled_n192_resolution/stage4_coupled_n192/stage4_coupled_n192_tp.dat",
+  "helios_flux": "/project/ls-heng/Bethany.Burt/helios_stage4_rcb_attrib/stage4_coupled_n192_resolution/stage4_coupled_n192/stage4_coupled_n192_integrated_flux.dat",
+  "labelled_resolution_test": true,
+  "helios_parity_headline": false,
+  "full_stage4_claim": false,
+  "status": "COMPLETE",
+  "rcb_log10p": 4.737679161708228,
+  "n_cz_layers": 41,
+  "n96_rcb_log10p": 4.7187499048239445,
+  "rcb_dex_vs_n96": 0.018929256884283596,
+  "toward_mlt_1p07bar": true
+}
